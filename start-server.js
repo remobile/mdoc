@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 require('babel-register')({
     babelrc: false,
     only: [__dirname, process.cwd() + '/lib'],
