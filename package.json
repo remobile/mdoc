@@ -5,6 +5,10 @@
     "mdoc-build": "./build-files.js"
   },
   "dependencies": {
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-register": "^6.24.1",
+    "babel-traverse": "^6.25.0",
     "classnames": "^2.2.5",
     "color": "^2.0.1",
     "commander": "^2.11.0",
@@ -19,11 +23,7 @@
   },
   "description": "Markdown doc web site",
   "devDependencies": {
-    "prettier": "^1.9.1",
-    "babel-preset-env": "^1.6.0",
-    "babel-preset-react": "^6.24.1",
-    "babel-register": "^6.24.1",
-    "babel-traverse": "^6.25.0"
+    "prettier": "^1.9.1"
   },
   "keywords": [
     "documentation",
