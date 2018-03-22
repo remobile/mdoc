@@ -6,9 +6,9 @@ function execute(port) {
     const os = require('os');
     const path = require('path');
     const color = require('color');
+    const chalk = require('chalk');
     const mkdirp = require('mkdirp');
     const CWD = process.cwd() + '/';
-    const ROOT_PATH = 'root/';
 
     // remove a module and child modules from require cache, so server does not have
     // to be restarted
@@ -31,7 +31,7 @@ function execute(port) {
         });
     }
     function getDocumentPath(file) {
-        return CWD + ROOT_PATH + file;
+        return CWD + (config.documentPath || 'doc').replace(/\/$/, '') + '/' + file;
     }
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + 'config.js');
@@ -74,7 +74,7 @@ function execute(port) {
 
         // 设置 homePage
         if (!homePage) {
-            console.error('必须设置homePage');
+            console.error(chalk.red('必须设置homePage'));
             process.exit(0);
         }
         config.homePage.id = 'index';
@@ -114,6 +114,7 @@ function execute(port) {
         removeModuleAndChildrenFromCache('../lib/DocsLayout.js');
         const DocsLayout = require('../lib/DocsLayout.js');
         const file =  getDocumentPath(page.current.path);
+        console.log('render file: ', file);
         if (!fs.existsSync(file)) {
             removeModuleAndChildrenFromCache('../lib/ErrorPage.js');
             const ErrorPage = require('../lib/ErrorPage.js');
@@ -195,7 +196,7 @@ function execute(port) {
 
     const config = reloadSiteConfig();
     if (!config.colors || !config.colors.primaryColor || !config.colors.secondaryColor) {
-        console.error('缺少颜色配置');
+        console.error(chalk.red('缺少颜色配置'));
         process.exit(0);
     }
     const app = express();

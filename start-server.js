@@ -1,27 +1,22 @@
 #!/usr/bin/env node
 
-require('babel-register')({
-    babelrc: false,
-    only: [__dirname, process.cwd() + '/lib'],
-    presets: ['react'],
-});
-
-// For verifying port usage
 const tcpPortUsed = require('tcp-port-used');
-
-// initial check that required files are present
+const program = require('commander');
 const chalk = require('chalk');
 const fs = require('fs');
-const CWD = process.cwd();
+const CWD = process.cwd() + '/';
 
-if (!fs.existsSync(CWD + '/config.js')) {
-    console.error(
-        chalk.red('Error: No config.js file found in website folder!')
-    );
+if (!fs.existsSync(CWD + 'config.js')) {
+    console.error(chalk.red('Error: 缺少配置文件'));
     process.exit(1);
 }
+const config = require(CWD + 'config.js');
 
-const program = require('commander');
+require('babel-register')({
+    babelrc: false,
+    only: config.footer ? [__dirname, CWD + config.footer] : [__dirname],
+    presets: ['react'],
+});
 
 program.option('--port <number>', 'Specify port number').parse(process.argv);
 
@@ -35,7 +30,6 @@ tcpPortUsed
         process.exit(1);
     } else {
         console.log('Starting mdoc server on port ' + port + '...');
-        // start local server on specified port
         const server = require('./server/server.js');
         server(port);
     }
