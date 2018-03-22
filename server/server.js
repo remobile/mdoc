@@ -36,7 +36,8 @@ function execute(port) {
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + 'config.js');
         const config = require(CWD + 'config.js');
-        const { highlight, menus } = config;
+        !config.menus && ( config.menus = [] );
+        const { highlight, homePage, menus } = config;
 
         // 设置 baseUrl
         config.baseUrl = `/${config.projectName}/`;
@@ -71,7 +72,11 @@ function execute(port) {
             }
         }
 
-        // 为homePage添加id
+        // 设置 homePage
+        if (!homePage) {
+            console.error('必须设置homePage');
+            process.exit(0);
+        }
         config.homePage.id = 'index';
 
         return config;

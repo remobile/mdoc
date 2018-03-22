@@ -34,7 +34,7 @@ tcpPortUsed
         console.error(chalk.red('Port ' + port + ' is in use'));
         process.exit(1);
     } else {
-        console.log('Starting Docusaurus server on port ' + port + '...');
+        console.log('Starting mdoc server on port ' + port + '...');
         // start local server on specified port
         const server = require('./server/server.js');
         server(port);
