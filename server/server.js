@@ -148,13 +148,8 @@ function execute(port) {
                 )
             );
         } else if (extension === '.js') {
-            const tempDir = __dirname + '/temp/';
-            const tempFile = tempDir + page.current.path;
-            mkdirp.sync(path.dirname(tempFile));
-            fs.copySync(file, tempFile);
-
-            removeModuleAndChildrenFromCache(tempFile);
-            const ReactComp = require(tempFile);
+            removeModuleAndChildrenFromCache(file);
+            const ReactComp = require(file);
             res.send(
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
@@ -162,7 +157,6 @@ function execute(port) {
                     </DocsLayout>
                 )
             );
-            fs.removeSync(tempDir);
         } else if (extension === '.pdf') {
             res.send(
                 renderToStaticMarkup(

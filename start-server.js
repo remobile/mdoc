@@ -10,11 +10,9 @@ if (!fs.existsSync(CWD + 'config.js')) {
     console.error(chalk.red('Error: 缺少配置文件'));
     process.exit(1);
 }
-const config = require(CWD + 'config.js');
 
 require('babel-register')({
     babelrc: false,
-    only: config.footer ? [__dirname, CWD + config.footer] : [__dirname],
     presets: ['react'],
 });
 
