@@ -6,9 +6,9 @@ var katex = require('katex');
 // Assumes that there is a "$" at state.src[pos]
 function isValidDelim(state, pos) {
     var prevChar, nextChar,
-        max = state.posMax,
-        can_open = true,
-        can_close = true;
+    max = state.posMax,
+    can_open = true,
+    can_close = true;
 
     prevChar = pos > 0 ? state.src.charCodeAt(pos - 1) : -1;
     nextChar = pos + 1 <= max ? state.src.charCodeAt(pos + 1) : -1;
@@ -16,7 +16,7 @@ function isValidDelim(state, pos) {
     // Check non-whitespace conditions for opening and closing, and
     // check that closing delimeter isn't followed by a number
     if (prevChar === 0x20/* " " */ || prevChar === 0x09/* \t */ ||
-            (nextChar >= 0x30/* "0" */ && nextChar <= 0x39/* "9" */)) {
+    (nextChar >= 0x30/* "0" */ && nextChar <= 0x39/* "9" */)) {
         can_close = false;
     }
     if (nextChar === 0x20/* " " */ || nextChar === 0x09/* \t */) {
@@ -92,8 +92,8 @@ function katex_inline(state, silent) {
 
 function katex_block(state, start, end, silent){
     var firstLine, lastLine, next, lastPos, found = false, token,
-        pos = state.bMarks[start] + state.tShift[start],
-        max = state.eMarks[start]
+    pos = state.bMarks[start] + state.tShift[start],
+    max = state.eMarks[start]
 
     if(pos + 2 > max){ return false; }
     if(state.src.slice(pos,pos+2)!=='$$'){ return false; }
