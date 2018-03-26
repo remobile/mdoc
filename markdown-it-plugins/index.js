@@ -6,6 +6,9 @@ var emoji = require('markdown-it-emoji');
 var footnote = require('markdown-it-footnote');
 var tasklists = require('markdown-it-task-lists');
 
+function disable_plugin(md) {
+    md.block.ruler.disable('code');
+}
 function anchors_plugin(md) {
     md.use(anchors);
 }
@@ -23,6 +26,7 @@ function tasklists_plugin(md) {
 }
 
 module.exports = [
+    disable_plugin,
     anchors_plugin,
     katex_plugin,
     emoji_plugin,
