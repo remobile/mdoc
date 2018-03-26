@@ -2,7 +2,6 @@
 
 var anchors = require('./anchors');
 var katex = require('./katex');
-var text = require('./text');
 var emoji = require('markdown-it-emoji');
 var footnote = require('markdown-it-footnote');
 var tasklists = require('markdown-it-task-lists');
@@ -12,7 +11,7 @@ var HTML_REPLACEMENTS = {
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
-    ' ': '&nbsp;',
+    ' ': '&ensp;',
     '\n': '</br>',
 };
 
@@ -46,20 +45,16 @@ function tasklists_plugin(md) {
 }
 function rewrite_plugin(md) {
     md.renderer.rules.text = function (tokens, idx /*, options, env */) {
-    console.log('----------', tokens[idx].content);
-        var x = escapeHtml(tokens[idx].content);
-        console.log('----------]', x);
-        return x;
+        return escapeHtml(tokens[idx].content);;
     };
 }
 
 module.exports = [
     disable_plugin,
     anchors_plugin,
-    // katex_plugin,
-    // // text_plugin,
-    // emoji_plugin,
-    // footnote_plugin,
-    // tasklists_plugin,
+    katex_plugin,
+    emoji_plugin,
+    footnote_plugin,
+    tasklists_plugin,
     rewrite_plugin,
 ];
