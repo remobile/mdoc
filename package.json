@@ -4,8 +4,7 @@
   "description": "Markdown doc web site",
   "main": "index.js",
   "bin": {
-    "mdoc-start": "./start-server.js",
-    "mdoc-build": "./build-files.js"
+    "mdoc": "./mdoc.js"
   },
   "dependencies": {
     "babel-preset-env": "^1.6.0",
@@ -25,8 +24,7 @@
     "markdown-it": "^8.4.1",
     "markdown-it-emoji": "^1.4.0",
     "markdown-it-footnote": "^3.0.1",
-    "markdown-it-task-lists": "^2.1.1",
-    "tcp-port-used": "^0.1.2"
+    "markdown-it-task-lists": "^2.1.1"
   },
   "devDependencies": {
     "prettier": "^1.9.1"

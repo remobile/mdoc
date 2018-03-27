@@ -1,13 +1,14 @@
-function execute(port) {
-    const express = require('express');
+function buildProject(port) {
     const React = require('react');
     const renderToStaticMarkup = require('react-dom/server').renderToStaticMarkup;
     const fs = require('fs-extra');
-    const os = require('os');
+    const glob = require('glob');
     const path = require('path');
     const color = require('color');
     const chalk = require('chalk');
     const mkdirp = require('mkdirp');
+    const DocsLayout = require('../lib/DocsLayout.js');
+    const ErrorPage = require('../lib/ErrorPage.js');
     const CWD = process.cwd() + '/';
 
     // remove a module and child modules from require cache, so server does not have
@@ -38,7 +39,6 @@ function execute(port) {
         const config = require(CWD + 'config.js');
         !config.menus && ( config.menus = [] );
         const { highlight, homePage, menus } = config;
-
         // 设置 baseUrl
         config.baseUrl = `/${config.projectName}/`;
 
@@ -81,44 +81,20 @@ function execute(port) {
 
         return config;
     }
-    function getPageById(id) {
-        for (const menu of config.menus) {
-            if (!menu.groups && menu.mainPage) { // 如果菜单没有group的情况
-                if (menu.mainPageId === id) {
-                    return { current: { path: menu.mainPage, id: menu.mainPageId, name: menu.name, scripts: menu.scripts, styles: menu.styles },  menuId: menu.id, config };
-                }
-            } else if (!menu.groups && menu.pages) { //下拉查单
-                for (const i in menu.pages) {
-                    const page = menu.pages[i];
-                    if (page.id === id) {
-                        return { pre: menu.pages[i-1], current: page, next: menu.pages[i*1+1], menuId: menu.id, config };
-                    }
-                }
-            } else {
-                for (const i in menu.groups) {
-                    const group = menu.groups[i];
-                    for (const j in group.pages) {
-                        const page = group.pages[j];
-                        if (page.id === id) {
-                            const pre = group.pages[j-1] || (i == 0 ? undefined : menu.groups[i-1].pages[menu.groups[i-1].pages.length-1]);
-                            const next = group.pages[j*1+1] || (i == menu.groups.length-1 ? undefined : menu.groups[i*1+1].pages[0]);
-                            return { pre, current: page, next, group, groups: menu.groups, menuId: menu.id, config };
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    };
-    function renderFile(page, res) {
-        removeModuleAndChildrenFromCache('../lib/DocsLayout.js');
-        const DocsLayout = require('../lib/DocsLayout.js');
+    function writeFileWithPage(page, content) {
+        const targetFile = path.join(buildDir, page.current.id+'.html');
+        console.log('正在写文件：'+targetFile);
+        fs.writeFileSync(targetFile, content);
+    }
+    function copyResourceFile(file) {
+        let targetFile = path.join(buildDir, file);
+        mkdirp.sync(path.dirname(targetFile));
+        fs.copySync(getDocumentPath(file), targetFile);
+    }
+    function createFile(page) {
         const file =  getDocumentPath(page.current.path);
-        console.log('render file: ', file);
         if (!fs.existsSync(file)) {
-            removeModuleAndChildrenFromCache('../lib/ErrorPage.js');
-            const ErrorPage = require('../lib/ErrorPage.js');
-            return res.send(
+            return writeFileWithPage(page,
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
                         <ErrorPage>
@@ -131,7 +107,7 @@ function execute(port) {
         const extension = path.extname(file);
         if (extension === '.md') {
             const rawContent = fs.readFileSync(file, 'utf8');
-            return res.send(
+            return writeFileWithPage(page,
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
                         {rawContent}
@@ -140,7 +116,7 @@ function execute(port) {
             );
         } else if (extension === '.html') {
             const rawContent = fs.readFileSync(file, 'utf8');
-            res.send(
+            writeFileWithPage(page,
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
                         <div dangerouslySetInnerHTML={{ __html: rawContent }} />
@@ -150,7 +126,7 @@ function execute(port) {
         } else if (extension === '.js') {
             removeModuleAndChildrenFromCache(file);
             const ReactComp = require(file);
-            res.send(
+            writeFileWithPage(page,
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
                         <ReactComp />
@@ -158,7 +134,8 @@ function execute(port) {
                 )
             );
         } else if (extension === '.pdf') {
-            res.send(
+            copyResourceFile(page.current.path);
+            writeFileWithPage(page,
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
                         <iframe src={`/simiantong/pdfjs/viewer.html?file=${config.baseUrl+page.current.path}`} width="80%" height="80%"></iframe>
@@ -166,7 +143,8 @@ function execute(port) {
                 )
             );
         } else if (extension.match(/^\.(png|jpg|jpeg|gif)$/)) {
-            res.send(
+            copyResourceFile(page.current.path);
+            writeFileWithPage(page,
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
                         <img src={config.baseUrl+page.current.path} />
@@ -176,7 +154,7 @@ function execute(port) {
         } else {
             removeModuleAndChildrenFromCache('../lib/ErrorPage.js');
             const ErrorPage = require('../lib/ErrorPage.js');
-            return res.send(
+            return writeFileWithPage(page,
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
                         <ErrorPage>
@@ -187,66 +165,67 @@ function execute(port) {
             );
         }
     }
+    function writeStaticFile(file) {
+        let targetFile = path.join(buildDir, file.split('/static/')[1] || '');
+        // 替换css的颜色
+        if (file.match(/\.css$/)) {
+            let cssContent = fs.readFileSync(file, 'utf8');
 
+            Object.keys(config.colors).forEach(key => {
+                const color = config.colors[key];
+                cssContent = cssContent.replace(new RegExp('\\$' + key, 'g'), color);
+            });
+            const codeColor = color(config.colors.primaryColor).alpha(0.07).string();
+            cssContent = cssContent.replace(new RegExp('\\$codeColor', 'g'), codeColor);
+
+            mkdirp.sync(path.dirname(targetFile));
+            fs.writeFileSync(targetFile, cssContent);
+        } else if (!fs.lstatSync(file).isDirectory()) {
+            mkdirp.sync(path.dirname(targetFile));
+            fs.copySync(file, targetFile);
+        }
+    }
+
+    console.log('generate.js triggered...');
     const config = reloadSiteConfig();
     if (!config.colors || !config.colors.primaryColor || !config.colors.secondaryColor) {
         console.error(chalk.red('缺少颜色配置'));
         process.exit(0);
     }
-    const app = express();
+    const buildDir = path.join(CWD, 'build', config.projectName);
+    fs.removeSync(path.join(CWD, 'build'));
+    mkdirp.sync(buildDir);
 
-    // generate the main.css file by concatenating user provided css to the end
-    app.get(/.*\.css$/, (req, res) => {
-        let cssPath = __dirname + '/static/' + req.path.toString().replace(config.baseUrl, '');
-        if (!fs.existsSync(cssPath)) {
-            cssPath = CWD + 'static/' + req.path.toString().replace(config.baseUrl, '');
-            if (!fs.existsSync(cssPath)) {
-                res.sendStatus(404);
+    // 创建首页
+    createFile({ current: config.homePage, config });
+
+    // 写各个页面
+    for (const menu of config.menus) {
+        if (!menu.groups && menu.mainPage) { // 如果菜单没有group的情况
+            createFile({ current: { path: menu.mainPage, id: menu.mainPageId, name: menu.name, scripts: menu.scripts, styles: menu.styles },  menuId: menu.id, config });
+        } else if (!menu.groups && menu.pages) { //下拉查单
+            for (const i in menu.pages) {
+                createFile({ pre: menu.pages[i-1], current: menu.pages[i], next: menu.pages[i*1+1], menuId: menu.id, config });
+            }
+        } else {
+            for (const i in menu.groups) {
+                const group = menu.groups[i];
+                for (const j in group.pages) {
+                    const pre = group.pages[j-1] || (i == 0 ? undefined : menu.groups[i-1].pages[menu.groups[i-1].pages.length-1]);
+                    const next = group.pages[j*1+1] || (i == menu.groups.length-1 ? undefined : menu.groups[i*1+1].pages[0]);
+                    createFile({ pre, current: group.pages[j], next, group, groups: menu.groups, menuId: menu.id, config });
+                }
             }
         }
+    }
+    // 拷贝modc的static文件
+    let files = glob.sync(path.join(__dirname, 'static', '**'));
+    files.forEach(writeStaticFile);
 
-        let cssContent = fs.readFileSync(cssPath, {encoding: 'utf8'});
-        Object.keys(config.colors).forEach(key => {
-            const color = config.colors[key];
-            cssContent = cssContent.replace(new RegExp('\\$' + key, 'g'), color);
-        });
-        const codeColor = color(config.colors.primaryColor).alpha(0.07).string();
-        cssContent = cssContent.replace(new RegExp('\\$codeColor', 'g'), codeColor);
+    // 拷贝用户的static文件
+    files = glob.sync(path.join(CWD, 'static', '**'));
+    files.forEach(writeStaticFile);
 
-        res.send(cssContent);
-    });
-
-    // serve static assets from these locations
-    app.use(config.baseUrl, express.static(CWD + 'static'));
-    app.use(config.baseUrl, express.static(__dirname + '/static'));
-
-    app.get(/.*\.html$/, (req, res, next) => {
-        const id = req.path.toString().replace(config.baseUrl, '').replace(/\.html$/, '');
-        const page = getPageById(id);
-        if (!page) {
-            return next();
-        }
-        renderFile(page, res);
-    });
-    app.get(/.*\.pdf$/, (req, res, next) => {
-        const file = getDocumentPath(req.path.toString().replace(config.baseUrl, ''));
-        res.sendFile(file);
-    });
-    app.get(/.*\.(png|jpg|jpeg|gif)$/, (req, res, next) => {
-        const file = getDocumentPath(req.path.toString().replace(config.baseUrl, ''));
-        res.sendFile(file);
-    });
-    app.get('*', (req, res) => {
-        if (/^(index\.html)?$/.test(req.path.toString().replace(config.baseUrl, ''))) {
-            const page = { current: config.homePage, config };
-            renderFile(page, res);
-        } else {
-            res.sendStatus(404);
-        }
-    });
-
-    app.listen(port);
-    console.log('Open http://localhost:' + port + config.baseUrl);
 }
 
-module.exports = execute;
+module.exports = buildProject;

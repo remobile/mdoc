@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-const tcpPortUsed = require('tcp-port-used');
 const program = require('commander');
 const chalk = require('chalk');
 const fs = require('fs');
+const path = require('path');
 const CWD = process.cwd() + '/';
 const NODE_MODULES_PATH = 'node_modules/markdown-it/'
 const test_file = CWD + NODE_MODULES_PATH + 'MODIFYED';
@@ -31,24 +31,26 @@ require('babel-register')({
     presets: ['react'],
 });
 
-program.option('--port <number>', 'Specify port number').parse(process.argv);
+program
+.version('0.0.1')
+.option('-p, --port [4000]', 'port of server', 4000)
+.option('-s, --start', 'start server for project')
+.option('-b, --build', 'build release for project')
+.option('-m, --markdown <markdown file name>', 'build single md file')
+.parse(process.argv);
 
-const port = parseInt(program.port, 10) || 4000;
-
-tcpPortUsed
-.check(port, 'localhost')
-.then(function(inUse) {
-    if (inUse) {
-        console.error(chalk.red('Port ' + port + ' is in use'));
-        process.exit(1);
-    } else {
-        console.log('Starting mdoc server on port ' + port + '...');
-        const server = require('./server/server.js');
-        server(port);
+const { port, start, build, markdown } = program;
+if (markdown) {
+    if (path.extname(markdown) !== '.md') {
+        console.error(chalk.red('Error: 必须是.md文件'));
+        process.exit(0);
     }
-})
-.catch(function(ex) {
-    setTimeout(function() {
-        throw ex;
-    }, 0);
-});
+    const buildMarkdown = require('./server/buildMarkdown.js');
+    buildMarkdown(markdown);
+} else if (build) {
+    const buildProject = require('./server/buildProject.js');
+    buildProject();
+} else {
+    const startServer = require('./server/startServer.js');
+    startServer(port*1);
+}
