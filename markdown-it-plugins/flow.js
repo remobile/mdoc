@@ -11,8 +11,8 @@ module.exports = function flow_plugin(md) {
             const content = tokens[idx].markup.split('\n').filter(o=>!!o).map(o=>`'${o.replace(/'/g, `\\'`)}\\n'`).join('+');
             flow_id ++;
             return `
-            <div id="diagram${flow_id}"></div>
-            <script>$(document).ready(function(){flowchart.parse(${content}).drawSVG("diagram${flow_id}")})</script>
+            <div id="modc_flow_${flow_id}"></div>
+            <script>$(document).ready(function(){flowchart.parse(${content}).drawSVG("modc_flow_${flow_id}")})</script>
             `;
         },
     });
