@@ -33,7 +33,7 @@ function katex_plugin(md) {
     md.use(katex);
 }
 function flow_plugin(md) {
-    md.use(katex);
+    md.use(flow);
 }
 function emoji_plugin(md) {
     md.use(emoji);
