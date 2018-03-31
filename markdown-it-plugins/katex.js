@@ -1,11 +1,11 @@
 'use strict';
 
-var katex = require('katex');
+const katex = require('katex');
 
 // Test if potential opening or closing delimieter
 // Assumes that there is a "$" at state.src[pos]
 function isValidDelim(state, pos) {
-    var prevChar, nextChar,
+    let prevChar, nextChar,
     max = state.posMax,
     can_open = true,
     can_close = true;
@@ -30,7 +30,7 @@ function isValidDelim(state, pos) {
 }
 
 function katex_inline(state, silent) {
-    var start, match, token, res, pos, esc_count;
+    let start, match, token, res, pos, esc_count;
 
     if (state.src[state.pos] !== "$") { return false; }
 
@@ -91,7 +91,7 @@ function katex_inline(state, silent) {
 }
 
 function katex_block(state, start, end, silent){
-    var firstLine, lastLine, next, lastPos, found = false, token,
+    let firstLine, lastLine, next, lastPos, found = false, token,
     pos = state.bMarks[start] + state.tShift[start],
     max = state.eMarks[start]
 
@@ -148,7 +148,7 @@ module.exports = function katex_plugin(md, options) {
     options = options || {};
 
     // set KaTeX as the renderer for markdown-it-simplekatex
-    var katexInline = function(latex){
+    const katexInline = function(latex){
         options.displayMode = false;
         try{
             return katex.renderToString(latex, options);
@@ -159,11 +159,11 @@ module.exports = function katex_plugin(md, options) {
         }
     };
 
-    var inlineRenderer = function(tokens, idx){
+    const inlineRenderer = function(tokens, idx){
         return katexInline(tokens[idx].content);
     };
 
-    var katexBlock = function(latex){
+    const katexBlock = function(latex){
         options.displayMode = true;
         try{
             return "<p>" + katex.renderToString(latex, options) + "</p>";
@@ -174,7 +174,7 @@ module.exports = function katex_plugin(md, options) {
         }
     }
 
-    var blockRenderer = function(tokens, idx){
+    const blockRenderer = function(tokens, idx){
         return  katexBlock(tokens[idx].content) + '\n';
     }
 

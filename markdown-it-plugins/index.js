@@ -2,6 +2,7 @@
 
 var anchors = require('./anchors');
 var katex = require('./katex');
+var flow = require('./flow');
 var emoji = require('markdown-it-emoji');
 var footnote = require('markdown-it-footnote');
 var tasklists = require('markdown-it-task-lists');
@@ -31,8 +32,8 @@ function anchors_plugin(md) {
 function katex_plugin(md) {
     md.use(katex);
 }
-function text_plugin(md) {
-    md.use(text);
+function flow_plugin(md) {
+    md.use(katex);
 }
 function emoji_plugin(md) {
     md.use(emoji);
@@ -53,6 +54,7 @@ module.exports = [
     disable_plugin,
     anchors_plugin,
     katex_plugin,
+    flow_plugin,
     emoji_plugin,
     footnote_plugin,
     tasklists_plugin,

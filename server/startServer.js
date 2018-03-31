@@ -1,7 +1,6 @@
 function startServer(port) {
     const React = require('react');
     const express = require('express');
-    const React = require('react');
     const renderToStaticMarkup = require('react-dom/server').renderToStaticMarkup;
     const fs = require('fs-extra');
     const path = require('path');

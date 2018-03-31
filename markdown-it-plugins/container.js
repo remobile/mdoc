@@ -21,7 +21,7 @@ module.exports = function container_plugin(md, name, options) {
 
     options = options || {};
 
-    var min_markers = 3,
+    let min_markers = 3,
     marker_str  = options.marker || ':',
     marker_char = marker_str.charCodeAt(0),
     marker_len  = marker_str.length,
@@ -30,7 +30,7 @@ module.exports = function container_plugin(md, name, options) {
     customContent = !!options.content;
 
     function container(state, startLine, endLine, silent) {
-        var pos, nextLine, marker_count, markup, params, token,
+        let pos, nextLine, marker_count, markup, params, token,
         old_parent, old_line_max,
         auto_closed = false,
         start = state.bMarks[startLine] + state.tShift[startLine],
@@ -61,7 +61,7 @@ module.exports = function container_plugin(md, name, options) {
         //
         if (silent) { return true; }
 
-        var contentStart = max;
+        let contentStart = max;
 
         // Search for the end of the block
         //
