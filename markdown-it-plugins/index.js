@@ -1,5 +1,6 @@
 'use strict';
 
+var variable = require('./variable');
 var anchors = require('./anchors');
 var katex = require('./katex');
 var flow = require('./flow');
@@ -27,6 +28,9 @@ function escapeHtml(str) {
 
 function disable_plugin(md) {
     md.block.ruler.disable('code');
+}
+function variable_plugin(md) {
+    md.use(variable);
 }
 function anchors_plugin(md) {
     md.use(anchors);
@@ -60,6 +64,7 @@ function rewrite_plugin(md) {
 
 module.exports = [
     disable_plugin,
+    variable_plugin,
     anchors_plugin,
     katex_plugin,
     flow_plugin,
