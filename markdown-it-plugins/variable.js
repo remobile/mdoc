@@ -3,22 +3,16 @@
 
 
 module.exports = function sub_plugin(md) {
-    var escapeRE        = md.utils.escapeRE,
-    arrayReplaceAt  = md.utils.arrayReplaceAt;
-
-    // ASCII characters in Cc, Sc, Sm, Sk categories we should terminate on;
-    // you can check character classes here:
-    // http://www.unicode.org/Public/UNIDATA/UnicodeData.txt
-    var OTHER_CHARS      = ' \r\n$+<=>^`|~';
-
-    var UNICODE_PUNCT_RE = md.utils.lib.ucmicro.P.source;
-    var UNICODE_SPACE_RE = md.utils.lib.ucmicro.Z.source;
+    const escapeRE = md.utils.escapeRE;
+    const arrayReplaceAt = md.utils.arrayReplaceAt;
+    const OTHER_CHARS      = ' \r\n$+<=>^`|~';
+    const UNICODE_PUNCT_RE = md.utils.lib.ucmicro.P.source;
+    const UNICODE_SPACE_RE = md.utils.lib.ucmicro.Z.source;
 
 
     function variable_def(state, startLine, endLine, silent) {
-        var label, title, ch, labelStart, labelEnd,
-        pos = state.bMarks[startLine] + state.tShift[startLine],
-        max = state.eMarks[startLine];
+        let pos = state.bMarks[startLine] + state.tShift[startLine];
+        const max = state.eMarks[startLine];
 
         if (pos + 1 >= max) {
             return false;
@@ -28,10 +22,11 @@ module.exports = function sub_plugin(md) {
             return false;
         }
 
-        labelStart = pos;
+        const labelStart = pos;
+        let labelEnd;
 
         for (; pos < max; pos++) {
-            ch = state.src.charCodeAt(pos);
+            const ch = state.src.charCodeAt(pos);
             if (ch === 0x5B /* [ */) {
                 return false;
             } else if (ch === 0x5D /* ] */) {
@@ -48,8 +43,8 @@ module.exports = function sub_plugin(md) {
 
         if (silent) { return true; }
 
-        label = state.src.slice(labelStart, labelEnd).replace(/\\(.)/g, '$1');
-        title = state.src.slice(labelEnd + 2, max).trim();
+        const label = state.src.slice(labelStart, labelEnd).replace(/\\(.)/g, '$1');
+        const title = state.src.slice(labelEnd + 2, max).trim();
         if (label.length === 0) { return false; }
         if (title.length === 0) { return false; }
         if (!state.env.variable_reviations) { state.env.variable_reviations = {}; }
@@ -63,12 +58,8 @@ module.exports = function sub_plugin(md) {
 
 
     function variable_replace(state) {
-        var i, j, l, tokens, token, text, nodes, pos, reg, m, regText, regSimple,
-        currentToken,
-        blockTokens = state.tokens;
-
         if (!state.env.variable_reviations) { return; }
-        regSimple = new RegExp('(?:' +
+        const regSimple = new RegExp('(?:' +
         Object.keys(state.env.variable_reviations).map(function (x) {
             return x;
         }).sort(function (a, b) {
@@ -76,7 +67,7 @@ module.exports = function sub_plugin(md) {
         }).map(escapeRE).join('|') +
         ')');
 
-        regText = '(^|' + UNICODE_PUNCT_RE + '|' + UNICODE_SPACE_RE +
+        const regText = '(^|' + UNICODE_PUNCT_RE + '|' + UNICODE_SPACE_RE +
         '|[' + OTHER_CHARS.split('').map(escapeRE).join('') + '])'
         + '(' + Object.keys(state.env.variable_reviations).map(function (x) {
             return x;
@@ -86,56 +77,39 @@ module.exports = function sub_plugin(md) {
         + '($|' + UNICODE_PUNCT_RE + '|' + UNICODE_SPACE_RE +
         '|[' + OTHER_CHARS.split('').map(escapeRE).join('') + '])';
 
-        reg = new RegExp(regText, 'g');
+        const reg = new RegExp(regText, 'g');
 
-        for (j = 0, l = blockTokens.length; j < l; j++) {
-            if (blockTokens[j].type !== 'inline') { continue; }
-            tokens = blockTokens[j].children;
+        for (const token of state.tokens) {
+            let m;
+            let pos = 0;
+            let content = '';
+            const text = token.content;
+            reg.lastIndex = 0;
 
-            // We scan from the end, to keep position when new tags added.
-            for (i = tokens.length - 1; i >= 0; i--) {
-                currentToken = tokens[i];
-                if (currentToken.type !== 'text') { continue; }
-
-                pos = 0;
-                text = currentToken.content;
-                reg.lastIndex = 0;
-                nodes = [];
-
-                // fast regexp run to determine whether there are any abbreviated words
-                // in the current token
-                if (!regSimple.test(text)) { continue; }
-
-                while ((m = reg.exec(text))) {
-                    if (m.index > 0 || m[1].length > 0) {
-                        token         = new state.Token('text', '', 0);
-                        token.content = text.slice(pos, m.index + m[1].length);
-                        nodes.push(token);
-                    }
-
-                    token         = new state.Token('text', '', 0);
-                    token.content = state.env.variable_reviations[m[2]];
-                    nodes.push(token);
-
-                    reg.lastIndex -= m[3].length;
-                    pos = reg.lastIndex;
-                }
-
-                if (!nodes.length) { continue; }
-
-                if (pos < text.length) {
-                    token         = new state.Token('text', '', 0);
-                    token.content = text.slice(pos);
-                    nodes.push(token);
-                }
-
-                // replace current node
-                blockTokens[j].children = tokens = arrayReplaceAt(tokens, i, nodes);
+            if (token.type !== 'inline') {
+                continue;
             }
+
+            if (!regSimple.test(text)) {
+                continue;
+            }
+
+            while ((m = reg.exec(text))) {
+                if (m.index > 0 || m[1].length > 0) {
+                    content += text.slice(pos, m.index + m[1].length);
+                }
+                content += state.env.variable_reviations[m[2]];
+
+                reg.lastIndex -= m[3].length;
+                pos = reg.lastIndex;
+            }
+            if (pos < text.length) {
+                content += text.slice(pos);
+            }
+            token.content = content;
         }
     }
 
-    md.block.ruler.before('reference', 'variable_def', variable_def, { alt: [ 'paragraph', 'reference' ] });
-
-    md.core.ruler.after('linkify', 'variable_replace', variable_replace);
+    md.block.ruler.before('reference', 'variable_def', variable_def, { alt: [ 'paragraph', 'reference'] });
+    md.core.ruler.before('inline', 'variable_replace', variable_replace);
 };
