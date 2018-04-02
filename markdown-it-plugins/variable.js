@@ -15,7 +15,7 @@ module.exports = function sub_plugin(md) {
     var UNICODE_SPACE_RE = md.utils.lib.ucmicro.Z.source;
 
 
-    function abbr_def(state, startLine, endLine, silent) {
+    function variable_def(state, startLine, endLine, silent) {
         var label, title, ch, labelStart, labelEnd,
         pos = state.bMarks[startLine] + state.tShift[startLine],
         max = state.eMarks[startLine];
@@ -52,9 +52,9 @@ module.exports = function sub_plugin(md) {
         title = state.src.slice(labelEnd + 2, max).trim();
         if (label.length === 0) { return false; }
         if (title.length === 0) { return false; }
-        if (!state.env.abbreviations) { state.env.abbreviations = {}; }
-        if (typeof state.env.abbreviations[`[${label}]`] === 'undefined') {
-            state.env.abbreviations[`[${label}]`] = title;
+        if (!state.env.variable_reviations) { state.env.variable_reviations = {}; }
+        if (typeof state.env.variable_reviations[`[${label}]`] === 'undefined') {
+            state.env.variable_reviations[`[${label}]`] = title;
         }
 
         state.line = startLine + 1;
@@ -62,14 +62,14 @@ module.exports = function sub_plugin(md) {
     }
 
 
-    function abbr_replace(state) {
+    function variable_replace(state) {
         var i, j, l, tokens, token, text, nodes, pos, reg, m, regText, regSimple,
         currentToken,
         blockTokens = state.tokens;
 
-        if (!state.env.abbreviations) { return; }
+        if (!state.env.variable_reviations) { return; }
         regSimple = new RegExp('(?:' +
-        Object.keys(state.env.abbreviations).map(function (x) {
+        Object.keys(state.env.variable_reviations).map(function (x) {
             return x;
         }).sort(function (a, b) {
             return b.length - a.length;
@@ -78,7 +78,7 @@ module.exports = function sub_plugin(md) {
 
         regText = '(^|' + UNICODE_PUNCT_RE + '|' + UNICODE_SPACE_RE +
         '|[' + OTHER_CHARS.split('').map(escapeRE).join('') + '])'
-        + '(' + Object.keys(state.env.abbreviations).map(function (x) {
+        + '(' + Object.keys(state.env.variable_reviations).map(function (x) {
             return x;
         }).sort(function (a, b) {
             return b.length - a.length;
@@ -114,7 +114,7 @@ module.exports = function sub_plugin(md) {
                     }
 
                     token         = new state.Token('text', '', 0);
-                    token.content = state.env.abbreviations[m[2]];
+                    token.content = state.env.variable_reviations[m[2]];
                     nodes.push(token);
 
                     reg.lastIndex -= m[3].length;
@@ -135,7 +135,7 @@ module.exports = function sub_plugin(md) {
         }
     }
 
-    md.block.ruler.before('reference', 'abbr_def', abbr_def, { alt: [ 'paragraph', 'reference' ] });
+    md.block.ruler.before('reference', 'variable_def', variable_def, { alt: [ 'paragraph', 'reference' ] });
 
-    md.core.ruler.after('linkify', 'abbr_replace', abbr_replace);
+    md.core.ruler.after('linkify', 'variable_replace', variable_replace);
 };
