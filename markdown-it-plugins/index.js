@@ -1,11 +1,11 @@
 'use strict';
 
 var variable = require('./variable');
-var anchors = require('./anchors');
 var katex = require('./katex');
 var flow = require('./flow');
 var sequence = require('./sequence');
 var chart = require('./chart');
+var toc = require('./toc');
 var emoji = require('markdown-it-emoji');
 var footnote = require('markdown-it-footnote');
 var tasklists = require('markdown-it-task-lists');
@@ -32,9 +32,6 @@ function disable_plugin(md) {
 function variable_plugin(md) {
     md.use(variable);
 }
-function anchors_plugin(md) {
-    md.use(anchors);
-}
 function katex_plugin(md) {
     md.use(katex);
 }
@@ -56,6 +53,9 @@ function footnote_plugin(md) {
 function tasklists_plugin(md) {
     md.use(tasklists);
 }
+function toc_plugin(md) {
+    md.use(toc);
+}
 function rewrite_plugin(md) {
     md.renderer.rules.text = function (tokens, idx /*, options, env */) {
         return escapeHtml(tokens[idx].content);;
@@ -65,7 +65,6 @@ function rewrite_plugin(md) {
 module.exports = [
     disable_plugin,
     variable_plugin,
-    anchors_plugin,
     katex_plugin,
     flow_plugin,
     sequence_plugin,
@@ -73,5 +72,6 @@ module.exports = [
     emoji_plugin,
     footnote_plugin,
     tasklists_plugin,
+    toc_plugin,
     rewrite_plugin,
 ];
