@@ -60,7 +60,7 @@ module.exports = function(md) {
                 `
                 <h${level}>
                 <a class="anchor" aria-hidden="true" id="${head_id}"></a>
-                <a href="#${toc_id}" aria-hidden="true" class="hash-link" >${ANCHOR_SVG}</a>
+                ${options.ztree ? '' : `<a href="#${toc_id}" aria-hidden="true" class="hash-link" >${ANCHOR_SVG}</a>`}
                 ${options.autoNumber ? `<span style="margin-right: 10px;">${serial}</span>` : ''}
                 `
             );
