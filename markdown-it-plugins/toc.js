@@ -8,6 +8,9 @@ module.exports = function(md) {
     const options = {};
 
     function getSerial(serialPool, level) {
+        if (_.includes(options.disableNumberList, level)) {
+            return [];
+        }
         let list = [];
         for (const l in serialPool) {
             list.push(serialPool[l]);
@@ -30,8 +33,14 @@ module.exports = function(md) {
         }
         pos += 5;
         let params = text.slice(pos, max).split(' ').filter(o=>o);
-        if (params.indexOf('number') !== -1) {
+        const numberParam =  _.find(params, o=>/^number.*/.test(o));
+        options.disableNumberList = [];
+        if (numberParam) {
             options.autoNumber = true;
+            const list = numberParam.split('=')[1];
+            if (list) {
+                options.disableNumberList = _.map(list.split(/[,，]/), o=>-o);
+            }
         }
         const treeParam =  _.find(params, o=>/^tree.*/.test(o));
         if (treeParam) {
@@ -155,12 +164,14 @@ module.exports = function(md) {
             if (_.includes(options.disableList, level)) {
                 continue;
             }
-            if (lastLevel < level) {
-                serialPool[level] = 1;
-            } else {
-                serialPool[level]++;
+            if (!_.includes(options.disableNumberList, level)) {
+                if (lastLevel < level) {
+                    serialPool[level] = 1;
+                } else {
+                    serialPool[level]++;
+                }
+                lastLevel = level;
             }
-            lastLevel = level;
             const serialList = getSerial(serialPool, level);
             const serial = serialList.join('.');
             const serialId = serialList.join('_');
