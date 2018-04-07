@@ -1,10 +1,10 @@
 'use strict';
 
+const _ = require('lodash');
 const ANCHOR_SVG = '<svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg>';
 
 module.exports = function(md) {
     let gstate;
-    let hasToc = false;
     const options = {};
 
     function getSerial(serialPool, level) {
@@ -33,11 +33,19 @@ module.exports = function(md) {
         if (params.indexOf('number') !== -1) {
             options.autoNumber = true;
         }
-        if (params.indexOf('tree') !== -1) {
+        const treeParam =  _.find(params, o=>/^tree.*/.test(o));
+        if (treeParam) {
             options.ztree = true;
+            options.width = +(treeParam.split('=')[1]) || 250;
         }
-        params = params.filter(o=>o!=='tree'&&o!=='number');
-        options.width = +params[0] || 250;
+        options.disableList = [];
+        const disableParam =  _.find(params, o=>/^disable=.*/.test(o));
+        if (disableParam) {
+            const list = disableParam.split('=')[1];
+            if (list) {
+                options.disableList = _.map(list.split(/[,，]/), o=>+o);
+            }
+        }
 
         state.line = startLine + 1;
 
@@ -49,13 +57,12 @@ module.exports = function(md) {
         }
         token.map = [ startLine, state.line ];
 
-        hasToc = true;
-
         return true;
     }
     md.renderer.rules.heading_open = function(tokens, idx) {
-        const { serial, toc_id, head_id, level } = tokens[idx].toc;
-        if (hasToc) {
+        const token = tokens[idx];
+        if (token.toc) {
+            const { serial, toc_id, head_id, level } = token.toc;
             return (
                 `
                 <h${level}>
@@ -65,7 +72,7 @@ module.exports = function(md) {
                 `
             );
         }
-        return `<h${level}>`;
+        return `<${token.tag}>`;
     };
 
     md.renderer.rules.toc_ztree_tail = function(tokens, index) {
@@ -106,6 +113,9 @@ module.exports = function(md) {
         const headings = gstate.tokens.filter(o => o.type === 'heading_open');
 
         const list = headings.map(o => {
+            if (!o.toc) {
+                return '';
+            }
             const { serial, toc_id, head_id, name, level } = o.toc;
             const res = [];
             if (level > indent) {
@@ -133,6 +143,7 @@ module.exports = function(md) {
         const serialPool = {};
         const tokens = state.tokens;
         let lastLevel = 0;
+        let hasToc = false;
         const zNodes = [{ id: 'toc_id_0', name: "目录", open: true}];
 
         for (const i in tokens) {
@@ -141,6 +152,9 @@ module.exports = function(md) {
                 continue;
             }
             const level = +token.tag.substr(1, 1);
+            if (_.includes(options.disableList, level)) {
+                continue;
+            }
             if (lastLevel < level) {
                 serialPool[level] = 1;
             } else {
@@ -169,6 +183,7 @@ module.exports = function(md) {
                 url: `#${head_id}`,
                 target:'_self'
             });
+            !hasToc && (hasToc = true);
         }
         if (hasToc && options.ztree) {
             tokens.push({type: 'toc_ztree_tail', tag: '',  nesting: 0});
