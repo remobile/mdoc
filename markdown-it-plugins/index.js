@@ -9,6 +9,7 @@ var toc = require('./toc');
 var emoji = require('markdown-it-emoji');
 var footnote = require('markdown-it-footnote');
 var tasklists = require('markdown-it-task-lists');
+var attrs = require('markdown-it-attrs');
 
 var HTML_REPLACEMENTS = {
     '&': '&amp;',
@@ -53,6 +54,9 @@ function footnote_plugin(md) {
 function tasklists_plugin(md) {
     md.use(tasklists);
 }
+function attrs_plugin(md) {
+    md.use(attrs);
+}
 function toc_plugin(md) {
     md.use(toc);
 }
@@ -72,6 +76,7 @@ module.exports = [
     emoji_plugin,
     footnote_plugin,
     tasklists_plugin,
+    attrs_plugin,
     toc_plugin,
     rewrite_plugin,
 ];
