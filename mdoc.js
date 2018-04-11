@@ -36,17 +36,14 @@ program
 .option('-p, --port [4000]', 'port of server', 4000)
 .option('-s, --start', 'start server for project')
 .option('-b, --build', 'build release for project')
-.option('-m, --markdown <markdown file name>', 'build single md file')
+.option('-f, --file <config file>', 'build single file with config')
 .parse(process.argv);
 
-const { port, start, build, markdown } = program;
-if (markdown) {
-    if (path.extname(markdown) !== '.md') {
-        console.error(chalk.red('Error: 必须是.md文件'));
-        process.exit(0);
-    }
-    const buildMarkdown = require('./server/buildMarkdown.js');
-    buildMarkdown(markdown);
+const { port, start, build, file } = program;
+
+if (file) {
+    const buildFile = require('./server/buildFile.js');
+    buildFile(file);
 } else if (build) {
     const buildProject = require('./server/buildProject.js');
     buildProject();

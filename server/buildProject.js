@@ -7,8 +7,8 @@ function buildProject(port) {
     const color = require('color');
     const chalk = require('chalk');
     const mkdirp = require('mkdirp');
-    const DocsLayout = require('../lib/DocsLayout.js');
-    const ErrorPage = require('../lib/ErrorPage.js');
+    const DocsLayout = require('../lib/DocsLayout');
+    const ErrorPage = require('../lib/ErrorPage');
     const CWD = process.cwd() + '/';
 
     // remove a module and child modules from require cache, so server does not have
@@ -186,7 +186,7 @@ function buildProject(port) {
         }
     }
 
-    console.log('generate.js triggered...');
+    console.log('开始编译...');
     const config = reloadSiteConfig();
     if (!config.colors || !config.colors.primaryColor || !config.colors.secondaryColor) {
         console.error(chalk.red('缺少颜色配置'));
