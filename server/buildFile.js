@@ -1,5 +1,6 @@
 function buildMarkdown(configPath) {
     const React = require('react');
+    const request = require('superagent');
     const renderToStaticMarkup = require('react-dom/server').renderToStaticMarkup;
     const mkdirp = require('mkdirp');
     const fs = require('fs-extra');
@@ -45,7 +46,6 @@ function buildMarkdown(configPath) {
         return config;
     }
 
-    console.log('开始编译...');
     const config = reloadSiteConfig();
     if (!config.colors || !config.colors.primaryColor || !config.colors.secondaryColor) {
         console.error(chalk.red('缺少颜色配置'));
@@ -69,6 +69,7 @@ function buildMarkdown(configPath) {
     fs.removeSync(distFile);
     mkdirp.sync(path.dirname(distFile));
 
+    console.log('path:', distFile);
 
     let ReactComp, rawContent;
     if (path.extname(file) === '.md') {
@@ -79,7 +80,7 @@ function buildMarkdown(configPath) {
 
     return fs.writeFileSync(distFile,
         renderToStaticMarkup(
-            <SingleDocLayout page={{current: page}}>
+            <SingleDocLayout page={{current: page, config}}>
                 { rawContent || <ReactComp /> }
             </SingleDocLayout>
         )
