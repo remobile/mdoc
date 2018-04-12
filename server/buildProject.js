@@ -83,6 +83,7 @@ function buildProject(port) {
     }
     function copyResourceFile(file) {
         let targetFile = path.join(buildDir, file);
+        console.log('正在拷贝文件：'+targetFile);
         mkdirp.sync(path.dirname(targetFile));
         fs.copySync(getDocumentPath(file), targetFile);
     }
@@ -162,6 +163,7 @@ function buildProject(port) {
     }
     function writeStaticFile(file) {
         let targetFile = path.join(buildDir, file.split('/static/')[1] || '');
+        console.log('正在拷贝资源文件：'+targetFile);
         // 替换css的颜色
         if (file.match(/\.css$/)) {
             let cssContent = fs.readFileSync(file, 'utf8');
@@ -220,6 +222,11 @@ function buildProject(port) {
     // 拷贝用户的static文件
     files = glob.sync(path.join(CWD, 'static', '**'));
     files.forEach(writeStaticFile);
+
+    // 拷贝highlight的css文件
+    const theme = config.highlight && config.highlight.theme || 'default';
+    console.log('正在拷贝资源文件：'+path.join(buildDir, `${theme}.css`));
+    fs.copySync(path.join(CWD, `node_modules/highlight.js/styles/${theme}.css`), path.join(buildDir, `${theme}.css`));
 
 }
 

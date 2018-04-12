@@ -189,12 +189,12 @@ function startServer(port) {
     const app = express();
 
     // generate the main.css file by concatenating user provided css to the end
-    app.get(/.*\.css$/, (req, res) => {
+    app.get(/.*\.css$/, (req, res, next) => {
         let cssPath = __dirname + '/static/' + req.path.toString().replace(config.baseUrl, '');
         if (!fs.existsSync(cssPath)) {
             cssPath = CWD + 'static/' + req.path.toString().replace(config.baseUrl, '');
             if (!fs.existsSync(cssPath)) {
-                res.sendStatus(404);
+                return next();
             }
         }
 
@@ -211,6 +211,7 @@ function startServer(port) {
 
     // serve static assets from these locations
     app.use(config.baseUrl, express.static(CWD + 'static'));
+    app.use(config.baseUrl, express.static(CWD + 'node_modules/highlight.js/styles'));
     app.use(config.baseUrl, express.static(__dirname + '/static'));
 
     app.get(/.*\.html$/, (req, res, next) => {
