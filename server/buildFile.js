@@ -1,6 +1,6 @@
 function buildMarkdown(configPath) {
     const React = require('react');
-    const request = require('superagent');
+    const express = require('express');
     const renderToStaticMarkup = require('react-dom/server').renderToStaticMarkup;
     const mkdirp = require('mkdirp');
     const fs = require('fs-extra');
@@ -35,14 +35,9 @@ function buildMarkdown(configPath) {
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + 'config.js');
         const config = require(CWD + 'config.js');
-        const { highlight } = config;
         // 设置 baseUrl
         config.baseUrl = `/${config.projectName}/`;
 
-        // 设置语法高亮
-        if (highlight && highlight.hljs) {
-            highlight.hljs(require('highlight.js'));
-        }
         return config;
     }
 
@@ -71,20 +66,64 @@ function buildMarkdown(configPath) {
 
     console.log('path:', distFile);
 
-    let ReactComp, rawContent;
-    if (path.extname(file) === '.md') {
-        rawContent = fs.readFileSync(file, 'utf8');
-    } else {
-        ReactComp = require(file);
-    }
+    const app = express();
 
-    return fs.writeFileSync(distFile,
-        renderToStaticMarkup(
-            <SingleDocLayout page={{current: page, config}}>
-                { rawContent || <ReactComp /> }
-            </SingleDocLayout>
-        )
-    );
+    // generate the main.css file by concatenating user provided css to the end
+    app.get(/.*\.css$/, (req, res) => {
+        let cssPath = __dirname + '/static/' + req.path.toString().replace(config.baseUrl, '');
+        if (!fs.existsSync(cssPath)) {
+            cssPath = CWD + 'static/' + req.path.toString().replace(config.baseUrl, '');
+            if (!fs.existsSync(cssPath)) {
+                res.sendStatus(404);
+            }
+        }
+
+        let cssContent = fs.readFileSync(cssPath, {encoding: 'utf8'});
+        Object.keys(config.colors).forEach(key => {
+            const color = config.colors[key];
+            cssContent = cssContent.replace(new RegExp('\\$' + key, 'g'), color);
+        });
+        const codeColor = color(config.colors.primaryColor).alpha(0.07).string();
+        cssContent = cssContent.replace(new RegExp('\\$codeColor', 'g'), codeColor);
+
+        res.send(cssContent);
+    });
+
+    // serve static assets from these locations
+    app.use(config.baseUrl, express.static(CWD + 'static'));
+    app.use(config.baseUrl, express.static(__dirname + '/static'));
+
+    app.get(config.baseUrl, (req, res, next) => {
+        let ReactComp, rawContent;
+        if (path.extname(file) === '.md') {
+            rawContent = fs.readFileSync(file, 'utf8');
+        } else {
+            ReactComp = require(file);
+        }
+        return res.send(
+            renderToStaticMarkup(
+                <SingleDocLayout page={{current: page, config}}>
+                    { rawContent || <ReactComp /> }
+                </SingleDocLayout>
+            )
+        );
+    });
+    app.get(/.*\.(png|jpg|jpeg|gif)$/, (req, res, next) => {
+        const file = getDocumentPath(req.path.toString().replace(config.baseUrl, ''));
+        res.sendFile(file);
+    });
+    app.get('*', (req, res) => {
+        res.sendStatus(404);
+    });
+
+    let port = 4000;
+    const server = app.listen(port);
+    server.on('listening', function () {
+        console.log('Open http://localhost:' + port + config.baseUrl);
+    });
+    server.on('error', function (err) {
+        startServer(port+1);
+    });
 }
 
 module.exports = buildMarkdown;

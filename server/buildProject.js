@@ -38,14 +38,9 @@ function buildProject(port) {
         removeModuleAndChildrenFromCache(CWD + 'config.js');
         const config = require(CWD + 'config.js');
         !config.menus && ( config.menus = [] );
-        const { highlight, homePage, menus } = config;
+        const { homePage, menus } = config;
         // 设置 baseUrl
         config.baseUrl = `/${config.projectName}/`;
-
-        // 设置语法高亮
-        if (highlight && highlight.hljs) {
-            highlight.hljs(require('highlight.js'));
-        }
 
         // 为每个 page 添加 id
         for (const menu of menus) {
