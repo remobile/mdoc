@@ -1,10 +1,12 @@
 function buildMarkdown(configPath) {
     const React = require('react');
     const express = require('express');
+    const inliner = require('inliner');
     const renderToStaticMarkup = require('react-dom/server').renderToStaticMarkup;
     const mkdirp = require('mkdirp');
     const fs = require('fs-extra');
     const path = require('path');
+    const color = require('color');
     const chalk = require('chalk');
     const SingleDocLayout = require('../lib/SingleDocLayout');
     const CWD = process.cwd() + '/';
@@ -64,8 +66,6 @@ function buildMarkdown(configPath) {
     fs.removeSync(distFile);
     mkdirp.sync(path.dirname(distFile));
 
-    console.log('path:', distFile);
-
     const app = express();
 
     // generate the main.css file by concatenating user provided css to the end
@@ -119,7 +119,21 @@ function buildMarkdown(configPath) {
     let port = 4000;
     const server = app.listen(port);
     server.on('listening', function () {
-        console.log('Open http://localhost:' + port + config.baseUrl);
+        const url = 'http://localhost:' + port + config.baseUrl;
+        console.log('Open', url);
+        new inliner(url, { inlinemin: true, }, function (error, html) {
+            if (error) {
+                console.log(chalk.red(event));
+            } else {
+                fs.writeFileSync(distFile, html);
+
+                console.log('output:', distFile);
+                process.exit(0);
+            }
+        })
+        .on('progress', function (event) {
+            console.log(chalk.green(event));
+        });
     });
     server.on('error', function (err) {
         startServer(port+1);
