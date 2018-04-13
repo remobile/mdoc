@@ -4,7 +4,7 @@
   "description": "Markdown doc web site",
   "main": "index.js",
   "bin": {
-    "mdoc": "./mdoc.js"
+    "mdoc": "./script.js"
   },
   "dependencies": {
     "babel-preset-env": "^1.6.0",

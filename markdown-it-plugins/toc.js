@@ -5,6 +5,7 @@ const ANCHOR_SVG = '<svg aria-hidden="true" height="16" version="1.1" viewBox="0
 
 module.exports = function(md) {
     let gstate;
+    let hasToc = false;
     const options = {};
 
     function getSerial(serialPool, level) {
@@ -65,6 +66,7 @@ module.exports = function(md) {
             token = state.push('toc_body', '', 0);
         }
         token.map = [ startLine, state.line ];
+        !hasToc && (hasToc = true);
 
         return true;
     }
@@ -89,32 +91,32 @@ module.exports = function(md) {
     };
     md.renderer.rules.toc_ztree_start = function(tokens, index) {
         const setting = {
-			view: {
-				dblClickExpand: false,
-				showLine: true,
-				showIcon: false,
-				selectedMulti: false,
-			},
-			data: {
-				simpleData: {
-					enable: true,
-					idKey : "id",
-					pIdKey: "pId",
-				},
-			},
-		};
+            view: {
+                dblClickExpand: false,
+                showLine: true,
+                showIcon: false,
+                selectedMulti: false,
+            },
+            data: {
+                simpleData: {
+                    enable: true,
+                    idKey : "id",
+                    pIdKey: "pId",
+                },
+            },
+        };
         return (
             `<div style="display:flex;width: 100%;">
-                <div style="width:${options.width}px;"></div>
-            	<div style="float:left;width:${options.width}px;position:fixed;">
-                    <ul id="toc_root" class="ztree"><ul>
-                    <script>
-                        $(document).ready(function(){
-                			$.fn.zTree.init($("#toc_root"), ${JSON.stringify(setting)}, ${JSON.stringify(gstate.zNodes)});
-                		});
-                    </script>
-                </div>
-                <div style="flex:1;">`
+            <div style="width:${options.width}px;"></div>
+            <div style="float:left;width:${options.width}px;position:fixed;">
+            <ul id="toc_root" class="ztree"><ul>
+            <script>
+            $(document).ready(function(){
+                $.fn.zTree.init($("#toc_root"), ${JSON.stringify(setting)}, ${JSON.stringify(gstate.zNodes)});
+            });
+            </script>
+            </div>
+            <div style="flex:1;">`
         );
     };
     md.renderer.rules.toc_body = function(tokens, index) {
@@ -152,9 +154,11 @@ module.exports = function(md) {
         const serialPool = {};
         const tokens = state.tokens;
         let lastLevel = 0;
-        let hasToc = false;
         const zNodes = [{ id: 'toc_id_0', name: "目录", open: true}];
 
+        if (!hasToc) {
+            return;
+        }
         for (const i in tokens) {
             const token = tokens[i];
             if (token.type !== 'heading_open') {
@@ -194,9 +198,8 @@ module.exports = function(md) {
                 url: `#${head_id}`,
                 target:'_self'
             });
-            !hasToc && (hasToc = true);
         }
-        if (hasToc && options.ztree) {
+        if (options.ztree) {
             tokens.push({type: 'toc_ztree_tail', tag: '',  nesting: 0});
             state.zNodes = zNodes;
         }
