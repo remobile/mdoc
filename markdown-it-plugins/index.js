@@ -1,19 +1,20 @@
 'use strict';
 
-var variable = require('./variable');
-var katex = require('./katex');
-var flow = require('./flow');
-var sequence = require('./sequence');
-var chart = require('./chart');
-var toc = require('./toc');
-var link = require('./link');
-var media = require('./media');
-var emoji = require('markdown-it-emoji');
-var footnote = require('markdown-it-footnote');
-var tasklists = require('markdown-it-task-lists');
-var attrs = require('markdown-it-attrs');
+const fence = require('./fence');
+const variable = require('./variable');
+const katex = require('./katex');
+const flow = require('./flow');
+const sequence = require('./sequence');
+const chart = require('./chart');
+const toc = require('./toc');
+const link = require('./link');
+const media = require('./media');
+const emoji = require('markdown-it-emoji');
+const footnote = require('markdown-it-footnote');
+const tasklists = require('markdown-it-task-lists');
+const attrs = require('markdown-it-attrs');
 
-var HTML_REPLACEMENTS = {
+const HTML_REPLACEMENTS = {
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
@@ -68,6 +69,9 @@ function link_plugin(md, config) {
 function media_plugin(md, config) {
     md.use(media, config);
 }
+function fence_plugin(md, config) {
+    md.use(fence, config);
+}
 function rewrite_plugin(md) {
     md.renderer.rules.text = function (tokens, idx /*, options, env */) {
         return escapeHtml(tokens[idx].content);;
@@ -76,6 +80,7 @@ function rewrite_plugin(md) {
 
 module.exports = [
     disable_plugin,
+    fence_plugin,
     variable_plugin,
     katex_plugin,
     flow_plugin,
