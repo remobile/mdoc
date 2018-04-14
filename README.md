@@ -20,7 +20,7 @@ npm install git+https://github.com/remobile/mdoc.git --save
 
 然后执行 npm run mdoc -s
 
-在浏览器中输入：http://localhost:4000/simiantong/
+在浏览器中输入：http://localhost:4000/mdoc-example
 
 ## config.js 模板
 
@@ -28,7 +28,7 @@ npm install git+https://github.com/remobile/mdoc.git --save
 const markdownPlugins = require('./lib/markdownPlugins');
 
 const config = {
-    projectName: 'simiantong', // 工程名称，访问网站的时候会使用到：http://localhost:4000/simiantong
+    projectName: 'mdoc-example', // 工程名称，访问网站的时候会使用到：http://localhost:4000/mdoc-example
     title: '四面通物流大超市', // html 的 title
     favicon: 'img/favicon.ico', // html 的 favicon
     logo: 'img/logo.png', // logo
@@ -46,10 +46,9 @@ const config = {
     styles: [], // 整个工程的 style，全局有效 [可空]
     scripts: [], // 整个工程的 script，全局有效 [可空]
     footer: 'lib/Footer.js', //设置footer [可空]
-    homePage: { // 首页 （每个页面都可以配自己的styles和scripts）
-        name: '四面通', // 标题
-        path: 'index.js', // 标题
-        styles: ['css/custom.css'], // 该页面的style [可空]
+    homePage: {  // 首页 （每个页面都可以配自己的styles和scripts）
+        name: 'mdoc的用法',  // 标题
+        path: 'index.md',  // 标题
     },
     menus: [ // 菜单，第一级会显示在顶部菜单栏，menus 包含多个 menu
         { // 第一个 menu，这个menu没有groups和pages，只显示一个页面
@@ -140,6 +139,16 @@ const config = {
             name: '四面通',
             mainPage: 'smt/tuxiang.png',
             groups: [
+                {
+                    name: '快速了解',
+                    pages: [
+                        {
+                            name: '概括',
+                            path: 'smt/index.js',
+                            styles: ['css/custom.css'],  // 该页面的style [可空]
+                        },
+                    ]
+                },
                 {
                     name: '公司风采',
                     pages: [
@@ -235,6 +244,12 @@ Usage: script [options]
     -f, --file <config file>  build single file with config
     -h, --help                output usage information
 ```
+
+## 文件路径
+
+建议资源文件使用相对路径，如 `![美丽的小猫](img/cat.png)`, 不建议使用 `![美丽的小猫](/mdoc-example/img/cat.png)`，因为如果改变了 projectName 就需要做相应的修改.
+超链接也建议使用相对路径：`这个可以链接到 [api](smt_api_md.html).`
+
 
 ## 关联
 

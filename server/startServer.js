@@ -1,6 +1,7 @@
 function startServer(port) {
     const React = require('react');
     const express = require('express');
+    const morgan = require('morgan');
     const renderToStaticMarkup = require('react-dom/server').renderToStaticMarkup;
     const fs = require('fs-extra');
     const path = require('path');
@@ -154,7 +155,7 @@ function startServer(port) {
             res.send(
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
-                        <iframe src={`/simiantong/pdfjs/viewer.html?file=${config.baseUrl+page.current.path}`} width="80%" height="80%"></iframe>
+                        <iframe src={`pdfjs/viewer.html?file=${config.baseUrl+page.current.path}`} width="80%" height="80%"></iframe>
                     </DocsLayout>
                 )
             );
@@ -162,7 +163,7 @@ function startServer(port) {
             res.send(
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
-                        <img src={config.baseUrl+page.current.path} />
+                        <img src={page.current.path} />
                     </DocsLayout>
                 )
             );
@@ -187,12 +188,13 @@ function startServer(port) {
         process.exit(0);
     }
     const app = express();
+    app.use(morgan('short'));
 
     // generate the main.css file by concatenating user provided css to the end
     app.get(/.*\.css$/, (req, res, next) => {
-        let cssPath = __dirname + '/static/' + req.path.toString().replace(config.baseUrl, '');
+        let cssPath = __dirname + '/static/' + req.path.replace(config.baseUrl, '');
         if (!fs.existsSync(cssPath)) {
-            cssPath = CWD + 'static/' + req.path.toString().replace(config.baseUrl, '');
+            cssPath = CWD + 'static/' + req.path.replace(config.baseUrl, '');
             if (!fs.existsSync(cssPath)) {
                 return next();
             }
@@ -215,7 +217,7 @@ function startServer(port) {
     app.use(config.baseUrl, express.static(__dirname + '/static'));
 
     app.get(/.*\.html$/, (req, res, next) => {
-        const id = req.path.toString().replace(config.baseUrl, '').replace(/\.html$/, '');
+        const id = req.path.replace(config.baseUrl, '').replace(/\.html$/, '');
         const page = getPageById(id);
         if (!page) {
             return next();
@@ -223,15 +225,15 @@ function startServer(port) {
         renderFile(page, res);
     });
     app.get(/.*\.pdf$/, (req, res, next) => {
-        const file = getDocumentPath(req.path.toString().replace(config.baseUrl, ''));
+        const file = getDocumentPath(req.path.replace(config.baseUrl, ''));
         res.sendFile(file);
     });
     app.get(/.*\.(png|jpg|jpeg|gif)$/, (req, res, next) => {
-        const file = getDocumentPath(req.path.toString().replace(config.baseUrl, ''));
+        const file = getDocumentPath(req.path.replace(config.baseUrl, ''));
         res.sendFile(file);
     });
     app.get('*', (req, res) => {
-        if (/^(index\.html)?$/.test(req.path.toString().replace(config.baseUrl, ''))) {
+        if (/^(index\.html)?$/.test(req.path.replace(config.baseUrl, ''))) {
             const page = { current: config.homePage, config };
             renderFile(page, res);
         } else {

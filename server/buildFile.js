@@ -70,9 +70,9 @@ function buildMarkdown(configPath) {
 
     // generate the main.css file by concatenating user provided css to the end
     app.get(/.*\.css$/, (req, res, next) => {
-        let cssPath = __dirname + '/static/' + req.path.toString().replace(config.baseUrl, '');
+        let cssPath = __dirname + '/static/' + req.path.toString();
         if (!fs.existsSync(cssPath)) {
-            cssPath = CWD + 'static/' + req.path.toString().replace(config.baseUrl, '');
+            cssPath = CWD + 'static/' + req.path.toString();
             if (!fs.existsSync(cssPath)) {
                 return next();
             }
@@ -110,7 +110,7 @@ function buildMarkdown(configPath) {
         );
     });
     app.get(/.*\.(png|jpg|jpeg|gif)$/, (req, res, next) => {
-        const file = getDocumentPath(req.path.toString().replace(config.baseUrl, ''));
+        const file = getDocumentPath(req.path.toString());
         res.sendFile(file);
     });
     app.get('*', (req, res) => {

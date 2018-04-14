@@ -134,7 +134,7 @@ function buildProject(port) {
             writeFileWithPage(page,
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
-                        <iframe src={`/simiantong/pdfjs/viewer.html?file=${config.baseUrl+page.current.path}`} width="80%" height="80%"></iframe>
+                        <iframe src={`pdfjs/viewer.html?file=${page.current.path}`} width="80%" height="80%"></iframe>
                     </DocsLayout>
                 )
             );
