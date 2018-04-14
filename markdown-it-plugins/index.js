@@ -6,6 +6,7 @@ var flow = require('./flow');
 var sequence = require('./sequence');
 var chart = require('./chart');
 var toc = require('./toc');
+var link = require('./link');
 var emoji = require('markdown-it-emoji');
 var footnote = require('markdown-it-footnote');
 var tasklists = require('markdown-it-task-lists');
@@ -60,6 +61,9 @@ function attrs_plugin(md) {
 function toc_plugin(md) {
     md.use(toc);
 }
+function link_plugin(md) {
+    md.use(link);
+}
 function rewrite_plugin(md) {
     md.renderer.rules.text = function (tokens, idx /*, options, env */) {
         return escapeHtml(tokens[idx].content);;
@@ -78,5 +82,6 @@ module.exports = [
     tasklists_plugin,
     attrs_plugin,
     toc_plugin,
+    link_plugin,
     rewrite_plugin,
 ];
