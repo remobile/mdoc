@@ -215,7 +215,7 @@ function buildProject(port) {
             }
         }
     }
-    // 拷贝modc的static文件
+    // 拷贝mdoc的static文件
     let files = glob.sync(path.join(__dirname, 'static', '**'));
     files.forEach(writeStaticFile);
 

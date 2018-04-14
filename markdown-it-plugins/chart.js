@@ -11,8 +11,8 @@ module.exports = function flow_plugin(md) {
             const content = tokens[idx].markup.split('\n').filter(o=>!!o).map(o=>`${o.trim()}`).join('');
             chart_id ++;
             return `
-            <div id="modc_chart_${chart_id}" style="width: 600px;height:400px;"></div>
-            <script>$(document).ready(function(){echarts.init(document.getElementById('modc_chart_${chart_id}')).setOption(${content})})</script>
+            <div id="mdoc_chart_${chart_id}" style="width: 600px;height:400px;"></div>
+            <script>$(document).ready(function(){echarts.init(document.getElementById('mdoc_chart_${chart_id}')).setOption(${content})})</script>
             `;
         },
     });

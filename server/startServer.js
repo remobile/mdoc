@@ -2,6 +2,7 @@ function startServer(port) {
     const React = require('react');
     const express = require('express');
     const morgan = require('morgan');
+    const crypto = require('crypto');
     const renderToStaticMarkup = require('react-dom/server').renderToStaticMarkup;
     const fs = require('fs-extra');
     const path = require('path');
@@ -32,6 +33,17 @@ function startServer(port) {
     function getDocumentPath(file) {
         return CWD + (config.documentPath || 'doc').replace(/\/$/, '') + '/' + file;
     }
+    function getPageId(path) {
+        if (/^https?:/.test(path)) {
+            const hash = crypto.createHash('md5');
+            hash.update(path);
+            return hash.digest('hex');
+        }
+        return path.replace(/[/.]/g, '_');
+    }
+    function getPathFromReqPath(path) {
+        return  path.replace(new RegExp(`^${config.baseUrl}`), '');
+    }
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + 'config.js');
         const config = require(CWD + 'config.js');
@@ -47,24 +59,25 @@ function startServer(port) {
                 menu.mainPage = menu.groups[0].pages[0].path;
             }
             if (menu.mainPage) {
-                menu.mainPageId = menu.mainPage.replace(/[/.]/g, '_');
+                menu.mainPageId = getPageId(menu.mainPage);
                 menu.id = menu.mainPageId;
                 for (const group of (menu.groups||[])) {
                     for (const page of group.pages) {
                         if (!page.id) {
-                            page.id = page.path.replace(/[/.]/g, '_');
+                            page.id = getPageId(page.path);
                         }
                     }
                 }
             } else {
                 for (const page of menu.pages) {
                     if (!page.id) {
-                        page.id = page.path.replace(/[/.]/g, '_');
+                        page.id = getPageId(page.path);
                     }
                 }
                 menu.id = menu.pages[0].id;
             }
         }
+        console.log(JSON.stringify(menus, 0, 2));
 
         // 设置 homePage
         if (!homePage) {
@@ -192,9 +205,9 @@ function startServer(port) {
 
     // generate the main.css file by concatenating user provided css to the end
     app.get(/.*\.css$/, (req, res, next) => {
-        let cssPath = __dirname + '/static/' + req.path.replace(config.baseUrl, '');
+        let cssPath = __dirname + '/static/' + getPathFromReqPath(req.path);
         if (!fs.existsSync(cssPath)) {
-            cssPath = CWD + 'static/' + req.path.replace(config.baseUrl, '');
+            cssPath = CWD + 'static/' + getPathFromReqPath(req.path);
             if (!fs.existsSync(cssPath)) {
                 return next();
             }
@@ -217,7 +230,7 @@ function startServer(port) {
     app.use(config.baseUrl, express.static(__dirname + '/static'));
 
     app.get(/.*\.html$/, (req, res, next) => {
-        const id = req.path.replace(config.baseUrl, '').replace(/\.html$/, '');
+        const id = getPathFromReqPath(req.path).replace(/\.html$/, '');
         const page = getPageById(id);
         if (!page) {
             return next();
@@ -225,15 +238,15 @@ function startServer(port) {
         renderFile(page, res);
     });
     app.get(/.*\.pdf$/, (req, res, next) => {
-        const file = getDocumentPath(req.path.replace(config.baseUrl, ''));
+        const file = getDocumentPath(getPathFromReqPath(req.path));
         res.sendFile(file);
     });
     app.get(/.*\.(png|jpg|jpeg|gif)$/, (req, res, next) => {
-        const file = getDocumentPath(req.path.replace(config.baseUrl, ''));
+        const file = getDocumentPath(getPathFromReqPath(req.path));
         res.sendFile(file);
     });
     app.get('*', (req, res) => {
-        if (/^(index\.html)?$/.test(req.path.replace(config.baseUrl, ''))) {
+        if (/^(index\.html)?$/.test(getPathFromReqPath(req.path))) {
             const page = { current: config.homePage, config };
             renderFile(page, res);
         } else {

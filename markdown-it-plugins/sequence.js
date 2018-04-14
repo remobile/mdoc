@@ -11,8 +11,8 @@ module.exports = function sequence_plugin(md) {
             const content = tokens[idx].markup.split('\n').filter(o=>!!o).map(o=>`'${o.replace(/'/g, `\\'`)}\\n'`).join('+');
             sequence_id ++;
             return `
-            <div id="modc_sequence_${sequence_id}"></div>
-            <script>$(document).ready(function(){Diagram.parse(${content}).drawSVG("modc_sequence_${sequence_id}", {theme: 'simple'})})</script>
+            <div id="mdoc_sequence_${sequence_id}"></div>
+            <script>$(document).ready(function(){Diagram.parse(${content}).drawSVG("mdoc_sequence_${sequence_id}", {theme: 'simple'})})</script>
             `;
         },
     });
