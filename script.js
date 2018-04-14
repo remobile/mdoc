@@ -44,10 +44,10 @@ const { port, start, build, file, verbose } = program;
 
 if (file) {
     const buildFile = require('./server/buildFile.js');
-    buildFile(file, verbose);
+    buildFile(file);
 } else if (build) {
     const buildProject = require('./server/buildProject.js');
-    buildProject(verbose);
+    buildProject();
 } else {
     const startServer = require('./server/startServer.js');
     startServer(port*1, verbose);

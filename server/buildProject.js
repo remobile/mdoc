@@ -1,8 +1,9 @@
-function buildProject(port) {
+function buildProject() {
     const React = require('react');
     const renderToStaticMarkup = require('react-dom/server').renderToStaticMarkup;
     const fs = require('fs-extra');
     const glob = require('glob');
+    const crypto = require('crypto');
     const path = require('path');
     const color = require('color');
     const chalk = require('chalk');
@@ -34,11 +35,20 @@ function buildProject(port) {
     function getDocumentPath(file) {
         return CWD + (config.documentPath || 'doc').replace(/\/$/, '') + '/' + file;
     }
+    function getPageId(path) {
+        if (/^https?:/.test(path)) {
+            const hash = crypto.createHash('md5');
+            hash.update(path);
+            return hash.digest('hex');
+        }
+        return path.replace(/[/.]/g, '_');
+    }
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + 'config.js');
         const config = require(CWD + 'config.js');
         !config.menus && ( config.menus = [] );
         const { homePage, menus } = config;
+
         // 设置 baseUrl
         config.baseUrl = `/${config.projectName}/`;
 
@@ -48,19 +58,19 @@ function buildProject(port) {
                 menu.mainPage = menu.groups[0].pages[0].path;
             }
             if (menu.mainPage) {
-                menu.mainPageId = menu.mainPage.replace(/[/.]/g, '_');
+                menu.mainPageId = getPageId(menu.mainPage);
                 menu.id = menu.mainPageId;
                 for (const group of (menu.groups||[])) {
                     for (const page of group.pages) {
                         if (!page.id) {
-                            page.id = page.path.replace(/[/.]/g, '_');
+                            page.id = getPageId(page.path);
                         }
                     }
                 }
             } else {
                 for (const page of menu.pages) {
                     if (!page.id) {
-                        page.id = page.path.replace(/[/.]/g, '_');
+                        page.id = getPageId(page.path);
                     }
                 }
                 menu.id = menu.pages[0].id;
@@ -143,7 +153,7 @@ function buildProject(port) {
             writeFileWithPage(page,
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
-                        <img src={config.baseUrl+page.current.path} />
+                        <img src={page.current.path} />
                     </DocsLayout>
                 )
             );

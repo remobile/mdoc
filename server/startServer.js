@@ -77,11 +77,6 @@ function startServer(port, verbose) {
                 menu.id = menu.pages[0].id;
             }
         }
-        if (verbose) {
-            console.log("============== config start ==============");
-            console.log(JSON.stringify(menus, 0, 2));
-            console.log("============== config end ==============");
-        }
 
         // 设置 homePage
         if (!homePage) {
@@ -89,6 +84,12 @@ function startServer(port, verbose) {
             process.exit(0);
         }
         config.homePage.id = 'index';
+
+        if (verbose) {
+            console.log("============== config start ==============");
+            console.log(JSON.stringify(config, 0, 2));
+            console.log("============== config end ==============");
+        }
 
         return config;
     }
