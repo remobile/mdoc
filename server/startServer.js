@@ -1,4 +1,4 @@
-function startServer(port) {
+function startServer(port, verbose) {
     const React = require('react');
     const express = require('express');
     const morgan = require('morgan');
@@ -77,7 +77,11 @@ function startServer(port) {
                 menu.id = menu.pages[0].id;
             }
         }
-        console.log(JSON.stringify(menus, 0, 2));
+        if (verbose) {
+            console.log("============== config start ==============");
+            console.log(JSON.stringify(menus, 0, 2));
+            console.log("============== config end ==============");
+        }
 
         // 设置 homePage
         if (!homePage) {
@@ -121,7 +125,7 @@ function startServer(port) {
         removeModuleAndChildrenFromCache('../lib/DocsLayout.js');
         const DocsLayout = require('../lib/DocsLayout.js');
         const file =  getDocumentPath(page.current.path);
-        console.log('render file: ', file);
+        verbose && console.log('render file: ', file);
         if (!fs.existsSync(file)) {
             removeModuleAndChildrenFromCache('../lib/ErrorPage.js');
             const ErrorPage = require('../lib/ErrorPage.js');
@@ -201,7 +205,7 @@ function startServer(port) {
         process.exit(0);
     }
     const app = express();
-    app.use(morgan('short'));
+    verbose && app.use(morgan('short'));
 
     // generate the main.css file by concatenating user provided css to the end
     app.get(/.*\.css$/, (req, res, next) => {

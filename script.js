@@ -35,19 +35,20 @@ program
 .version('0.0.1')
 .option('-p, --port [4000]', 'port of server', 4000)
 .option('-s, --start', 'start server for project')
+.option('-v, --verbose', 'verbose mode')
 .option('-b, --build', 'build release for project')
 .option('-f, --file <config file>', 'build single file with config')
 .parse(process.argv);
 
-const { port, start, build, file } = program;
+const { port, start, build, file, verbose } = program;
 
 if (file) {
     const buildFile = require('./server/buildFile.js');
-    buildFile(file);
+    buildFile(file, verbose);
 } else if (build) {
     const buildProject = require('./server/buildProject.js');
-    buildProject();
+    buildProject(verbose);
 } else {
     const startServer = require('./server/startServer.js');
-    startServer(port*1);
+    startServer(port*1, verbose);
 }
