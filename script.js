@@ -28,8 +28,10 @@ if (!fs.existsSync(CWD + 'config.js')) {
 
 require('babel-register')({
     babelrc: false,
+    only: [__dirname, process.cwd()],
     presets: ['react'],
 });
+
 
 program
 .version('0.0.1')
