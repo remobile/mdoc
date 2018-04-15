@@ -18,7 +18,7 @@ npm install git+https://github.com/remobile/mdoc.git --save
 
 建议将该工程 clone 下来然后修改。
 
-然后执行 npm run mdoc -s
+然后执行 npm run mdoc -- -s
 
 在浏览器中输入：http://localhost:4000/mdoc-example
 
@@ -205,7 +205,7 @@ module.exports = config;
 ## 编译工程release
 
 ```sh
-npm run mdoc -b
+npm run mdoc -- -b
 ```
 
 ## 编译单个文件
@@ -213,7 +213,7 @@ npm run mdoc -b
 参考conf中的各个文件，支持功能config中page的所有配置
 
 ```sh
-npm run mdoc -f conf/chart.js
+npm run mdoc -- -f conf/chart.js
 ```
 
 ```js
@@ -228,7 +228,7 @@ module.exports = {
 ## 命名行
 
 ```sh
-npm run mdoc -h
+npm run mdoc -- -h
 ```
 
 ```
@@ -250,6 +250,32 @@ Usage: script [options]
 建议资源文件使用相对路径，如 `![美丽的小猫](img/cat.png)`, 不建议使用 `![美丽的小猫](/mdoc-example/img/cat.png)`，因为如果改变了 projectName 就需要做相应的修改.
 超链接也建议使用相对路径：`这个可以链接到 [api](smt_api_md.html).`
 
+## 音视频
+```
+#### 棕熊的世界：
+![棕熊的世界](video/movie.mp4 "这是title信息"){width=450px height=250px autoplay controls}
+
+#### 马长嘶：
+![马长嘶](audio/horse.mp3){autoplay controls}
+```
+默认以`.mp4`和`.ogv`结尾的就是以video显示；以`.mp3`和`.ogv`结尾的就是以video显示。
+
+也可以在config中设置：`{ videoRegExp: /\.(mp4|ogv)$/, audioRegExp: /\.(mp3|ogg)$/ }` 的配置来判断
+
+还可以如下添加`video`和`audio`来强制显示video和audio
+```
+#### 棕熊的世界(强制音频)：
+![棕熊的世界](video/movie.mp4 "这是title信息"){audio autoplay controls}
+
+#### 马长嘶(强制视频)：
+![马长嘶](audio/horse.mp3){video autoplay controls}
+```
+
+## 超链接
+
+默认情况下，以`http(s):`开头的会在新窗口打开，其他的在本窗口打开。
+
+在config中设置 `urlTarget: '_blank'`，都在新窗口打开；设置 `urlTarget: '_self'`，都在本窗口打开。
 
 ## 关联
 
