@@ -23,7 +23,7 @@
 
 module.exports = function chart_plugin(md) {
     let chart_id = 0;
-    md.renderer.rules.fence_custom.chart = function(tokens, idx) {
+    md.renderer.rules.fence_custom.chart = function(params, tokens, idx) {
         const content = tokens[idx].content.split('\n').filter(o=>!!o).map(o=>`${o.trim()}`).join('');
         chart_id ++;
         return `

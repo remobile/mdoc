@@ -19,7 +19,7 @@
 
 module.exports = function sequence_plugin(md) {
     let sequence_id = 0;
-    md.renderer.rules.fence_custom.sequence = function(tokens, idx) {
+    md.renderer.rules.fence_custom.sequence = function(params, tokens, idx) {
         const content = tokens[idx].content.split('\n').filter(o=>!!o).map(o=>`'${o.replace(/'/g, `\\'`)}\\n'`).join('+');
         sequence_id ++;
         return `
