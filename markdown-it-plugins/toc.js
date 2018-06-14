@@ -70,20 +70,20 @@ module.exports = function(md) {
 
         return true;
     }
-    md.renderer.rules.heading_open = function(tokens, idx) {
+    md.renderer.rules.heading_open = function(tokens, idx, options, env, slf) {
         const token = tokens[idx];
         if (token.toc) {
             const { serial, toc_id, head_id, level } = token.toc;
             return (
                 `
-                <h${level}>
+                <h${level} ${slf.renderAttrs(token)}>
                 <a class="anchor" aria-hidden="true" id="${head_id}"></a>
                 ${options.ztree ? '' : `<a href="#${toc_id}" aria-hidden="true" class="hash-link" >${ANCHOR_SVG}</a>`}
                 ${options.autoNumber ? `<span style="margin-right: 10px;">${serial}</span>` : ''}
                 `
             );
         }
-        return `<${token.tag}>`;
+        return `<${token.tag} ${slf.renderAttrs(token)}>`;
     };
 
     md.renderer.rules.toc_ztree_tail = function(tokens, index) {
