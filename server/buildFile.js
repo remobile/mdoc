@@ -1,4 +1,4 @@
-function buildMarkdown(configPath) {
+function buildMarkdown(configPath, build) {
     const React = require('react');
     const express = require('express');
     const inliner = require('inliner');
@@ -122,19 +122,31 @@ function buildMarkdown(configPath) {
     server.on('listening', function () {
         const url = 'http://localhost:' + port + config.baseUrl;
         console.log('Open', url);
-        new inliner(url, { inlinemin: true, }, function (error, html) {
-            if (error) {
-                console.log(chalk.red(event));
-            } else {
-                fs.writeFileSync(distFile, html);
+        if (build) {
+            new inliner(url, { inlinemin: true, }, function (error, html) {
+                if (error) {
+                    console.log(chalk.red(event));
+                } else {
+                    fs.writeFileSync(distFile, html);
 
-                console.log('output:', distFile);
-                process.exit(0);
-            }
-        })
-        .on('progress', function (event) {
-            console.log(chalk.green(event));
-        });
+                    console.log('output:', distFile);
+                    process.exit(0);
+                }
+            })
+            .on('progress', function (event) {
+                console.log(chalk.green(event));
+            });
+        } else {
+            const gulp = require('gulp');
+            const browserSync = require('browser-sync').create();
+            gulp.task('default', function() {
+                browserSync.init({
+                    proxy: url,
+                    files: [file],
+                });
+            });
+            gulp.start('default');
+        }
     });
     server.on('error', function (err) {
         startServer(port+1);

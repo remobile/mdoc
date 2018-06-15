@@ -10,6 +10,15 @@ const test_file = CWD + NODE_MODULES_PATH + 'MODIFYED';
 const paragraph_file = CWD + NODE_MODULES_PATH + 'lib/rules_block/paragraph.js';
 const newline_file = CWD + NODE_MODULES_PATH + 'lib/rules_inline/newline.js';
 
+program
+.version('0.0.1')
+.option('-s, --start', 'start server for project')
+.option('-b, --build', 'build release for project or single file')
+.option('-f, --file <config file>', 'start server single file with config')
+.option('-p, --port [4000]', 'port of server', 4000)
+.option('-v, --verbose', 'verbose mode')
+.parse(process.argv);
+
 if (!fs.existsSync(test_file)) {
     fs.createWriteStream(test_file);
     let paragraph_text = fs.readFileSync(paragraph_file).toString();
@@ -28,25 +37,15 @@ if (!fs.existsSync(CWD + 'config.js')) {
 
 require('babel-register')({
     babelrc: false,
-    only: [__dirname, process.cwd()],
+    only: [path.join(__dirname, 'lib'), process.cwd()],
     presets: ['react'],
 });
-
-
-program
-.version('0.0.1')
-.option('-p, --port [4000]', 'port of server', 4000)
-.option('-s, --start', 'start server for project')
-.option('-v, --verbose', 'verbose mode')
-.option('-b, --build', 'build release for project')
-.option('-f, --file <config file>', 'build single file with config')
-.parse(process.argv);
 
 const { port, start, build, file, verbose } = program;
 
 if (file) {
     const buildFile = require('./server/buildFile.js');
-    buildFile(file);
+    buildFile(file, build);
 } else if (build) {
     const buildProject = require('./server/buildProject.js');
     buildProject();
