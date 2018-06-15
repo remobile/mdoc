@@ -1,4 +1,4 @@
-function buildMarkdown(configPath, build) {
+function buildMarkdown(port, configPath, build) {
     const React = require('react');
     const express = require('express');
     const inliner = require('inliner');
@@ -8,7 +8,6 @@ function buildMarkdown(configPath, build) {
     const path = require('path');
     const color = require('color');
     const chalk = require('chalk');
-    const SingleDocLayout = require('../lib/SingleDocLayout');
     const CWD = process.cwd() + '/';
 
     // remove a module and child modules from require cache, so server does not have
@@ -67,6 +66,7 @@ function buildMarkdown(configPath, build) {
     mkdirp.sync(path.dirname(distFile));
 
     const app = express();
+    const http = require('http').Server(app);
 
     // generate the main.css file by concatenating user provided css to the end
     app.get(/.*\.css$/, (req, res, next) => {
@@ -95,10 +95,13 @@ function buildMarkdown(configPath, build) {
     app.use(config.baseUrl, express.static(__dirname + '/static'));
 
     app.get(config.baseUrl, (req, res, next) => {
+        removeModuleAndChildrenFromCache('../lib/SingleDocLayout.js');
+        const SingleDocLayout = require('../lib/SingleDocLayout.js');
         let ReactComp, rawContent;
         if (path.extname(file) === '.md') {
             rawContent = fs.readFileSync(file, 'utf8');
         } else {
+            removeModuleAndChildrenFromCache(file);
             ReactComp = require(file);
         }
         return res.send(
@@ -117,7 +120,6 @@ function buildMarkdown(configPath, build) {
         res.sendStatus(404);
     });
 
-    let port = 4000;
     const server = app.listen(port);
     server.on('listening', function () {
         const url = 'http://localhost:' + port + config.baseUrl;
@@ -139,17 +141,22 @@ function buildMarkdown(configPath, build) {
         } else {
             const gulp = require('gulp');
             const browserSync = require('browser-sync').create();
-            gulp.task('default', function() {
+            gulp.task('browser', function() {
                 browserSync.init({
                     proxy: url,
                     files: [file],
                 });
             });
-            gulp.start('default');
+            gulp.task('server', function() {
+                gulp.watch([CWD+'lib/*.js', __dirname+'/../**/*.js'], function() {
+                    browserSync.reload();
+                });
+            });
+            gulp.start(['browser', 'server']);
         }
     });
     server.on('error', function (err) {
-        startServer(port+1);
+        buildMarkdown(port+1, configPath, build);
     });
 }
 
