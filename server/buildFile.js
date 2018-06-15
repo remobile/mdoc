@@ -145,6 +145,7 @@ function buildMarkdown(port, configPath, build) {
                 browserSync.init({
                     proxy: url,
                     files: [file],
+                    notify: false,
                 });
             });
             gulp.task('server', function() {

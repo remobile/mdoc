@@ -269,6 +269,7 @@ function startServer(port, verbose) {
             browserSync.init({
                 proxy: url,
                 files: [CWD + (config.documentPath || 'doc')],
+                notify: false,
             });
         });
         gulp.start('default');
