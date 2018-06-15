@@ -37,7 +37,7 @@ if (!fs.existsSync(CWD + 'config.js')) {
 
 require('babel-register')({
     babelrc: false,
-    only: [path.join(__dirname, 'lib'), process.cwd()],
+    only: [__dirname, path.join(process.cwd(), 'lib')],
     presets: ['react'],
 });
 

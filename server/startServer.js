@@ -261,7 +261,17 @@ function startServer(port, verbose) {
 
     const server = app.listen(port);
     server.on('listening', function () {
-        console.log('Open http://localhost:' + port + config.baseUrl);
+        const url = 'http://localhost:' + port + config.baseUrl;
+        console.log('Open', url);
+        const gulp = require('gulp');
+        const browserSync = require('browser-sync').create();
+        gulp.task('default', function() {
+            browserSync.init({
+                proxy: url,
+                files: [CWD + (config.documentPath || 'doc')],
+            });
+        });
+        gulp.start('default');
     });
     server.on('error', function (err) {
         startServer(port+1);
