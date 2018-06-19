@@ -151,7 +151,8 @@ function buildMarkdown(port, configPath, build) {
                 });
             });
             gulp.task('server', function() {
-                gulp.watch([CWD+'lib/*.js', __dirname+'/../**/*.js', __dirname+'/../**/*.css'], function() {
+                gulp.watch([CWD+'lib/*.js', __dirname+'/../**/*.js', __dirname+'/../**/*.css'], function(item) {
+                    removeModuleAndChildrenFromCache(item.path);
                     browserSync.reload();
                 });
             });
