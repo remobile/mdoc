@@ -31,7 +31,7 @@ function startServer(port, verbose) {
         });
     }
     function getDocumentPath(file) {
-        return CWD + (config.documentPath || 'doc').replace(/\/$/, '') + '/' + file;
+        return CWD + config.documentPath + '/' + file;
     }
     function getPageId(path) {
         if (/^https?:/.test(path)) {
@@ -50,6 +50,8 @@ function startServer(port, verbose) {
         !config.menus && ( config.menus = [] );
         const { homePage, menus } = config;
 
+        // 设置 documentPath
+        config.documentPath = (config.documentPath || 'doc').replace(/\/$/, '');
         // 设置 baseUrl
         config.baseUrl = `/${config.projectName}/`;
 
@@ -265,14 +267,19 @@ function startServer(port, verbose) {
         console.log('Open', url);
         const gulp = require('gulp');
         const browserSync = require('browser-sync').create();
-        gulp.task('default', function() {
+        gulp.task('browser', function() {
             browserSync.init({
                 proxy: url,
-                files: [CWD + (config.documentPath || 'doc')],
+                files: [CWD + config.documentPath],
                 notify: false,
             });
         });
-        gulp.start('default');
+        gulp.task('server', function() {
+            gulp.watch([CWD+'lib/*.js', __dirname+'/../**/*.js', __dirname+'/../**/*.css'], function() {
+                browserSync.reload();
+            });
+        });
+        gulp.start(['browser', 'server']);
     });
     server.on('error', function (err) {
         startServer(port+1);

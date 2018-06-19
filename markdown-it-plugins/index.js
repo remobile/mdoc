@@ -1,18 +1,19 @@
 'use strict';
 
+const emoji = require('markdown-it-emoji');
+const footnote = require('markdown-it-footnote');
+const tasklists = require('markdown-it-task-lists');
+const attrs = require('markdown-it-attrs');
 const fence = require('./fence');
 const variable = require('./variable');
 const katex = require('./katex');
 const flow = require('./flow');
 const sequence = require('./sequence');
 const chart = require('./chart');
+const artical = require('./artical');
 const toc = require('./toc');
 const link = require('./link');
 const media = require('./media');
-const emoji = require('markdown-it-emoji');
-const footnote = require('markdown-it-footnote');
-const tasklists = require('markdown-it-task-lists');
-const attrs = require('markdown-it-attrs');
 
 const HTML_REPLACEMENTS = {
     '&': '&amp;',
@@ -33,6 +34,9 @@ function escapeHtml(str) {
 function disable_plugin(md) {
     md.block.ruler.disable('code');
 }
+function fence_plugin(md, config) {
+    md.use(fence, config);
+}
 function variable_plugin(md, config) {
     md.use(variable, config);
 }
@@ -47,6 +51,9 @@ function sequence_plugin(md, config) {
 }
 function chart_plugin(md, config) {
     md.use(chart, config);
+}
+function artical_plugin(md, config) {
+    md.use(artical, config);
 }
 function emoji_plugin(md, config) {
     md.use(emoji, config);
@@ -69,9 +76,6 @@ function link_plugin(md, config) {
 function media_plugin(md, config) {
     md.use(media, config);
 }
-function fence_plugin(md, config) {
-    md.use(fence, config);
-}
 function rewrite_plugin(md) {
     md.renderer.rules.text = function (tokens, idx /*, options, env */) {
         return escapeHtml(tokens[idx].content);;
@@ -86,6 +90,7 @@ module.exports = [
     flow_plugin,
     sequence_plugin,
     chart_plugin,
+    artical_plugin,
     emoji_plugin,
     footnote_plugin,
     tasklists_plugin,

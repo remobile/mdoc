@@ -31,11 +31,13 @@ function buildMarkdown(port, configPath, build) {
         });
     }
     function getDocumentPath(file) {
-        return CWD + (config.documentPath || 'doc').replace(/\/$/, '') + '/' + file;
+        return CWD + config.documentPath + '/' + file;
     }
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + 'config.js');
         const config = require(CWD + 'config.js');
+        // 设置 documentPath
+        config.documentPath = (config.documentPath || 'doc').replace(/\/$/, '');
         // 设置 baseUrl
         config.baseUrl = `/${config.projectName}/`;
 
@@ -149,7 +151,7 @@ function buildMarkdown(port, configPath, build) {
                 });
             });
             gulp.task('server', function() {
-                gulp.watch([CWD+'lib/*.js', __dirname+'/../**/*.js'], function() {
+                gulp.watch([CWD+'lib/*.js', __dirname+'/../**/*.js', __dirname+'/../**/*.css'], function() {
                     browserSync.reload();
                 });
             });

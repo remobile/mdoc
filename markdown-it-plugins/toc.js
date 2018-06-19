@@ -6,10 +6,10 @@ const ANCHOR_SVG = '<svg aria-hidden="true" height="16" version="1.1" viewBox="0
 module.exports = function(md) {
     let gstate;
     let hasToc = false;
-    const options = {};
+    const settings = {};
 
     function getSerial(serialPool, level) {
-        if (_.includes(options.disableNumberList, level)) {
+        if (_.includes(settings.disableNumberList, level)) {
             return [];
         }
         let list = [];
@@ -35,32 +35,32 @@ module.exports = function(md) {
         pos += 5;
         let params = text.slice(pos, max).split(' ').filter(o=>o);
         const numberParam =  _.find(params, o=>/^number.*/.test(o));
-        options.disableNumberList = [];
+        settings.disableNumberList = [];
         if (numberParam) {
-            options.autoNumber = true;
+            settings.autoNumber = true;
             const list = numberParam.split('=')[1];
             if (list) {
-                options.disableNumberList = _.map(list.split(/[,，]/), o=>-o);
+                settings.disableNumberList = _.map(list.split(/[,，]/), o=>-o);
             }
         }
         const treeParam =  _.find(params, o=>/^tree.*/.test(o));
         if (treeParam) {
-            options.ztree = true;
-            options.width = +(treeParam.split('=')[1]) || 250;
+            settings.ztree = true;
+            settings.width = +(treeParam.split('=')[1]) || 250;
         }
-        options.disableList = [];
+        settings.disableList = [];
         const disableParam =  _.find(params, o=>/^disable=.*/.test(o));
         if (disableParam) {
             const list = disableParam.split('=')[1];
             if (list) {
-                options.disableList = _.map(list.split(/[,，]/), o=>+o);
+                settings.disableList = _.map(list.split(/[,，]/), o=>+o);
             }
         }
 
         state.line = startLine + 1;
 
         let token;
-        if (options.ztree) {
+        if (settings.ztree) {
             token = state.push('toc_ztree_start', '', 0);
         } else {
             token = state.push('toc_body', '', 0);
@@ -78,8 +78,8 @@ module.exports = function(md) {
                 `
                 <h${level} ${slf.renderAttrs(token)}>
                 <a class="anchor" aria-hidden="true" id="${head_id}"></a>
-                ${options.ztree ? '' : `<a href="#${toc_id}" aria-hidden="true" class="hash-link" >${ANCHOR_SVG}</a>`}
-                ${options.autoNumber ? `<span style="margin-right: 10px;">${serial}</span>` : ''}
+                ${settings.ztree ? '' : `<a href="#${toc_id}" aria-hidden="true" class="hash-link" >${ANCHOR_SVG}</a>`}
+                ${settings.autoNumber ? `<span style="margin-right: 10px;">${serial}</span>` : ''}
                 `
             );
         }
@@ -107,8 +107,8 @@ module.exports = function(md) {
         };
         return (
             `<div style="display:flex;width: 100%;">
-            <div style="width:${options.width}px;"></div>
-            <div style="float:left;width:${options.width}px;position:fixed;">
+            <div style="width:${settings.width}px;"></div>
+            <div style="float:left;width:${settings.width}px;position:fixed;">
             <ul id="toc_root" class="ztree"><ul>
             <script>
             $(document).ready(function(){
@@ -142,7 +142,7 @@ module.exports = function(md) {
                     indent--;
                 }
             }
-            res.push(`<li style="list-style:none;"><a class="anchor" aria-hidden="true" href="#${head_id}" id="${toc_id}">${options.autoNumber ? `<span style="margin-right: 12px;">${serial}</span>` : ''}${name}</a></li>`);
+            res.push(`<li style="list-style:none;"><a class="anchor" aria-hidden="true" href="#${head_id}" id="${toc_id}">${settings.autoNumber ? `<span style="margin-right: 12px;">${serial}</span>` : ''}${name}</a></li>`);
             return res.join('');
         });
 
@@ -165,10 +165,10 @@ module.exports = function(md) {
                 continue;
             }
             const level = +token.tag.substr(1, 1);
-            if (_.includes(options.disableList, level)) {
+            if (_.includes(settings.disableList, level)) {
                 continue;
             }
-            if (!_.includes(options.disableNumberList, level)) {
+            if (!_.includes(settings.disableNumberList, level)) {
                 if (lastLevel < level) {
                     serialPool[level] = 1;
                 } else {
@@ -190,16 +190,16 @@ module.exports = function(md) {
                 head_id,
                 level,
             }
-            options.ztree && zNodes.push({
+            settings.ztree && zNodes.push({
                 id: toc_id,
                 pId: toc_parent_id,
-                name: (options.autoNumber ? serial + '    ' : '') + name,
+                name: (settings.autoNumber ? serial + '    ' : '') + name,
                 open: true,
                 url: `#${head_id}`,
                 target:'_self'
             });
         }
-        if (options.ztree) {
+        if (settings.ztree) {
             tokens.push({type: 'toc_ztree_tail', tag: '',  nesting: 0});
             state.zNodes = zNodes;
         }

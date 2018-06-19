@@ -33,7 +33,7 @@ function buildProject() {
         });
     }
     function getDocumentPath(file) {
-        return CWD + (config.documentPath || 'doc').replace(/\/$/, '') + '/' + file;
+        return CWD + config.documentPath + '/' + file;
     }
     function getPageId(path) {
         if (/^https?:/.test(path)) {
@@ -48,7 +48,8 @@ function buildProject() {
         const config = require(CWD + 'config.js');
         !config.menus && ( config.menus = [] );
         const { homePage, menus } = config;
-
+        // 设置 documentPath
+        config.documentPath = (config.documentPath || 'doc').replace(/\/$/, '');
         // 设置 baseUrl
         config.baseUrl = `/${config.projectName}/`;
 
