@@ -39,7 +39,7 @@ function startServer(port, verbose) {
         return hash.digest('hex');
     }
     function getPathFromReqPath(path) {
-        return  path.replace(new RegExp(`^${config.baseUrl}`), '');
+        return  decodeURI(path).replace(new RegExp(`^${config.baseUrl}`), '');
     }
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + 'config.js');
