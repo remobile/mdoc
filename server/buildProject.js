@@ -36,12 +36,9 @@ function buildProject() {
         return CWD + config.documentPath + '/' + file;
     }
     function getPageId(path) {
-        if (/^https?:/.test(path)) {
-            const hash = crypto.createHash('md5');
-            hash.update(path);
-            return hash.digest('hex');
-        }
-        return path.replace(/[/.]/g, '_');
+        const hash = crypto.createHash('md5');
+        hash.update(path);
+        return hash.digest('hex');
     }
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + 'config.js');

@@ -34,12 +34,9 @@ function startServer(port, verbose) {
         return CWD + config.documentPath + '/' + file;
     }
     function getPageId(path) {
-        if (/^https?:/.test(path)) {
-            const hash = crypto.createHash('md5');
-            hash.update(path);
-            return hash.digest('hex');
-        }
-        return path.replace(/[/.]/g, '_');
+        const hash = crypto.createHash('md5');
+        hash.update(path);
+        return hash.digest('hex');
     }
     function getPathFromReqPath(path) {
         return  path.replace(new RegExp(`^${config.baseUrl}`), '');
