@@ -107,6 +107,7 @@ module.exports = function(md) {
         };
         return (
             `<div style="display:flex;width: 150%;">
+            <style>code{max-width:800px;}</style>
             <div style="width:${settings.width}px;"></div>
             <div style="float:left;width:${settings.width-80}px;position:fixed;max-height:80%;overflow:scroll;">
             <ul id="toc_root" class="ztree"><ul>
