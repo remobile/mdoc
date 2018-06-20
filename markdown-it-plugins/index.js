@@ -10,6 +10,7 @@ const katex = require('./katex');
 const flow = require('./flow');
 const sequence = require('./sequence');
 const chart = require('./chart');
+const images = require('./images');
 const artical = require('./artical');
 const toc = require('./toc');
 const link = require('./link');
@@ -52,6 +53,9 @@ function sequence_plugin(md, config) {
 function chart_plugin(md, config) {
     md.use(chart, config);
 }
+function images_plugin(md, config) {
+    md.use(images, config);
+}
 function artical_plugin(md, config) {
     md.use(artical, config);
 }
@@ -90,6 +94,7 @@ module.exports = [
     flow_plugin,
     sequence_plugin,
     chart_plugin,
+    images_plugin,
     artical_plugin,
     emoji_plugin,
     footnote_plugin,
