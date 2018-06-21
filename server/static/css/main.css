@@ -1341,3 +1341,7 @@ footer .copyright {
         width: 100%;
     }
 }
+#mdoc_image_container {
+    min-width: 800px;
+    min-height: 80%;
+}
