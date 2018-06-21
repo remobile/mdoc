@@ -148,6 +148,7 @@ function buildMarkdown(port, configPath, build) {
                     proxy: url,
                     files: [file],
                     notify: false,
+                    open: false,
                 });
             });
             gulp.task('server', function() {

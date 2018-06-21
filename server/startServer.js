@@ -177,10 +177,24 @@ function startServer(port, verbose) {
                 )
             );
         } else if (extension.match(/^\.(png|jpg|jpeg|gif)$/)) {
+            if (!page.current.supports) {
+                page.current.supports = ['viewer'];
+            } else if (page.current.supports.indexOf('viewer') < 0) {
+                page.current.supports.push('viewer');
+            }
             res.send(
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
-                        <img src={page.current.path} />
+                        <div id="mdoc_image_container">
+                            <img src={page.current.path} style={{visibility:'hidden'}} />
+                        </div>
+                        <script
+                            dangerouslySetInnerHTML={{
+                                __html: `
+                                $(document).ready(function(){new Viewer(document.getElementById("mdoc_image_container"), {inline:true,navbar:false})})
+                                `,
+                            }}
+                            />
                     </DocsLayout>
                 )
             );
@@ -269,6 +283,7 @@ function startServer(port, verbose) {
                 proxy: url,
                 files: [CWD + config.documentPath],
                 notify: false,
+                open: false,
             });
         });
         gulp.task('server', function() {
