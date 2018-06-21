@@ -16,8 +16,7 @@ function startServer(port, verbose) {
         let mod = require.resolve(moduleName);
         if (mod && (mod = require.cache[mod])) {
             mod.children.forEach(child => {
-                delete require.cache[child.id];
-                removeModulePathFromCache(mod.id);
+                removeModuleAndChildrenFromCache(child.id);
             });
             delete require.cache[mod.id];
             removeModulePathFromCache(mod.id);
@@ -289,6 +288,9 @@ function startServer(port, verbose) {
         gulp.task('server', function() {
             gulp.watch([CWD+'lib/*.js', __dirname+'/../**/*.js', __dirname+'/../**/*.css'], function(item) {
                 removeModuleAndChildrenFromCache(item.path);
+                if (/\/mdoc\/markdown-it-plugins\//.test(item.path)) {
+                    removeModuleAndChildrenFromCache(item.path.replace(/\/mdoc\/markdown-it-plugins\/.*/, '/mdoc/lib/MarkdownBlock.js'));
+                }
                 browserSync.reload();
             });
         });

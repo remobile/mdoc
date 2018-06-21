@@ -16,8 +16,7 @@ function buildMarkdown(port, configPath, build) {
         let mod = require.resolve(moduleName);
         if (mod && (mod = require.cache[mod])) {
             mod.children.forEach(child => {
-                delete require.cache[child.id];
-                removeModulePathFromCache(mod.id);
+                removeModuleAndChildrenFromCache(mod.id);
             });
             delete require.cache[mod.id];
             removeModulePathFromCache(mod.id);
