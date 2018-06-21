@@ -747,6 +747,14 @@ pre code {
 .navigationSlider .slidingNav ul li.siteNavGroupActive a {
     background: $primaryColor;
 }
+@media only screen and (max-width: 735px) {
+    .navigationSlider .slidingNav ul li a:focus,
+    .navigationSlider .slidingNav ul li a:hover,
+    .navigationSlider .slidingNav ul li.siteNavItemActive a,
+    .navigationSlider .slidingNav ul li.siteNavGroupActive a {
+        background: $secondaryColor;
+    }
+}
 .menuExpand {
     display: flex;
     flex-flow: column nowrap;
@@ -1286,7 +1294,34 @@ footer .copyright {
     color: rgba(255, 255, 255, 0.4);
     text-align: center;
 }
-
 .error {
     color: red;
+}
+.mdoc_select_menu_table {
+    margin-top: 10px;
+    border: 0;
+    display: none;
+    width: 100;
+    position: absolute;
+}
+.mdoc_select_menu_table td{
+    background-color: $primaryColor;
+    border-top: solid 1px gray;
+    width: 100px;
+}
+@media only screen and (max-width: 735px) {
+    .mdoc_select_menu_table {
+        margin-top: 0px;
+        border: 0;
+        display: none;
+        width: 100;
+        position: absolute;
+    }
+    .mdoc_select_menu_table td{
+        background-color: $secondaryColor;
+        border-top: solid 1px white;
+        width: 100px;
+        padding: 0px;
+        color: white;
+    }
 }
