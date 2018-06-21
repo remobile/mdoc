@@ -130,7 +130,11 @@ header h2 {
     max-width: 1100px;
     padding: 0 20px;
 }
-
+@media only screen and (max-width: 735px) {
+    .wrapper {
+        padding: 0 6px;
+    }
+}
 .center {
     display: block;
     text-align: center;
@@ -396,10 +400,6 @@ header h2 {
     font-weight: 400;
 }
 @media (max-width: 375px) {
-    .logo {
-        display: none;
-    }
-
     .headerTitle {
         font-size: 17px;
         font-weight: 300;
@@ -1188,7 +1188,11 @@ table tr th {
     padding-top: 40px;
     min-height: 80%;
 }
-
+@media only screen and (max-width: 735px) {
+    .mainContainer .wrapper .post{
+        padding-top: 30px;
+    }
+}
 /** Homepage **/
 .container .wrapper .alignCenter h2 {
     text-align: center;
@@ -1332,6 +1336,10 @@ footer .copyright {
     display:flex;
     width: 150%;
 }
+#mdoc_image_container {
+    width: 800px;
+    min-height: 80%;
+}
 @media only screen and (max-width: 735px) {
     .mdoc_toc_list {
         margin-top: 80px;
@@ -1340,8 +1348,8 @@ footer .copyright {
         display:flex;
         width: 100%;
     }
-}
-#mdoc_image_container {
-    min-width: 800px;
-    min-height: 80%;
+    #mdoc_image_container {
+        width: 100%;
+        min-height: 80%;
+    }
 }
