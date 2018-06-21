@@ -59,12 +59,7 @@ module.exports = function(md) {
 
         state.line = startLine + 1;
 
-        let token;
-        if (settings.ztree) {
-            token = state.push('toc_ztree_start', '', 0);
-        } else {
-            token = state.push('toc_body', '', 0);
-        }
+        const token = state.push('toc_ztree_start', '', 0);
         token.map = [ startLine, state.line ];
         !hasToc && (hasToc = true);
 
@@ -90,7 +85,36 @@ module.exports = function(md) {
         return '</div></div>';
     };
     md.renderer.rules.toc_ztree_start = function(tokens, index) {
-        const setting = {
+        let indent = 0;
+        const headings = gstate.tokens.filter(o => o.type === 'heading_open');
+        const list = headings.map(o => {
+            if (!o.toc) {
+                return '';
+            }
+            const { serial, toc_id, head_id, name, level } = o.toc;
+            const res = [];
+            if (level > indent) {
+                const ldiff = (level - indent);
+                for (let i = 0; i < ldiff; i++) {
+                    res.push('<ul>');
+                    indent++;
+                }
+            } else if (level < indent) {
+                const ldiff = (indent - level);
+                for (let i = 0; i < ldiff; i++) {
+                    res.push('</ul>');
+                    indent--;
+                }
+            }
+            res.push(`<li><a class="anchor" aria-hidden="true" href="#${head_id}" id="${toc_id}">${settings.autoNumber ? `<span style="margin-right: 12px;">${serial}</span>` : ''}${name}</a></li>`);
+            return res.join('');
+        });
+
+        const toc_html = '<div class="mdoc_toc_list">'+list.join('') + new Array(indent + 1).join('</ul>')+'</div>';
+        if (!settings.ztree) {
+            return toc_html;
+        }
+        const ztree_setting = {
             view: {
                 dblClickExpand: false,
                 showLine: true,
@@ -106,51 +130,30 @@ module.exports = function(md) {
             },
         };
         return (
-            `<div style="display:flex;width: 150%;">
+            `
+            ${toc_html}
+            <div id="mdoc_toc_container">
             <style>code{max-width:800px;}</style>
-            <div style="width:${settings.width}px;"></div>
-            <div style="float:left;width:${settings.width-80}px;position:fixed;max-height:80%;overflow:scroll;">
+            <div id="mdoc_toc_sidebar" style="width:${settings.width}px;"></div>
+            <div id="mdoc_toc_menu" style="float:left;width:${settings.width-80}px;position:fixed;max-height:80%;overflow:scroll;">
             <ul id="toc_root" class="ztree"><ul>
             <script>
             $(document).ready(function(){
-                $.fn.zTree.init($("#toc_root"), ${JSON.stringify(setting)}, ${JSON.stringify(gstate.zNodes)});
+                if ($(window).width()<=735) {
+                    $(".mdoc_toc_list").show();
+                    $("#mdoc_toc_sidebar").hide();
+                    $("#mdoc_toc_menu").hide();
+                } else {
+                    $(".mdoc_toc_list").hide();
+                    $.fn.zTree.init($("#toc_root"), ${JSON.stringify(ztree_setting)}, ${JSON.stringify(gstate.zNodes)});
+                }
             });
             </script>
             </div>
-            <div style="flex:1;">`
+            <div style="flex:1;">
+            `
         );
     };
-    md.renderer.rules.toc_body = function(tokens, index) {
-        let indent = 0;
-        const headings = gstate.tokens.filter(o => o.type === 'heading_open');
-
-        const list = headings.map(o => {
-            if (!o.toc) {
-                return '';
-            }
-            const { serial, toc_id, head_id, name, level } = o.toc;
-            const res = [];
-            if (level > indent) {
-                const ldiff = (level - indent);
-                for (let i = 0; i < ldiff; i++) {
-                    res.push('<ul class="ztree">');
-                    indent++;
-                }
-            } else if (level < indent) {
-                const ldiff = (indent - level);
-                for (let i = 0; i < ldiff; i++) {
-                    res.push('</ul>');
-                    indent--;
-                }
-            }
-            res.push(`<li style="list-style:none;"><a class="anchor" aria-hidden="true" href="#${head_id}" id="${toc_id}">${settings.autoNumber ? `<span style="margin-right: 12px;">${serial}</span>` : ''}${name}</a></li>`);
-            return res.join('');
-        });
-
-
-        return list.join('') + new Array(indent + 1).join('</ul>');
-    };
-
     md.core.ruler.push('grab_state', function(state) {
         const serialPool = {};
         const tokens = state.tokens;

@@ -1325,3 +1325,19 @@ footer .copyright {
         color: white;
     }
 }
+.mdoc_toc_list {
+    margin-top: 30px;
+}
+#mdoc_toc_container {
+    display:flex;
+    width: 150%;
+}
+@media only screen and (max-width: 735px) {
+    .mdoc_toc_list {
+        margin-top: 80px;
+    }
+    #mdoc_toc_container {
+        display:flex;
+        width: 100%;
+    }
+}
