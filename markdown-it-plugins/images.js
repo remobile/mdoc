@@ -3,12 +3,11 @@
 const { support, parseParams } = require('../lib/utils');
 
 module.exports = function images_plugin(md, page) {
-    const hasViewer = support(page.current, 'viewer');
-
     let images_id = 0;
     md.renderer.rules.fence_custom.images = function(params, tokens, idx) {
         const options = parseParams(params, { width: 600, col: 3 });
         const content = tokens[idx].content.split('\n').filter(o=>!!o);
+        const hasViewer = support(page.current, 'viewer');
         images_id++;
         return `
         <div id="mdoc_images_${images_id}" style="width:${options.width}px;">
