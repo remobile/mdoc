@@ -2,10 +2,10 @@
 'use strict';
 
 
-module.exports = function sub_plugin(md, options) {
+module.exports = function sub_plugin(md, page) {
     const defaultRender = md.renderer.rules.image;
-    const videoRegExp = options.videoRegExp || /\.(mp4|ogv)$/;
-    const audioRegExp = options.audioRegExp || /\.(mp3|ogg)$/;
+    const videoRegExp = page.config.videoRegExp || /\.(mp4|ogv)$/;
+    const audioRegExp = page.config.audioRegExp || /\.(mp3|ogg)$/;
 
     md.renderer.rules.image = function (tokens, idx, options, env, self) {
         const token = tokens[idx];

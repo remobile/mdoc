@@ -1,8 +1,10 @@
 'use strict';
 
-const { parseParams } = require('../lib/utils');
+const { support, parseParams } = require('../lib/utils');
 
-module.exports = function images_plugin(md) {
+module.exports = function images_plugin(md, page) {
+    const hasViewer = support(page.current, 'viewer');
+
     let images_id = 0;
     md.renderer.rules.fence_custom.images = function(params, tokens, idx) {
         const options = parseParams(params, { width: 600, col: 3 });
@@ -10,21 +12,27 @@ module.exports = function images_plugin(md) {
         images_id++;
         return `
         <div id="mdoc_images_${images_id}" style="width:${options.width}px;">
-            ${content.map(o=>`<img src="${o}" style="width:${options.width/options.col-2}px;height:${options.width/options.col-2}px;margin-right:2px;margin-bottom:2px;" >`).join('')}
+        ${content.map(o=>`<img src="${o}" style="width:${options.width/options.col-2}px;height:${options.width/options.col-2}px;margin-right:2px;margin-bottom:2px;" >`).join('')}
         </div>
-        <script>$(document).ready(function(){
-            var viewer = new Viewer(document.getElementById("mdoc_images_${images_id}"), {
-            backdrop: 'static',
-            toolbar: {
-                prev: 1,
-                zoomOut: 1,
-                oneToOne: 1,
-                play: 1,
-                reset: 1,
-                zoomIn: 1,
-                next: 1,
-            },
-        })})</script>
+        ${hasViewer ? `
+            <script>
+            $(document).ready(function(){
+                var viewer = new Viewer(document.getElementById("mdoc_images_${images_id}"), {
+                    backdrop: 'static',
+                    toolbar: {
+                        prev: 1,
+                        zoomOut: 1,
+                        oneToOne: 1,
+                        play: 1,
+                        reset: 1,
+                        zoomIn: 1,
+                        next: 1,
+                    },
+                })
+            })
+            </script>
+            ` : ''
+        }
         `;
     };
 };

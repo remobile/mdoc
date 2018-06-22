@@ -11,6 +11,7 @@ const flow = require('./flow');
 const sequence = require('./sequence');
 const chart = require('./chart');
 const images = require('./images');
+const swiper = require('./swiper');
 const artical = require('./artical');
 const toc = require('./toc');
 const link = require('./link');
@@ -35,50 +36,53 @@ function escapeHtml(str) {
 function disable_plugin(md) {
     md.block.ruler.disable('code');
 }
-function fence_plugin(md, config) {
-    md.use(fence, config);
+function fence_plugin(md, page) {
+    md.use(fence, page);
 }
-function variable_plugin(md, config) {
-    md.use(variable, config);
+function variable_plugin(md, page) {
+    md.use(variable, page);
 }
-function katex_plugin(md, config) {
-    md.use(katex, config);
+function katex_plugin(md, page) {
+    md.use(katex, page);
 }
-function flow_plugin(md, config) {
-    md.use(flow, config);
+function flow_plugin(md, page) {
+    md.use(flow, page);
 }
-function sequence_plugin(md, config) {
-    md.use(sequence, config);
+function sequence_plugin(md, page) {
+    md.use(sequence, page);
 }
-function chart_plugin(md, config) {
-    md.use(chart, config);
+function chart_plugin(md, page) {
+    md.use(chart, page);
 }
-function images_plugin(md, config) {
-    md.use(images, config);
+function images_plugin(md, page) {
+    md.use(images, page);
 }
-function artical_plugin(md, config) {
-    md.use(artical, config);
+function swiper_plugin(md, page) {
+    md.use(swiper, page);
 }
-function emoji_plugin(md, config) {
-    md.use(emoji, config);
+function artical_plugin(md, page) {
+    md.use(artical, page);
 }
-function footnote_plugin(md, config) {
-    md.use(footnote, config);
+function emoji_plugin(md, page) {
+    md.use(emoji, page);
 }
-function tasklists_plugin(md, config) {
-    md.use(tasklists, config);
+function footnote_plugin(md, page) {
+    md.use(footnote, page);
 }
-function attrs_plugin(md, config) {
-    md.use(attrs, config);
+function tasklists_plugin(md, page) {
+    md.use(tasklists, page);
 }
-function toc_plugin(md, config) {
-    md.use(toc, config);
+function attrs_plugin(md, page) {
+    md.use(attrs, page);
 }
-function link_plugin(md, config) {
-    md.use(link, config);
+function toc_plugin(md, page) {
+    md.use(toc, page);
 }
-function media_plugin(md, config) {
-    md.use(media, config);
+function link_plugin(md, page) {
+    md.use(link, page);
+}
+function media_plugin(md, page) {
+    md.use(media, page);
 }
 function rewrite_plugin(md) {
     md.renderer.rules.text = function (tokens, idx /*, options, env */) {
@@ -95,6 +99,7 @@ module.exports = [
     sequence_plugin,
     chart_plugin,
     images_plugin,
+    swiper_plugin,
     artical_plugin,
     emoji_plugin,
     footnote_plugin,
