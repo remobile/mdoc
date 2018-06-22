@@ -190,7 +190,12 @@ function startServer(port, verbose) {
                         <script
                             dangerouslySetInnerHTML={{
                                 __html: `
-                                $(document).ready(function(){new Viewer(document.getElementById("mdoc_image_container"), {inline:true,navbar:false})})
+                                $(document).ready(function(){
+                                    var viewer = new Viewer(document.getElementById("mdoc_image_container"), {
+                                    inline:true,
+                                    navbar:false,
+                                    toolbar: false
+                                })})
                                 `,
                             }}
                             />

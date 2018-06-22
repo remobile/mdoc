@@ -1353,3 +1353,11 @@ footer .copyright {
         min-height: 80%;
     }
 }
+.viewer-fullscreen-exit, .viewer-close {
+    margin-top: 52px;
+}
+@media only screen and (max-width: 735px) {
+    .viewer-fullscreen-exit, .viewer-close {
+        margin-top: 100px;
+    }
+}

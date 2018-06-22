@@ -12,7 +12,19 @@ module.exports = function images_plugin(md) {
         <div id="mdoc_images_${images_id}" style="width:${options.width}px;">
             ${content.map(o=>`<img src="${o}" style="width:${options.width/options.col-2}px;height:${options.width/options.col-2}px;margin-right:2px;margin-bottom:2px;" >`).join('')}
         </div>
-        <script>$(document).ready(function(){new Viewer(document.getElementById("mdoc_images_${images_id}"), {button:false})})</script>
+        <script>$(document).ready(function(){
+            var viewer = new Viewer(document.getElementById("mdoc_images_${images_id}"), {
+            backdrop: 'static',
+            toolbar: {
+                prev: 1,
+                zoomOut: 1,
+                oneToOne: 1,
+                play: 1,
+                reset: 1,
+                zoomIn: 1,
+                next: 1,
+            },
+        })})</script>
         `;
     };
 };
