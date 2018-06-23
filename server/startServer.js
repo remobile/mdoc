@@ -89,6 +89,11 @@ function startServer(port, verbose) {
             console.log("============== config end ==============");
         }
 
+        if (!config.colors || !config.colors.primaryColor || !config.colors.secondaryColor) {
+            console.error(chalk.red('缺少颜色配置'));
+            process.exit(0);
+        }
+
         return config;
     }
     function getPageById(id) {
@@ -217,11 +222,8 @@ function startServer(port, verbose) {
         }
     }
 
-    const config = reloadSiteConfig();
-    if (!config.colors || !config.colors.primaryColor || !config.colors.secondaryColor) {
-        console.error(chalk.red('缺少颜色配置'));
-        process.exit(0);
-    }
+    let config = reloadSiteConfig();
+
     const app = express();
     verbose && app.use(morgan('short'));
 
@@ -287,7 +289,6 @@ function startServer(port, verbose) {
                 proxy: url,
                 files: [CWD + config.documentPath],
                 notify: false,
-                open: false,
             });
         });
         gulp.task('server', function() {
@@ -299,9 +300,16 @@ function startServer(port, verbose) {
                 browserSync.reload();
             });
         });
-        gulp.start(['browser', 'server']);
+        gulp.task('config', function() {
+            gulp.watch([CWD+'config.js'], function(item) {
+                config = reloadSiteConfig();
+                browserSync.reload();
+            });
+        });
+        gulp.start(['browser', 'server', 'config']);
     });
     server.on('error', function (err) {
+        console.log("open error on port:", port);
         startServer(port+1);
     });
 }
