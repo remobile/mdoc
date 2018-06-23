@@ -42,7 +42,7 @@ function startServer(port, verbose) {
     }
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + 'config.js');
-        const config = require(CWD + 'config.js');
+        config = require(CWD + 'config.js');
         !config.menus && ( config.menus = [] );
         const { homePage, menus } = config;
 
@@ -93,8 +93,6 @@ function startServer(port, verbose) {
             console.error(chalk.red('缺少颜色配置'));
             process.exit(0);
         }
-
-        return config;
     }
     function getPageById(id) {
         for (const menu of config.menus) {
@@ -222,7 +220,8 @@ function startServer(port, verbose) {
         }
     }
 
-    let config = reloadSiteConfig();
+    let config;
+    reloadSiteConfig();
 
     const app = express();
     verbose && app.use(morgan('short'));
@@ -289,6 +288,7 @@ function startServer(port, verbose) {
                 proxy: url,
                 files: [CWD + config.documentPath],
                 notify: false,
+                open: true,
             });
         });
         gulp.task('server', function() {
@@ -302,7 +302,7 @@ function startServer(port, verbose) {
         });
         gulp.task('config', function() {
             gulp.watch([CWD+'config.js'], function(item) {
-                config = reloadSiteConfig();
+                reloadSiteConfig();
                 browserSync.reload();
             });
         });

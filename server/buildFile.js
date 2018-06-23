@@ -16,7 +16,7 @@ function buildMarkdown(port, configPath, build) {
         let mod = require.resolve(moduleName);
         if (mod && (mod = require.cache[mod])) {
             mod.children.forEach(child => {
-                removeModuleAndChildrenFromCache(mod.id);
+                removeModuleAndChildrenFromCache(child.id);
             });
             delete require.cache[mod.id];
             removeModulePathFromCache(mod.id);
@@ -34,37 +34,41 @@ function buildMarkdown(port, configPath, build) {
     }
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + 'config.js');
-        const config = require(CWD + 'config.js');
+        config = require(CWD + 'config.js');
         // 设置 documentPath
         config.documentPath = (config.documentPath || 'doc').replace(/\/$/, '');
         // 设置 baseUrl
         config.baseUrl = `/${config.projectName}/`;
 
-        return config;
+        if (!config.colors || !config.colors.primaryColor || !config.colors.secondaryColor) {
+            console.error(chalk.red('缺少颜色配置'));
+            process.exit(0);
+        }
+    }
+    function reloadPage() {
+        removeModuleAndChildrenFromCache(path.resolve(CWD, configPath));
+        page = require(path.resolve(CWD, configPath));
+        file =  getDocumentPath(page.path);
+        if (!fs.existsSync(file)) {
+            console.error(chalk.red('文件:'+file+'不存在'));
+            process.exit(0);
+        }
+        page.dist = page.dist || '';
+        if (path.extname(page.dist) === '.html') {
+            distFile = path.join(CWD, page.dist);
+        } else {
+            distFile = path.join(CWD, page.dist, path.basename(file).replace(/\.(md|js)$/, '.html'));
+        }
+        fs.removeSync(distFile);
+        mkdirp.sync(path.dirname(distFile));
     }
 
-    const config = reloadSiteConfig();
-    if (!config.colors || !config.colors.primaryColor || !config.colors.secondaryColor) {
-        console.error(chalk.red('缺少颜色配置'));
-        process.exit(0);
-    }
-
-    const page = require(path.resolve(CWD, configPath));
-    const file =  getDocumentPath(page.path);
-    if (!fs.existsSync(file)) {
-        console.error(chalk.red('文件:'+file+'不存在'));
-        process.exit(0);
-    }
-
+    let config;
+    let page;
+    let file;
     let distFile;
-    page.dist = page.dist || '';
-    if (path.extname(page.dist) === '.html') {
-        distFile = path.join(CWD, page.dist);
-    } else {
-        distFile = path.join(CWD, page.dist, path.basename(file).replace(/\.(md|js)$/, '.html'));
-    }
-    fs.removeSync(distFile);
-    mkdirp.sync(path.dirname(distFile));
+    reloadSiteConfig();
+    reloadPage();
 
     const app = express();
     const http = require('http').Server(app);
@@ -105,6 +109,7 @@ function buildMarkdown(port, configPath, build) {
             removeModuleAndChildrenFromCache(file);
             ReactComp = require(file);
         }
+        console.log(page);
         return res.send(
             renderToStaticMarkup(
                 <SingleDocLayout page={{current: page, config}}>
@@ -147,7 +152,7 @@ function buildMarkdown(port, configPath, build) {
                     proxy: url,
                     files: [file],
                     notify: false,
-                    open: false,
+                    open: true,
                 });
             });
             gulp.task('server', function() {
@@ -156,7 +161,13 @@ function buildMarkdown(port, configPath, build) {
                     browserSync.reload();
                 });
             });
-            gulp.start(['browser', 'server']);
+            gulp.task('config', function() {
+                gulp.watch([path.resolve(CWD, configPath)], function(item) {
+                    reloadPage();
+                    browserSync.reload();
+                });
+            });
+            gulp.start(['browser', 'server', 'config']);
         }
     });
     server.on('error', function (err) {
