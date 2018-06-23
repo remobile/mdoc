@@ -1191,6 +1191,7 @@ table tr th {
 @media only screen and (max-width: 735px) {
     .mainContainer .wrapper .post{
         padding-top: 30px;
+        overflow-x: scroll;
     }
 }
 /** Homepage **/
