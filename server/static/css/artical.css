@@ -33,12 +33,18 @@ h1, h2, h3, h4 {
     font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Arial,sans-serif;
     font-weight: 800;
 }
-img, video{
+h5 {
+    padding-top: 20;
+    padding-bottom: 20;
+    font-weight: 800;
+    text-align: center;
+}
+img, video, blockquote{
     width: 80%;
     margin-left: 10%;
 }
 @media only screen and (max-width: 735px) {
-    img, video{
+    img, video, blockquote{
         width: 100%;
         margin-left: 0;
     }
