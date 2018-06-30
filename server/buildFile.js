@@ -131,7 +131,7 @@ function buildMarkdown(port, configPath, build) {
         const url = 'http://localhost:' + port + config.baseUrl;
         console.log('Open', url);
         if (build) {
-            new inliner(url, { inlinemin: true, }, function (error, html) {
+            new inliner(url, { images: true}, function (error, html) {
                 if (error) {
                     console.log(chalk.red(event));
                 } else {
