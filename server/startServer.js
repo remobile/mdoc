@@ -8,6 +8,8 @@ function startServer(port, verbose) {
     const path = require('path');
     const color = require('color');
     const chalk = require('chalk');
+    const babel = require("babel-core");
+    const { support } = require("../lib/utils");
     const CWD = process.cwd() + '/';
 
     // remove a module and child modules from require cache, so server does not have
@@ -161,15 +163,36 @@ function startServer(port, verbose) {
                 )
             );
         } else if (extension === '.js') {
-            removeModuleAndChildrenFromCache(file);
-            const ReactComp = require(file);
-            res.send(
-                renderToStaticMarkup(
-                    <DocsLayout page={page}>
-                        <ReactComp />
-                    </DocsLayout>
-                )
-            );
+            const hasReact = support(page.current, 'react');
+            if (hasReact) { // 动态网页
+                const content = fs.readFileSync(file, 'utf8');
+                const script = babel.transform(content, { plugins:['transform-react-jsx'], presets: ['es2015']}).code;
+                res.send(
+                    renderToStaticMarkup(
+                        <DocsLayout page={page}>
+                            <div id="mdoc_react_root" />
+                            <script
+                                dangerouslySetInnerHTML={{
+                                    __html: `
+                                    ${script.replace('module.exports', 'var __mdoc_react_export')}
+                                    ReactDOM.render(__mdoc_react_export, document.getElementById("mdoc_react_root"));
+                                    `,
+                                }}
+                                />
+                        </DocsLayout>
+                    )
+                );
+            } else {
+                removeModuleAndChildrenFromCache(file);
+                const ReactComp = require(file);
+                res.send(
+                    renderToStaticMarkup(
+                        <DocsLayout page={page}>
+                            <ReactComp />
+                        </DocsLayout>
+                    )
+                );
+            }
         } else if (extension === '.pdf') {
             res.send(
                 renderToStaticMarkup(
