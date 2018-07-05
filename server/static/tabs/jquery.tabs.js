@@ -7,10 +7,10 @@ var tabs_new = function( tabs_id, opts ) {
 
     function _debug( msg )
     {
-       if( window.console && window.console.log ) 
-         console.log( "[debug] " + msg ); 
+       if( window.console && window.console.log )
+         console.log( "[debug] " + msg );
     }
-    
+
     var $tabs,
         $tabsNav,
         $tabsNavItems,
@@ -18,7 +18,7 @@ var tabs_new = function( tabs_id, opts ) {
 
     var defaults = { };
     var settings;
-        
+
   function _init( tabs_id, opts )
   {
     settings = $.extend( {}, defaults, opts );
@@ -35,28 +35,31 @@ var tabs_new = function( tabs_id, opts ) {
 
       // todo/fix: possible in css - non transparent background-color using default ??
       //  -- setting opacity: 1.0 tried but was NOT working; anything else to try?
-        
+
       $( 'head' ).append( "<style id='tabs-styles-default'>\n"+
        ".tabs-nav  { \n"+
        "  margin: 0; \n"+
        "  padding: 0; \n"+
        "  list-style-type: none; \n"+
-       "  border-bottom: 1px solid #999; \n"+
+       "  border-bottom: 1px solid #E8E8E8; \n"+
        "} \n"+
        ".tabs-nav li { \n"+
        "  display: inline-block; \n"+
-       "  margin: 0 0 0 5px; \n"+            // top right bottom left
-       "  padding: 5px 15px 3px 15px; \n"+   // top right bottom left
-       "  border: 1px solid transparent; \n"+
+       "  margin: 0 0 -1px 0 !important;  \n"+
+       "  padding: 5px 15px 3px 15px; \n"+
+       "  border: 1px solid "+ bodyBackgroundColor +"; \n"+
        "  border-bottom: none;  \n"+
+       "  border-top-left-radius: 10px;  \n"+
+       "  border-top-right-radius: 10px;  \n"+
        "  cursor: pointer; \n"+
-       "  background-color: "+ bodyBackgroundColor +"; \n"+
+       "  background-color: #E8E8E8; \n"+
        "} \n"+
        ".tabs-nav li.selected { \n"+
-       "  padding-bottom: 4px;  \n"+            // note: for bottom use +1px (3px+1px=4px) to overwrite border for "tab" selected effect (1/2)
-       "  margin-bottom: -1px;  \n"+            // note: for bottom use -1px (0px-1px=-1px) to overwrite border for "tab" selected effect (2/2)
-       "  border: 1px solid #999; \n"+
+       "  padding-bottom: 4px;  \n"+
+       "  margin: 0 0 -1px 0 !important;  \n"+
+       "  border: 1px solid #E8E8E8; \n"+
        "  border-bottom: none;  \n"+
+       "  background-color: "+ bodyBackgroundColor +"; \n"+
        "} \n"+
        ".tabs-panel { \n"+
        "  padding: 10px; \n"+
@@ -86,26 +89,26 @@ var tabs_new = function( tabs_id, opts ) {
 
 
   } // function _init
-  
-  _init( tabs_id, opts );  
 
-  
+  _init( tabs_id, opts );
+
+
   function _select( index ) {
     // step 1) reset selected tab (if present)
     $tabsNavItems.filter( '.selected' ).removeClass( 'selected' );
     $tabsPanels.filter( '.selected' ).removeClass( 'selected' ).hide();
 
-    // step 2) set new selected tab   
+    // step 2) set new selected tab
     $tabsNavItems.eq( index ).addClass( 'selected' );
-    $tabsPanels.eq( index ).addClass( 'selected' ).show(); 
+    $tabsPanels.eq( index ).addClass( 'selected' ).show();
   }
-  
+
     return {
       select: function( index ) {
         _select( index );
         return this;
       }
-    };  
+    };
 };
 
 
@@ -132,7 +135,7 @@ function tabify( tabs_id, opts ) {
       debug( "hello from setup_tabs" );
       var tabs = tabs_new( tabs_el, opts );
       var $tabs = $(tabs_el);
-      
+
       // NB: attach widget to dom element
       // - use like $('#tabs').data( 'widget' ).select(2); etc.
       $tabs.data( 'widget', tabs );
@@ -151,5 +154,3 @@ function tabify( tabs_id, opts ) {
     };
 
 }( jQuery ));
-
-
