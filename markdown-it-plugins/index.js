@@ -12,6 +12,7 @@ const sequence = require('./sequence');
 const chart = require('./chart');
 const images = require('./images');
 const swiper = require('./swiper');
+const tabs = require('./tabs');
 const react = require('./react');
 const artical = require('./artical');
 const toc = require('./toc');
@@ -61,6 +62,9 @@ function images_plugin(md, page) {
 function swiper_plugin(md, page) {
     md.use(swiper, page);
 }
+function tabs_plugin(md, page) {
+    md.use(tabs, page);
+}
 function react_plugin(md, page) {
     md.use(react, page);
 }
@@ -104,6 +108,7 @@ module.exports = [
     chart_plugin,
     images_plugin,
     swiper_plugin,
+    tabs_plugin,
     react_plugin,
     artical_plugin,
     emoji_plugin,
