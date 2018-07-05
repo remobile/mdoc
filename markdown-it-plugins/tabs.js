@@ -24,7 +24,6 @@ module.exports = function tabs_plugin(md, page) {
                     if (!begin) {
                         begin = true;
                     } else {
-                        console.log('---------', item);
                         body = `${body}<div>${renderToStaticMarkup(<MarkdownView source={item} page={page} />)}</div>`;
                         item = '';
                     }
