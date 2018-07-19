@@ -10,6 +10,7 @@ const katex = require('./katex');
 const flow = require('./flow');
 const sequence = require('./sequence');
 const chart = require('./chart');
+const form = require('./form');
 const images = require('./images');
 const swiper = require('./swiper');
 const tabs = require('./tabs');
@@ -55,6 +56,9 @@ function sequence_plugin(md, page) {
 }
 function chart_plugin(md, page) {
     md.use(chart, page);
+}
+function form_plugin(md, page) {
+    md.use(form, page);
 }
 function images_plugin(md, page) {
     md.use(images, page);
@@ -106,6 +110,7 @@ module.exports = [
     flow_plugin,
     sequence_plugin,
     chart_plugin,
+    form_plugin,
     images_plugin,
     swiper_plugin,
     tabs_plugin,

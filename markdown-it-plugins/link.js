@@ -1,6 +1,4 @@
-
 'use strict';
-
 
 module.exports = function sub_plugin(md, config) {
     const defaultRender = md.renderer.rules.link_open || function(tokens, idx, options, env, self) {

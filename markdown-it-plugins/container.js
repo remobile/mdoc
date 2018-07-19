@@ -1,5 +1,3 @@
-// Process block-level custom containers
-//
 'use strict';
 
 

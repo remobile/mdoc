@@ -1,6 +1,4 @@
-
 'use strict';
-
 
 module.exports = function sub_plugin(md) {
     const escapeRE = md.utils.escapeRE;

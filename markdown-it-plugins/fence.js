@@ -1,5 +1,5 @@
-
 'use strict';
+
 const unescapeAll  = require('markdown-it/lib/common/utils').unescapeAll;
 const has  = require('markdown-it/lib/common/utils').has;
 
