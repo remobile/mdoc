@@ -38,7 +38,7 @@ module.exports = function swiper_plugin(md, page) {
         render: function (tokens, idx) {
             const token = tokens[idx];
             if (token.type === 'container_swiper_open') {
-                const params = token.info.trim().split(/\s+/);
+                const params = token.info.trim().split(/\s+/).slice(1).join(' ');
                 options = parseParams(params, { width: 300, height: 300 });
             }
             return '';

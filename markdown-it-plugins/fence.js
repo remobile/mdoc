@@ -12,7 +12,7 @@ module.exports = function sub_plugin(md, config) {
         const fences = info.split(/\s+/g);
 
         if (has(self.rules.fence_custom, fences[0])) {
-            return self.rules.fence_custom[fences[0]](fences.slice(1), tokens, idx, options, env, self);
+            return self.rules.fence_custom[fences[0]](fences.slice(1).join(' '), tokens, idx, options, env, self);
         }
 
         return defaultRender(tokens, idx, options, env, self);

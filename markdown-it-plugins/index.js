@@ -11,6 +11,7 @@ const flow = require('./flow');
 const sequence = require('./sequence');
 const chart = require('./chart');
 const form = require('./form');
+const table = require('./table');
 const images = require('./images');
 const swiper = require('./swiper');
 const tabs = require('./tabs');
@@ -59,6 +60,9 @@ function chart_plugin(md, page) {
 }
 function form_plugin(md, page) {
     md.use(form, page);
+}
+function table_plugin(md, page) {
+    md.use(table, page);
 }
 function images_plugin(md, page) {
     md.use(images, page);
@@ -111,6 +115,7 @@ module.exports = [
     sequence_plugin,
     chart_plugin,
     form_plugin,
+    table_plugin,
     images_plugin,
     swiper_plugin,
     tabs_plugin,
