@@ -40,14 +40,8 @@ h5 {
     text-align: center;
 }
 img, video, blockquote{
-    width: 80%;
-    margin-left: 10%;
-}
-@media only screen and (max-width: 735px) {
-    img, video, blockquote{
-        width: 100%;
-        margin-left: 0;
-    }
+    width: 100%;
+    margin-left: 0;
 }
 p {
     margin-top: 20px;
