@@ -6,7 +6,7 @@ const { parseParams } = require('../lib/utils');
 module.exports = function artical_plugin(md) {
     let flow_id = 0;
     md.renderer.rules.fence_custom.artical = function(params, tokens, idx) {
-        const content = tokens[idx].content.split('\n').filter(o=>!!o);
+        const content = tokens[idx].content.split('\n').filter(o=>!!o).join(' ');
         const options = parseParams(content);
         return renderToStaticMarkup(
             <div>
