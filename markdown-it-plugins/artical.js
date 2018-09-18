@@ -8,9 +8,12 @@ module.exports = function artical_plugin(md) {
     md.renderer.rules.fence_custom.artical = function(params, tokens, idx) {
         const content = tokens[idx].content.split('\n').filter(o=>!!o).join(' ');
         const options = parseParams(content);
+        const titles = options.title.split('|');
         return renderToStaticMarkup(
             <div>
-                <div className='title'>{options.title}</div>
+                <div className='title'>
+                    { titles.map((t, k)=><div key={k}>{t}</div>) }
+                </div>
                 <div>
                     <span className='author'>{options.author}</span>
                     <span className='seprator'>|</span>
