@@ -63,7 +63,7 @@ img {
     height: auto;
 }
 
-article p img, article iframe {
+article p img, article {
     max-width: 100%;
     display: block;
     margin-left: auto;
