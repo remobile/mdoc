@@ -30,6 +30,9 @@ module.exports = function(md) {
         if (tag === 'CALENDER') {
             return `<iframe width="772px" height="370px" scrolling="no" frameborder="0" src="/mdoc-example/tools/calendar.html"></iframe>`;
         }
+        if (tag === 'TIME') {
+            return `<iframe width="538px" height="100px" scrolling="no" frameborder="0" src="/mdoc-example/tools/time.html"></iframe>`;
+        }
     };
     md.block.ruler.before('paragraph', 'tools_block', tools_block);
 };
