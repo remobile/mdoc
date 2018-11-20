@@ -13,6 +13,9 @@ module.exports = function(md) {
         } else if (text.slice(pos, pos + 6) === '[TIME]') {
             tag = 'TIME';
             pos += 6;
+        } else if (text.slice(pos, pos + 7) === '[CLOCK]') {
+            tag = 'CLOCK';
+            pos += 7;
         }
         if (!tag) {
             return false;
@@ -32,6 +35,9 @@ module.exports = function(md) {
         }
         if (tag === 'TIME') {
             return `<iframe width="538px" height="100px" scrolling="no" frameborder="0" src="/mdoc-example/tools/time.html"></iframe>`;
+        }
+        if (tag === 'CLOCK') {
+            return `<iframe width="250px" height="250px" scrolling="no" frameborder="0" src="/mdoc-example/tools/clock.html"></iframe>`;
         }
     };
     md.block.ruler.before('paragraph', 'tools_block', tools_block);
