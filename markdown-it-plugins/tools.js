@@ -1,6 +1,7 @@
 'use strict';
 
-module.exports = function(md) {
+module.exports = function(md, page) {
+    const projectName = page.config.projectName;
     function tools_block(state, startLine, endLine, silent) {
         let pos = state.bMarks[startLine] + state.tShift[startLine];
         let max = state.eMarks[startLine];
@@ -31,13 +32,13 @@ module.exports = function(md) {
         const { tag } = tokens[index];
 
         if (tag === 'CALENDER') {
-            return `<iframe width="772px" height="370px" scrolling="no" frameborder="0" src="/mdoc-example/tools/calendar.html"></iframe>`;
+            return `<iframe width="772px" height="370px" scrolling="no" frameborder="0" src="/${projectName}/tools/calendar.html"></iframe>`;
         }
         if (tag === 'TIME') {
-            return `<iframe width="538px" height="100px" scrolling="no" frameborder="0" src="/mdoc-example/tools/time.html"></iframe>`;
+            return `<iframe width="538px" height="100px" scrolling="no" frameborder="0" src="/${projectName}/tools/time.html"></iframe>`;
         }
         if (tag === 'CLOCK') {
-            return `<iframe width="250px" height="250px" scrolling="no" frameborder="0" src="/mdoc-example/tools/clock.html"></iframe>`;
+            return `<iframe width="250px" height="250px" scrolling="no" frameborder="0" src="/${projectName}/tools/clock.html"></iframe>`;
         }
     };
     md.block.ruler.before('paragraph', 'tools_block', tools_block);
