@@ -255,13 +255,13 @@ header h2 {
 .mainContainer .wrapper .post h1,
 .mainContainer .wrapper .post h2,
 .mainContainer .wrapper .post h3 {
-    font-weight: 300;
+    font-weight: 400;
 }
 
 .mainContainer .wrapper .post h4,
 .mainContainer .wrapper .post h5,
 .mainContainer .wrapper .post h6 {
-    font-weight: 400;
+    font-weight: 300;
 }
 
 
