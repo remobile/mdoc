@@ -10,7 +10,6 @@ module.exports = function(md) {
             const type = token.level === 0 ? '1' : token.level === 2 ? 'a' : 'i';
             !token.attrs && (token.attrs = []);
             token.attrs.push([ 'type', type ]);
-            console.log(token);
         }
     });
 };
