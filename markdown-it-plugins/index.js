@@ -21,6 +21,7 @@ const toc = require('./toc');
 const link = require('./link');
 const media = require('./media');
 const tools = require('./tools');
+const list = require('./list');
 
 const HTML_REPLACEMENTS = {
     '&': '&amp;',
@@ -104,6 +105,9 @@ function media_plugin(md, page) {
 function tools_plugin(md, page) {
     md.use(tools, page);
 }
+function list_plugin(md, page) {
+    md.use(list, page);
+}
 function rewrite_plugin(md) {
     md.renderer.rules.text = function (tokens, idx /*, options, env */) {
         return escapeHtml(tokens[idx].content);;
@@ -133,5 +137,6 @@ module.exports = [
     link_plugin,
     media_plugin,
     tools_plugin,
+    list_plugin,
     rewrite_plugin,
 ];

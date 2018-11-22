@@ -27,9 +27,6 @@ footer, header, hgroup, menu, nav, section {
 body {
     line-height: 1;
 }
-ol, ul {
-    list-style: none;
-}
 blockquote, q {
     quotes: none;
 }
@@ -254,9 +251,6 @@ header h2 {
 }
 .mainContainer .wrapper .post h5 strong {
     font-weight: 400;
-}
-.mainContainer .wrapper .post ol {
-    list-style: decimal outside none;
 }
 .mainContainer .wrapper .post h1,
 .mainContainer .wrapper .post h2,

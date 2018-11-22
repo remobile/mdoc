@@ -14,8 +14,10 @@ module.exports = function link_plugin(md, config) {
         let href = token.attrs[hrefIndex][1];
         if (!/^https?:/.test(href)) {
             if (/^#/.test(href)) {
-                console.log(`xx==${href.slice(1)}==`);
                 href = `#${md5(href.slice(1))}`;
+            } else if (/#/.test(href)) {
+                let list = href.split('#');
+                href = `${md5(list[0])}.html#${md5(decodeURI(list[1]))}`;
             } else {
                 href = `${md5(href)}.html`;
             }
