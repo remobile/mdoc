@@ -71,7 +71,7 @@ article p img, article {
 }
 
 a {
-    color: $primaryColor;
+    /* color: $primaryColor; */
     text-decoration: none;
 }
 
