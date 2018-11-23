@@ -34,7 +34,7 @@ module.exports = function(md) {
             return false;
         }
         pos += 5;
-        let params = text.slice(pos, max).split(' ').filter(o=>o);
+        const params = text.slice(pos, max).split(' ').filter(o=>o);
         const numberParam =  _.find(params, o=>/^number.*/.test(o));
         settings.disableNumberList = [];
         if (numberParam) {

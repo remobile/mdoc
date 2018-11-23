@@ -1,5 +1,7 @@
 'use strict';
 
+const { parseParams, encodeURIParams } = require('../lib/utils');
+
 module.exports = function(md, page) {
     const projectName = page.config.projectName;
     function tools_block(state, startLine, endLine, silent) {
@@ -17,6 +19,9 @@ module.exports = function(md, page) {
         } else if (text.slice(pos, pos + 7) === '[CLOCK]') {
             tag = 'CLOCK';
             pos += 7;
+        } else if (text.slice(pos, pos + 10) === '[COUPLETS]') {
+            tag = 'COUPLETS';
+            pos += 10;
         }
         if (!tag) {
             return false;
@@ -25,11 +30,13 @@ module.exports = function(md, page) {
 
         const token = state.push('tools_renderer', tag, 0);
         token.map = [ startLine, state.line ];
+        token.content = text.slice(pos, max);
 
         return true;
     }
     md.renderer.rules.tools_renderer = function(tokens, index) {
-        const { tag } = tokens[index];
+        const { tag, content } = tokens[index];
+        const params = parseParams(content);
 
         if (tag === 'CALENDAR') {
             return `<iframe width="772px" height="370px" scrolling="no" frameborder="0" src="/${projectName}/tools/calendar.html"></iframe>`;
@@ -39,6 +46,9 @@ module.exports = function(md, page) {
         }
         if (tag === 'CLOCK') {
             return `<iframe width="250px" height="250px" scrolling="no" frameborder="0" src="/${projectName}/tools/clock.html"></iframe>`;
+        }
+        if (tag === 'COUPLETS') {
+            return `<iframe width="${params.width}px" height="${params.height}px" scrolling="no" frameborder="0" src="/${projectName}/tools/couplets.html?${encodeURIParams(params)}"></iframe>`;
         }
     };
     md.block.ruler.before('paragraph', 'tools_block', tools_block);

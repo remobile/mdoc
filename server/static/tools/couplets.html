@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>对联</title>
+	<style>
+	html, body {
+		margin: 0;
+		padding: 0;
+	}
+	#container {
+		display: flex;
+		flex-direction: column;
+	}
+	#topContainer {
+		display: flex;
+		justify-content: center;
+	}
+	#bottomContainer {
+		flex: 1;
+		display: flex;
+		flex-direction: row;
+	}
+	#content {
+		flex: 1;
+	}
+	</style>
+</head>
+<body>
+	<div id="container">
+		<div id="topContainer">
+			<canvas id="top"></canvas>
+		</div>
+		<div id="bottomContainer">
+			<div id="leftContainer">
+				<canvas id="left"></canvas>
+			</div>
+			<div id="content">
+			</div>
+			<div id="rightContainer">
+				<canvas id="right"></canvas>
+			</div>
+		</div>
+	</div>
+	<script type="application/javascript">
+	function draw(texts, options) {
+		var size = options.size;
+		var outSize = size*5/3;
+		var backgroundColor = options.backgroundColor;
+		var color = options.color;
+		var container = document.getElementById('container');
+		container.style.width = options.width+'px';
+		container.style.height = options.height+'px';
+
+		var topContainer = document.getElementById('topContainer');
+		topContainer.style.height = outSize+'px';
+
+		var rightContainer = document.getElementById('rightContainer');
+		rightContainer.style.width = outSize+'px';
+
+		function drawItem(canvas, text, horizontal) {
+			var ctx = canvas.getContext("2d");
+			var width = canvas.offsetWidth;
+			var height =  canvas.offsetHeight;
+			var gap = 0, x = 0, y = 0, n = text.length;
+			if (horizontal) {
+				gap = (width-(n+2)*size)/(n-1);
+				x = size;
+				y = height / 2 + size / 3;
+			} else {
+				gap = (height-(n+2)*size)/(n-1);
+				x = (width - size)/2;
+				y = size*5/3;
+			}
+
+			ctx.font = size+"px STKaiti";
+			ctx.fillStyle = color;
+
+			for (var i=0; i<text.length; i++) {
+				ctx.fillText(text[i], x, y);
+				if (horizontal) {
+					x += size+gap;
+				} else {
+					y += size+gap;
+				}
+			}
+		}
+
+		var topCanvas = document.getElementById('top');
+		topCanvas.style.backgroundColor = backgroundColor;
+		topCanvas.width = options.width - outSize*2;
+		topCanvas.height = outSize;
+
+		var leftCanvas = document.getElementById('left');
+		leftCanvas.style.backgroundColor = backgroundColor;
+		leftCanvas.width = outSize;
+		leftCanvas.height = options.height - outSize;
+
+		var rightCanvas = document.getElementById('right');
+		rightCanvas.style.backgroundColor = backgroundColor;
+		rightCanvas.width = outSize;
+		rightCanvas.height = options.height - outSize;
+
+		drawItem(topCanvas, texts.top, true);
+		drawItem(leftCanvas, texts.left);
+		drawItem(rightCanvas, texts.right,);
+	}
+
+	var params = {};
+	window.location.search.substr(1).split('&').forEach(o=>{
+		var item = o.split('=');
+		params[item[0]] = decodeURIComponent(item[1]);
+	});
+	draw({
+		top: params.top,
+		left: params.left,
+		right: params.right,
+	}, { size: +params.size||30, width: +params.width||300, height: +params.height||550, backgroundColor: params.backgroundColor||'red', color: params.color||'black' });
+</script>
+</body>
+</html>
