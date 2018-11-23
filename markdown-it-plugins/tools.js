@@ -8,8 +8,8 @@ module.exports = function(md, page) {
         const text = state.src;
 
         let tag;
-        if (text.slice(pos, pos + 10) === '[CALENDER]') {
-            tag = 'CALENDER';
+        if (text.slice(pos, pos + 10) === '[CALENDAR]') {
+            tag = 'CALENDAR';
             pos += 10;
         } else if (text.slice(pos, pos + 6) === '[TIME]') {
             tag = 'TIME';
@@ -31,7 +31,7 @@ module.exports = function(md, page) {
     md.renderer.rules.tools_renderer = function(tokens, index) {
         const { tag } = tokens[index];
 
-        if (tag === 'CALENDER') {
+        if (tag === 'CALENDAR') {
             return `<iframe width="772px" height="370px" scrolling="no" frameborder="0" src="/${projectName}/tools/calendar.html"></iframe>`;
         }
         if (tag === 'TIME') {
