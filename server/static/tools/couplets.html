@@ -88,7 +88,7 @@
 
 		var topCanvas = document.getElementById('top');
 		topCanvas.style.backgroundColor = backgroundColor;
-		topCanvas.width = options.width - outSize*2;
+		topCanvas.width = options.topWidth - outSize*2;
 		topCanvas.height = outSize;
 
 		var leftCanvas = document.getElementById('left');
@@ -115,7 +115,14 @@
 		top: params.top,
 		left: params.left,
 		right: params.right,
-	}, { size: +params.size||30, width: +params.width||300, height: +params.height||550, backgroundColor: params.backgroundColor||'red', color: params.color||'black' });
+	}, {
+		size: +params.size||30,
+		width: +params.width||300,
+		topWidth: +params.topWidth||+params.width||300,
+		height: +params.height||550,
+		backgroundColor: params.backgroundColor||'red',
+		color: params.color||'black',
+	});
 </script>
 </body>
 </html>
