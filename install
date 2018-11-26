@@ -1,0 +1,7 @@
+#!/bin/bash
+
+path=`pwd`
+cd /usr/local/lib/node_modules
+ln -s $path mdoc
+cd /usr/local/bin
+ln -s ../lib/node_modules/mdoc/script.js mdoc
