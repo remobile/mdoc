@@ -2,6 +2,8 @@
 
 path=`pwd`
 cd /usr/local/lib/node_modules
+rm -fr mdoc
 ln -s $path mdoc
 cd /usr/local/bin
+rm -f mdoc
 ln -s ../lib/node_modules/mdoc/script.js mdoc
