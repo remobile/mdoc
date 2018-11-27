@@ -171,6 +171,11 @@ function buildProject() {
             );
         } else if (extension.match(/^\.(png|jpg|jpeg|gif)$/)) {
             copyResourceFile(page.current.path);
+            if (!page.current.supports) {
+                page.current.supports = ['viewer'];
+            } else if (page.current.supports.indexOf('viewer') < 0) {
+                page.current.supports.push('viewer');
+            }
             writeFileWithPage(page,
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
