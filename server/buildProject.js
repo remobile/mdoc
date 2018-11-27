@@ -174,7 +174,21 @@ function buildProject() {
             writeFileWithPage(page,
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
-                        <img src={page.current.path} />
+                        <div id="mdoc_image_container">
+                            <img src={page.current.path} style={{visibility:'hidden'}} />
+                        </div>
+                        <script
+                            dangerouslySetInnerHTML={{
+                                __html: `
+                                $(document).ready(function(){
+                                    var viewer = new Viewer(document.getElementById("mdoc_image_container"), {
+                                    inline:true,
+                                    navbar:false,
+                                    toolbar: false
+                                })})
+                                `,
+                            }}
+                            />
                     </DocsLayout>
                 )
             );
