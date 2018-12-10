@@ -81,15 +81,26 @@ function buildMarkdown(port, configPath, build) {
     app.use(config.baseUrl, express.static(__dirname + '/static'));
 
     app.get(config.baseUrl, (req, res, next) => {
-        // removeModuleAndChildrenFromCache('../lib/PPTLayout.js');
-        // const PPTLayout = require('../lib/PPTLayout.js');
+        removeModuleAndChildrenFromCache('../lib/PPTLayout.js');
+        const PPTLayout = require('../lib/PPTLayout.js');
 
-        let html = '';
+        const list = [];
         for (const page of config.pages) {
-            console.log("====", page);
-            html += page.path;
+            const file = getDocumentPath(page.path);
+            if (path.extname(file) === '.md') {
+                list.push(fs.readFileSync(file, 'utf8'));
+            } else {
+                removeModuleAndChildrenFromCache(file);
+                list.push(require(file));
+            }
         }
-        return res.send(html);
+        return res.send(
+            renderToStaticMarkup(
+                <PPTLayout config={{config}}>
+                    { list }
+                </PPTLayout>
+            )
+        );
     });
     app.get('*', (req, res) => {
         res.sendStatus(404);
