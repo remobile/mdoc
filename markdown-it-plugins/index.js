@@ -14,6 +14,7 @@ const form = require('./form');
 const table = require('./table');
 const images = require('./images');
 const swiper = require('./swiper');
+const fragment = require('./fragment');
 const tabs = require('./tabs');
 const react = require('./react');
 const artical = require('./artical');
@@ -72,6 +73,9 @@ function images_plugin(md, page) {
 function swiper_plugin(md, page) {
     md.use(swiper, page);
 }
+function fragment_plugin(md, page) {
+    md.use(fragment, page);
+}
 function tabs_plugin(md, page) {
     md.use(tabs, page);
 }
@@ -126,6 +130,7 @@ module.exports = [
     table_plugin,
     images_plugin,
     swiper_plugin,
+    fragment_plugin,
     tabs_plugin,
     react_plugin,
     artical_plugin,
