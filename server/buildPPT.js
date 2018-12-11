@@ -9,26 +9,8 @@ function buildMarkdown(port, configPath, build) {
     const color = require('color');
     const chalk = require('chalk');
     const CWD = process.cwd() + '/';
+    const { removeModuleAndChildrenFromCache } = require('../lib/utils');
 
-    // remove a module and child modules from require cache, so server does not have
-    // to be restarted
-    function removeModuleAndChildrenFromCache(moduleName) {
-        let mod = require.resolve(moduleName);
-        if (mod && (mod = require.cache[mod])) {
-            mod.children.forEach(child => {
-                removeModulePathFromCache(child.id);
-            });
-            delete require.cache[mod.id];
-            removeModulePathFromCache(mod.id);
-        }
-    }
-    function removeModulePathFromCache(moduleName) {
-        Object.keys(module.constructor._pathCache).forEach(function(cacheKey) {
-            if (cacheKey.indexOf(moduleName) > 0) {
-                delete module.constructor._pathCache[cacheKey];
-            }
-        });
-    }
     function getDocumentPath(file) {
         return CWD + config.documentPath + '/' + file;
     }
@@ -36,9 +18,14 @@ function buildMarkdown(port, configPath, build) {
         removeModuleAndChildrenFromCache(CWD + configPath);
         config = require(CWD + configPath);
         // 设置 documentPath
-        config.documentPath = (config.documentPath || 'ppt').replace(/\/$/, '');
+        config.documentPath = (config.documentPath || 'doc').replace(/\/$/, '');
         // 设置 baseUrl
         config.baseUrl = `/${config.projectName}/`;
+        const pages = config.pages;
+        if (!config.pages || !config.pages.length) {
+            console.error(chalk.red('请设置页面'));
+            process.exit(0);
+        }
 
         if (!config.colors || !config.colors.primaryColor || !config.colors.secondaryColor) {
             console.error(chalk.red('缺少颜色配置'));
@@ -83,23 +70,21 @@ function buildMarkdown(port, configPath, build) {
     app.get(config.baseUrl, (req, res, next) => {
         removeModuleAndChildrenFromCache('../lib/PPTLayout.js');
         const PPTLayout = require('../lib/PPTLayout.js');
-
-        const list = [];
+        let ReactComp, rawContent;
         for (const page of config.pages) {
             const file = getDocumentPath(page.path);
             if (path.extname(file) === '.md') {
-                list.push(fs.readFileSync(file, 'utf8'));
+                rawContent = fs.readFileSync(file, 'utf8');
             } else {
                 removeModuleAndChildrenFromCache(file);
-                list.push(require(file));
+                ReactComp = require(file);
             }
+            page.content = (rawContent || <ReactComp />);
+            page.config = config;
         }
+        // console.log(config);
         return res.send(
-            renderToStaticMarkup(
-                <PPTLayout config={{config}}>
-                    { list }
-                </PPTLayout>
-            )
+            renderToStaticMarkup(<PPTLayout config={config} />)
         );
     });
     app.get('*', (req, res) => {
@@ -130,7 +115,7 @@ function buildMarkdown(port, configPath, build) {
             gulp.task('browser', function() {
                 browserSync.init({
                     proxy: url,
-                    files: [file],
+                    files: [CWD + config.documentPath],
                     notify: false,
                     open: true,
                 });
@@ -143,7 +128,7 @@ function buildMarkdown(port, configPath, build) {
             });
             gulp.task('config', function() {
                 gulp.watch([path.resolve(CWD, configPath)], function(item) {
-                    reloadPage();
+                    reloadSiteConfig();
                     browserSync.reload();
                 });
             });

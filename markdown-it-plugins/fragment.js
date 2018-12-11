@@ -23,14 +23,18 @@ module.exports = function fragment_plugin(md, page) {
             style = `${style}${(options.x < 0) ? `right:${-options.x}px;` : `left:${options.x}px;`}`;
             style = `${style}${(options.y < 0) ? `bottom:${-options.y}px;` : `top:${options.y}px;`}`;
             options.style && (style = `${style}${options.style}`);
+            let className = '';
+            if (options.animate) {
+                className = `fragment ${options.animate}`;
+            }
 
             let html = '';
             if (options.img) {
-                html = `<img src="${content}" style="${style}" />`;
+                html = `<img class="${className}" src="${content}" style="${style}" />`;
             } else {
                 html = `
-                <div class="fragment" style="${style}">
-                    ${renderToStaticMarkup(<MarkdownView source={content} page={page} />)}
+                <div class="${className}" style="${style}">
+                    ${renderToStaticMarkup(<MarkdownView source={content} page={page} container={null} />)}
                 </div>
                 `;
             }
