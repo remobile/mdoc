@@ -14,11 +14,20 @@ module.exports = function fragment_plugin(md, page) {
         content: function (tokens, idx) {
             const content = tokens[idx].markup;
             let style = 'position: absolute;';
+            let append = '';
             if (options.w !== undefined)  {
-                style = `${style}width:${options.w}px;`;
+                if (!options.img) {
+                    style = `${style}width:${options.w}px;`;
+                } else {
+                    append = `${append}width="${options.w}px" `;
+                }
             }
             if (options.h !== undefined)  {
-                style = `${style}height:${options.h}px;`;
+                if (!options.img) {
+                    style = `${style}height:${options.h}px;`;
+                } else {
+                    append = `${append}height="${options.h}px" `;
+                }
             }
             style = `${style}${(options.x < 0) ? `right:${-options.x}px;` : `left:${options.x}px;`}`;
             style = `${style}${(options.y < 0) ? `bottom:${-options.y}px;` : `top:${options.y}px;`}`;
@@ -30,7 +39,7 @@ module.exports = function fragment_plugin(md, page) {
 
             let html = '';
             if (options.img) {
-                html = `<img class="${className}" src="${content}" style="${style}" />`;
+                html = `<img class="${className}" src="${content}" ${append} style="${style}" />`;
             } else {
                 html = `
                 <div class="${className}" style="${style}">

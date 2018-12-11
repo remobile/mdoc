@@ -123,6 +123,9 @@ function buildMarkdown(port, configPath, build) {
             gulp.task('server', function() {
                 gulp.watch([CWD+'lib/*.js', __dirname+'/../**/*.js', __dirname+'/../**/*.css'], function(item) {
                     removeModuleAndChildrenFromCache(item.path);
+                    if (/\/mdoc\/markdown-it-plugins\//.test(item.path)) {
+                        removeModuleAndChildrenFromCache(item.path.replace(/\/mdoc\/markdown-it-plugins\/.*/, '/mdoc/lib/MarkdownBlock.js'));
+                    }
                     browserSync.reload();
                 });
             });
