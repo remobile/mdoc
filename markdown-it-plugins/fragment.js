@@ -32,9 +32,9 @@ module.exports = function fragment_plugin(md, page) {
             style = `${style}${(options.x < 0) ? `right:${-options.x}px;` : `left:${options.x}px;`}`;
             style = `${style}${(options.y < 0) ? `bottom:${-options.y}px;` : `top:${options.y}px;`}`;
             options.style && (style = `${style}${options.style}`);
-            let className = '';
+            let className = page.edit ? 'target' : '';
             if (options.animate) {
-                className = `fragment ${options.animate}`;
+                className = `${className} fragment ${options.animate}`;
             }
 
             let html = '';
