@@ -1,4 +1,4 @@
-function buildMarkdown(port, configPath, build) {
+function buildMarkdown(port, configPath, build, index) {
     const React = require('react');
     const express = require('express');
     const inliner = require('inliner');
@@ -68,24 +68,44 @@ function buildMarkdown(port, configPath, build) {
     app.use(config.baseUrl, express.static(__dirname + '/static'));
 
     app.get(config.baseUrl, (req, res, next) => {
-        removeModuleAndChildrenFromCache('../lib/PPTLayout.js');
-        const PPTLayout = require('../lib/PPTLayout.js');
-        let ReactComp, rawContent;
-        for (const page of config.pages) {
-            const file = getDocumentPath(page.path);
-            if (path.extname(file) === '.md') {
-                rawContent = fs.readFileSync(file, 'utf8');
-            } else {
-                removeModuleAndChildrenFromCache(file);
-                ReactComp = require(file);
+        if (index === undefined) {
+            removeModuleAndChildrenFromCache('../lib/PPTLayout.js');
+            const PPTLayout = require('../lib/PPTLayout.js');
+            let ReactComp, rawContent;
+            for (const page of config.pages) {
+                const file = getDocumentPath(page.path);
+                if (path.extname(file) === '.md') {
+                    rawContent = fs.readFileSync(file, 'utf8');
+                } else {
+                    removeModuleAndChildrenFromCache(file);
+                    ReactComp = require(file);
+                }
+                page.content = (rawContent || <ReactComp />);
+                page.config = config;
             }
-            page.content = (rawContent || <ReactComp />);
+            // console.log(config);
+            return res.send(
+                renderToStaticMarkup(<PPTLayout config={config} />)
+            );
+        } else {
+            removeModuleAndChildrenFromCache('../lib/PPTEditLayout.js');
+            const PPTEditLayout = require('../lib/PPTEditLayout.js');
+            const page = config.pages[index];
+            if (!page) {
+                return res.send('错误的index');
+            }
+            const file = getDocumentPath(page.path);
+            if (path.extname(file) !== '.md') {
+                return res.send('对应的文件不能编辑');
+            }
+            page.content = fs.readFileSync(file, 'utf8');
             page.config = config;
+
+            // console.log(config);
+            return res.send(
+                renderToStaticMarkup(<PPTEditLayout page={page} />)
+            );
         }
-        // console.log(config);
-        return res.send(
-            renderToStaticMarkup(<PPTLayout config={config} />)
-        );
     });
     app.get('*', (req, res) => {
         res.sendStatus(404);

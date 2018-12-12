@@ -16,6 +16,7 @@ program
 .option('-b, --build', 'build release for project or single file')
 .option('-f, --file <config file>', 'start server single file with config')
 .option('-t, --ppt <config file>', 'start server single file with ppt')
+.option('-i, --index <ppt index file>', 'edit ppt file')
 .option('-p, --port [4000]', 'port of server', 4000)
 .option('-v, --verbose', 'verbose mode')
 .parse(process.argv);
@@ -51,14 +52,13 @@ require('babel-register')({
     presets: ['react'],
 });
 
-const { port, start, build, file, ppt, verbose } = program;
-
+const { port, start, build, file, ppt, index, verbose } = program;
 if (file) {
     const buildFile = require('./server/buildFile.js');
     buildFile(port*1, file, build);
 } else if (ppt) {
     const buildPPT = require('./server/buildPPT.js');
-    buildPPT(port*1, ppt, build);
+    buildPPT(port*1, ppt, build, index);
 } else if (build) {
     const buildProject = require('./server/buildProject.js');
     buildProject();
