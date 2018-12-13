@@ -188,7 +188,7 @@ var saveMarkdown = function(e) {
     console.log(text.join('\n'));
 };
 var onKeyDown = function (e) {
-    if (!target) {
+    if (target) {
         if (e.keyCode === 27) { // esc
             referent.style.display = "none";
             target.onmousedown = null;
