@@ -5,6 +5,8 @@ var clickX = 0; // 保留上次的X轴位置
 var clickY = 0; // 保留上次的Y轴位置
 var offsetX = 0; // 开始点击时距离被点击的元素的边框 X 距离
 var offsetY = 0; // 开始点击时距离被点击的元素的边框 Y 距离
+var isAltKeyPress = false; // alt是否被按住
+
 function $(id) {
     return document.getElementById(id);
 }

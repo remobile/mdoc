@@ -42,8 +42,8 @@ module.exports = function fragment_plugin(md, page) {
                 html = `<img class="${className}" src="${content}" ${append} style="${style}" />`;
             } else {
                 html = `
-                <div class="${className}" style="${style}">
-                    ${renderToStaticMarkup(<MarkdownView source={content} page={page} container={null} />)}
+                <div class="text ${className}" style="${style}">
+                    ${content}
                 </div>
                 `;
             }
