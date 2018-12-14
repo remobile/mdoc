@@ -1,11 +1,11 @@
-var action = null; // 当前操作的对象
-var target = null; // 要处理的对象
-var referent = null; // 参考对象
-var clickX = 0; // 保留上次的X轴位置
-var clickY = 0; // 保留上次的Y轴位置
-var offsetX = 0; // 开始点击时距离被点击的元素的边框 X 距离
-var offsetY = 0; // 开始点击时距离被点击的元素的边框 Y 距离
-var isAltKeyPress = false; // alt是否被按住
+let action = null; // 当前操作的对象
+let target = null; // 要处理的对象
+let referent = null; // 参考对象
+let clickX = 0; // 保留上次的X轴位置
+let clickY = 0; // 保留上次的Y轴位置
+let offsetX = 0; // 开始点击时距离被点击的元素的边框 X 距离
+let offsetY = 0; // 开始点击时距离被点击的元素的边框 Y 距离
+let isAltKeyPress = false; // alt是否被按住
 
 function $(id) {
     return document.getElementById(id);
@@ -18,12 +18,52 @@ function getLocation(e) {
         offsetY: e.offsetY,
     }
 }
-var copyTarget = function () {
-    var newTarget = target.cloneNode(true);
-    target.parentNode.insertBefore(newTarget, target);
+function copyTarget(target) {
+    target.parentNode.insertBefore(target.cloneNode(true), target);
 }
-var onDragDown = function (e, type) {
-    var location = getLocation(e);
+function resize(operateType, location) {
+    document.body.style.cursor = location + "_resize";
+    switch (operateType) {
+        case "e": {
+            const add_length = clickX - location.x;
+            clickX = location.x;
+            const length = parseInt(referent.style.width) - add_length;
+            referent.style.width = length + "px";
+            break;
+        }
+        case "s": {
+            const add_length = clickY - location.y;
+            clickY = location.y;
+            const length = parseInt(referent.style.height) - add_length;
+            referent.style.height = length + "px";
+            break;
+        }
+        case "w": {
+            const add_length = clickX - location.x;
+            clickX = location.x;
+            const length = parseInt(referent.style.width) + add_length;
+            referent.style.width = length + "px";
+            referent.style.left = clickX + "px";
+            break;
+        }
+        case "n":  {
+            const add_length = clickY - location.y;
+            clickY = location.y;
+            const length = parseInt(referent.style.height) + add_length;
+            referent.style.height = length + "px";
+            referent.style.top = clickY + "px";
+            break;
+        }
+    }
+}
+function move(location) {
+    clickX = location.x;
+    clickY = location.y;
+    referent.style.left = (clickX - offsetX) + "px";
+    referent.style.top = (clickY - offsetY) + "px";
+}
+function onReferentMouseDown(e, type) {
+    const location = getLocation(e);
     clickY = location.y;
     clickX = location.x;
     offsetX = location.offsetX,
@@ -31,162 +71,64 @@ var onDragDown = function (e, type) {
     action = this;
     action.operateType = type;
     e.stopPropagation();
-};
-var onReferentDown = function (e) {
-    onDragDown(e, "move");
-    if (isAltKeyPress) {
-        copyTarget();
-    }
-};
-var onUpDown = function (e) {
-    onDragDown(e, "n");
-};
-var onDownDown = function (e) {
-    onDragDown(e, "s");
-};
-var onCenterLeftDown = function (e) {
-    onDragDown(e, "w");
-};
-var onCenterRightDown = function (e) {
-    onDragDown(e, "e");
-};
-var onUpLeftDown = function (e) {
-    onDragDown(e, "nw");
-};
-var onUpRightDown = function (e) {
-    onDragDown(e, "ne");
-};
-var onDownLeftDown = function (e) {
-    onDragDown(e, "sw");
-};
-var onDownRightDown = function (e) {
-    onDragDown(e, "se");
-};
-var onDragUp = function () {
+    isAltKeyPress && type === 'move' && copyTarget(e.target);
+}
+function onDocumentMouseUp() {
     document.body.style.cursor = "auto";
     action = null;
-};
-var resize = function (operateType, location) {
-    document.body.style.cursor = location + "_resize";
-    switch (operateType) {
-        case "e": {
-            var add_length = clickX - location.x;
-            clickX = location.x;
-            var length = parseInt(referent.style.width) - add_length;
-            referent.style.width = length + "px";
-            break;
-        }
-        case "s": {
-            var add_length = clickY - location.y;
-            clickY = location.y;
-            var length = parseInt(referent.style.height) - add_length;
-            referent.style.height = length + "px";
-            break;
-        }
-        case "w": {
-            var add_length = clickX - location.x;
-            clickX = location.x;
-            var length = parseInt(referent.style.width) + add_length;
-            referent.style.width = length + "px";
-            referent.style.left = clickX + "px";
-            break;
-        }
-        case "n":  {
-            var add_length = clickY - location.y;
-            clickY = location.y;
-            var length = parseInt(referent.style.height) + add_length;
-            referent.style.height = length + "px";
-            referent.style.top = clickY + "px";
-            break;
-        }
-    }
-};
-var move = function (location) {
-    clickX = location.x;
-    clickY = location.y;
-    referent.style.left = (clickX - offsetX) + "px";
-    referent.style.top = (clickY - offsetY) + "px";
 }
-var syncTarget = function() {
-    if (target) {
-        target.style.width = (referent.offsetWidth-2) + "px";
-        target.style.height = (referent.offsetHeight-2) + "px";
-        target.style.top = (referent.offsetTop+1) + "px";
-        target.style.left = (referent.offsetLeft+1) + "px";
-    }
-};
-var onDragMove = function (e) {
+function syncTarget(target) {
+    target.style.width = (referent.offsetWidth-2) + "px";
+    target.style.height = (referent.offsetHeight-2) + "px";
+    target.style.top = (referent.offsetTop+1) + "px";
+    target.style.left = (referent.offsetLeft+1) + "px";
+}
+function onDocumentMouseMove(e) {
     if (action) {
-        var location = getLocation(e);
-        switch (action.operateType) {
-            case "n": {
-                resize("n", location);
-                break;
-            }
-            case "s": {
-                resize("s", location);
-                break;
-            }
-            case "w": {
-                resize("w", location);
-                break;
-            }
-            case "e": {
-                resize("e", location);
-                break;
-            }
-            case "nw": {
-                resize("n", location);
-                resize("w", location);
-                break;
-            }
-            case "ne": {
-                resize("n", location);
-                resize("e", location);
-                break;
-            }
-            case "sw": {
-                resize("s", location);
-                resize("w", location);
-                break;
-            }
-            case "se": {
-                resize("s", location);
-                resize("e", location);
-                break;
-            }
-            case "move": {
-                move(location);
-                break;
-            }
+        const operateType = action.operateType;
+        const location = getLocation(e);
+        if (operateType === 'move') {
+            move(location);
+        } else {
+            resize(operateType[0], location);
+            operateType[1] && resize(operateType[1], location);
         }
-        syncTarget();
+        target && syncTarget(target);
     }
     return false;
+}
+// 删除所有的referent
+function removeAllReferents(html) {
+    const list = document.querySelectorAll('.referent');
+	for (const el of list) {
+        document.removeChild(el);
+    }
+}
+// 为target创建一个referent
+function createReferentForTarget(target) {
+    const div = document.createElement("div");
+    const dirs = ['n', 's', 'w', 'e', 'nw', 'ne', 'sw', 'se'];
+    const style = `height:${target.offsetHeight}px;width:${target.offsetWidth}px;top:${target.offsetTop-1}px;left:${target.offsetLeft-1}px`;
+    div.innerHTML = `<div class="referent" style="${style}" onmousedown="onReferentMouseDown(event, 'move')">${dirs.map(dir=>(`<div class="referent_node" data-dir="${dir}" onmousedown="onReferentMouseDown(event, '${dir}')"></div>`)).join('')}</div>`
+    const referent = div.childNodes[0];
+    referent.target = referent;
+    document.body.appendChild(referent);
 };
-var setTarget = function (ele) {
-    target = ele;
-    referent.style.height = target.offsetHeight + "px";
-    referent.style.width = target.offsetWidth + "px";
-    referent.style.top = (target.offsetTop-1) + "px";
-    referent.style.left = (target.offsetLeft-1) + "px";
-    referent.style.display = "block";
-};
-var onDocumentDown = function (e) {
+function onDocumentMouseDown(e) {
     const classNameList = e.target.className.split(' ');
     if (classNameList.indexOf('target') !== -1) {
-        setTarget(e.target);
+        createReferentForTarget(e.target);
     }
-};
-var saveMarkdown = function(e) {
-    var text = [];
-    var list = document.querySelectorAll('.target');
-    for (var el of list) {
-        var x = el.offsetLeft;
-        var y = el.offsetTop;
-        var w = el.offsetWidth;
-        var h = el.offsetHeight;
-        var img = el.src ? ' img' : '';
+}
+function saveMarkdown(e) {
+    const text = [];
+    const list = document.querySelectorAll('.target');
+    for (const el of list) {
+        const x = el.offsetLeft;
+        const y = el.offsetTop;
+        const w = el.offsetWidth;
+        const h = el.offsetHeight;
+        const img = el.src ? ' img' : '';
 
         text.push('::: fm' + img + 'x='+x+' y='+y+' w='+w+' h='+h);
         text.push(img ? el.src : el.innerHTML);
@@ -195,30 +137,29 @@ var saveMarkdown = function(e) {
         text.push('');
     }
     console.log(text.join('\n'));
-};
-var onKeyDown = function (e) {
-    console.log("==========", e);
+}
+function onDocumentKeyDown(e) {
     if (target) {
         if (e.keyCode === 27) { // esc
             referent.style.display = "none";
             target.onmousedown = null;
             target = null;
         } else if (e.keyCode === 189) { // -
-            var fontSize = parseInt(getComputedStyle(target).fontSize);
+            const fontSize = parseInt(getComputedStyle(target).fontSize);
             fontSize = !e.altKey ? fontSize - 1 : fontSize - 3;
             if (fontSize < 5) {
                 fontSize = 5;
             }
             target.style.fontSize = fontSize + 'px';
         } else if (e.keyCode === 187) { // +
-            var fontSize = parseInt(getComputedStyle(target).fontSize);
+            const fontSize = parseInt(getComputedStyle(target).fontSize);
             fontSize = !e.altKey ? fontSize + 1 : fontSize + 3;
             if (fontSize > 100) {
                 fontSize = 100;
             }
             target.style.fontSize = fontSize + 'px';
         } else if (e.keyCode === 66) { // b
-            var fontWeight = parseInt(getComputedStyle(target).fontWeight);
+            const fontWeight = parseInt(getComputedStyle(target).fontWeight);
             fontWeight = !e.altKey ? fontWeight + 100 : fontWeight + 300;
             if (fontWeight < 100) {
                 fontWeight = 900;
@@ -228,7 +169,7 @@ var onKeyDown = function (e) {
             }
             target.style.fontWeight = fontWeight;
         } else if (e.keyCode === 73) { // i
-            var fontStyle = getComputedStyle(target).fontStyle;
+            const fontStyle = getComputedStyle(target).fontStyle;
             if (fontStyle === 'normal') {
                 fontStyle = 'italic';
             } else if (fontStyle === 'italic') {
@@ -244,26 +185,16 @@ var onKeyDown = function (e) {
     } else if (e.keyCode === 18) { // alt
         isAltKeyPress = true;
     }
-};
-var onKeyUp = function (e) {
+}
+function onDocumentKeyUp(e) {
     if (e.keyCode === 18) { // alt
         isAltKeyPress = false;
     }
-};
+}
 window.onload = function () {
-    referent = $("referent");
-    referent.onmousedown = onReferentDown;
-    $("referent_center_up").onmousedown = onUpDown;
-    $("referent_center_down").onmousedown = onDownDown;
-    $("referent_left_middle").onmousedown = onCenterLeftDown;
-    $("referent_right_middle").onmousedown = onCenterRightDown;
-    $("referent_left_up").onmousedown = onUpLeftDown;
-    $("referent_right_up").onmousedown = onUpRightDown;
-    $("referent_left_down").onmousedown = onDownLeftDown;
-    $("referent_right_down").onmousedown = onDownRightDown;
-    document.onmousedown = onDocumentDown;
-    document.onmousemove = onDragMove;
-    document.onmouseup = onDragUp;
-    document.onkeydown = onKeyDown;
-    document.onkeyup = onKeyUp;
+    document.onmousedown = onDocumentMouseDown;
+    document.onmousemove = onDocumentMouseMove;
+    document.onmouseup = onDocumentMouseUp;
+    document.onkeydown = onDocumentKeyDown;
+    document.onkeyup = onDocumentKeyUp;
 }
