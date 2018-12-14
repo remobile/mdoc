@@ -18,6 +18,10 @@ function getLocation(e) {
         offsetY: e.offsetY,
     }
 }
+var copyTarget = function () {
+    var newTarget = target.cloneNode(true);
+    target.parentNode.insertBefore(newTarget, target);
+}
 var onDragDown = function (e, type) {
     var location = getLocation(e);
     clickY = location.y;
@@ -30,6 +34,9 @@ var onDragDown = function (e, type) {
 };
 var onReferentDown = function (e) {
     onDragDown(e, "move");
+    if (isAltKeyPress) {
+        copyTarget();
+    }
 };
 var onUpDown = function (e) {
     onDragDown(e, "n");
@@ -190,6 +197,7 @@ var saveMarkdown = function(e) {
     console.log(text.join('\n'));
 };
 var onKeyDown = function (e) {
+    console.log("==========", e);
     if (target) {
         if (e.keyCode === 27) { // esc
             referent.style.display = "none";
@@ -197,21 +205,21 @@ var onKeyDown = function (e) {
             target = null;
         } else if (e.keyCode === 189) { // -
             var fontSize = parseInt(getComputedStyle(target).fontSize);
-            fontSize = !e.ctrlKey ? fontSize - 1 : fontSize - 3;
+            fontSize = !e.altKey ? fontSize - 1 : fontSize - 3;
             if (fontSize < 5) {
                 fontSize = 5;
             }
             target.style.fontSize = fontSize + 'px';
         } else if (e.keyCode === 187) { // +
             var fontSize = parseInt(getComputedStyle(target).fontSize);
-            fontSize = !e.ctrlKey ? fontSize + 1 : fontSize + 3;
+            fontSize = !e.altKey ? fontSize + 1 : fontSize + 3;
             if (fontSize > 100) {
                 fontSize = 100;
             }
             target.style.fontSize = fontSize + 'px';
         } else if (e.keyCode === 66) { // b
             var fontWeight = parseInt(getComputedStyle(target).fontWeight);
-            fontWeight = !e.ctrlKey ? fontWeight + 100 : fontWeight + 300;
+            fontWeight = !e.altKey ? fontWeight + 100 : fontWeight + 300;
             if (fontWeight < 100) {
                 fontWeight = 900;
             }
@@ -230,9 +238,16 @@ var onKeyDown = function (e) {
         }
     }
     if (e.keyCode === 83) { // s
-        if (e.ctrlKey) {
+        if (e.altKey) {
             saveMarkdown();
         }
+    } else if (e.keyCode === 18) { // alt
+        isAltKeyPress = true;
+    }
+};
+var onKeyUp = function (e) {
+    if (e.keyCode === 18) { // alt
+        isAltKeyPress = false;
     }
 };
 window.onload = function () {
@@ -250,4 +265,5 @@ window.onload = function () {
     document.onmousemove = onDragMove;
     document.onmouseup = onDragUp;
     document.onkeydown = onKeyDown;
+    document.onkeyup = onKeyUp;
 }
