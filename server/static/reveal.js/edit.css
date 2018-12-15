@@ -1,4 +1,5 @@
 .referent { position:absolute; border:1px dashed gray; z-index:10000; cursor:move; }
+.referent.group { border:1px solid gray; }
 .referent_node { position:absolute; background:#CDC9C9; width:9px; height:9px; z-index:3; }
 .referent_node[data-dir = "n"] { top:-4px; left:50%; cursor:n-resize; }
 .referent_node[data-dir = "s"] { bottom:-4px; left:50%; cursor:s-resize; }

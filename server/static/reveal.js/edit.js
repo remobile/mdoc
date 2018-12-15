@@ -106,30 +106,54 @@ function removeAllReferents() {
     referents = [];
 }
 // 为target创建一个referent
-function createReferentForTarget(target) {
-    if (!isAltKeyPress) {
-        removeAllReferents();
-    }
+function createReferentForTarget(target, isGroup) {
     const div = document.createElement("div");
     const dirs = ['n', 's', 'w', 'e', 'nw', 'ne', 'sw', 'se'];
     const style = `height:${target.offsetHeight}px;width:${target.offsetWidth}px;top:${target.offsetTop-1}px;left:${target.offsetLeft-1}px`;
-    div.innerHTML = `<div class="referent" style="${style}" onmousedown="onReferentMouseDown(event, 'move')">${dirs.map(dir=>(`<div class="referent_node" data-dir="${dir}" onmousedown="onReferentMouseDown(event, '${dir}')"></div>`)).join('')}</div>`
+    const className = 'referent' + (isGroup ? ' group' : '');
+    div.innerHTML = `<div class="${className}" style="${style}" onmousedown="onReferentMouseDown(event, 'move')">${dirs.map(dir=>(`<div class="referent_node" data-dir="${dir}" onmousedown="onReferentMouseDown(event, '${dir}')"></div>`)).join('')}</div>`
     const referent = div.childNodes[0];
     referent.target = target;
     document.body.appendChild(referent);
     !referents.push(referent);
     console.log("create referent");
 };
+function createReferents(target) {
+    if (!isAltKeyPress) {
+        removeAllReferents();
+    }
+    if (!target.dataset.groupId) {
+        createReferentForTarget(target);
+    } else {
+        const list = document.querySelectorAll(`.target[data-group-id = "${target.dataset.groupId}"]`);
+        for (const el of list) {
+            createReferentForTarget(el, true);
+        }
+    }
+};
 function onDocumentMouseDown(e) {
     const classNameList = e.target.className.split(' ');
     if (classNameList.indexOf('target') !== -1) {
-        createReferentForTarget(e.target);
+        createReferents(e.target);
     }
 }
-function bindAllReferents() {
-    groupId++;
-    for (const refrent of referents) {
-        refrent.target.dataset.groupId = groupId;
+function toggleTargetGroup() {
+    if (referents.length < 2) {
+        return;
+    }
+    if (referents[0].target.dataset.groupId === undefined) {
+        groupId++;
+        for (const refrent of referents) {
+            refrent.target.dataset.groupId = groupId;
+            refrent.className = `${refrent.className} group`;
+        }
+        console.log("add group");
+    } else {
+        for (const refrent of referents) {
+            delete refrent.target.dataset.groupId;
+            refrent.className = refrent.className.replace('group', '');
+        }
+        console.log("delete group");
     }
 }
 function saveMarkdown(e) {
@@ -151,6 +175,7 @@ function saveMarkdown(e) {
     console.log(text.join('\n'));
 }
 function onDocumentKeyDown(e) {
+    console.log(e)
     if (referents.length) {
         if (e.keyCode === 27) { // esc
             removeAllReferents();
@@ -190,8 +215,8 @@ function onDocumentKeyDown(e) {
                 target.style.fontStyle = fontStyle;
             }
         } else {
-            if (e.altKey && e.keyCode === 85) { // u 合并
-                bindAllReferents();
+            if (e.altKey && e.keyCode === 71) { // 切换group状态
+                toggleTargetGroup();
             }
         }
     }
