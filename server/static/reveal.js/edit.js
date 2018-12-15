@@ -1,9 +1,12 @@
 let actions = null; // 当前操作的对象
 let referents = []; // 当前选中的refrent列表
+let history = []; // 历史记录
+let depHistory = []; // 回滚的历史记录
 let isAltKeyPress = false; // alt是否被按住
 let clickX = 0; // 保留上次的X轴位置
 let clickY = 0; // 保留上次的Y轴位置©
 let groupId = -1; // 集合的id最小值
+let root;
 
 function getLocation(e) {
     return {
@@ -11,7 +14,28 @@ function getLocation(e) {
         y: e.y || e.clientY,
     }
 }
-function getInitGroupId() {
+function pushHistory() {
+    history.push(root.innerHTML);
+    console.log(history);
+    depHistory = [];
+}
+function popHistory() {
+    if (history.length > 1) {
+        depHistory.push(history.pop());
+        console.log(history);
+        root.innerHTML = history[history.length-1];
+    }
+}
+function recoverHistory() {
+    if (depHistory.length) {
+        const html = depHistory.pop();
+        history.push(html);
+        root.innerHTML = html;
+    }
+}
+function initialize() {
+    root = document.body;
+    history.push(root.innerHTML);
     const list = document.querySelectorAll('.target');
     for (const el of list) {
         groupId = Math.max(groupId, +el.dataset.groupId||0);
@@ -30,7 +54,10 @@ function onReferentMouseDown(e, type) {
 }
 function onDocumentMouseUp() {
     document.body.style.cursor = "auto";
-    actions = null;
+    if (actions) {
+        pushHistory();
+        actions = null;
+    }
 }
 function resize(referent, operateType, location) {
     document.body.style.cursor = location + "_resize";
@@ -155,6 +182,7 @@ function toggleTargetGroup() {
         }
         console.log("delete group");
     }
+    pushHistory();
 }
 function saveMarkdown(e) {
     const text = [];
@@ -166,7 +194,7 @@ function saveMarkdown(e) {
         const h = el.offsetHeight;
         const img = el.src ? ' img' : '';
 
-        text.push('::: fm' + img + 'x='+x+' y='+y+' w='+w+' h='+h);
+        text.push('::: fm' + img + ' x='+x+' y='+y+' w='+w+' h='+h);
         text.push(img ? el.src : el.innerHTML);
         text.push(':::');
         text.push('');
@@ -179,6 +207,7 @@ function onDocumentKeyDown(e) {
     if (referents.length) {
         if (e.keyCode === 27) { // esc
             removeAllReferents();
+            pushHistory();
         } else if (referents.length === 1) {
             const target = referents[0].target;
             if (e.keyCode === 189) { // -
@@ -188,6 +217,7 @@ function onDocumentKeyDown(e) {
                     fontSize = 5;
                 }
                 target.style.fontSize = fontSize + 'px';
+                pushHistory();
             } else if (e.keyCode === 187) { // +
                 let fontSize = parseInt(getComputedStyle(target).fontSize);
                 fontSize = !e.altKey ? fontSize + 1 : fontSize + 3;
@@ -195,6 +225,7 @@ function onDocumentKeyDown(e) {
                     fontSize = 100;
                 }
                 target.style.fontSize = fontSize + 'px';
+                pushHistory();
             } else if (e.keyCode === 66) { // b
                 let fontWeight = parseInt(getComputedStyle(target).fontWeight);
                 fontWeight = !e.altKey ? fontWeight + 100 : fontWeight + 300;
@@ -205,6 +236,7 @@ function onDocumentKeyDown(e) {
                     fontWeight = 100;
                 }
                 target.style.fontWeight = fontWeight;
+                pushHistory();
             } else if (e.keyCode === 73) { // i 斜体
                 let fontStyle = getComputedStyle(target).fontStyle;
                 if (fontStyle === 'normal') {
@@ -213,15 +245,21 @@ function onDocumentKeyDown(e) {
                     fontStyle = 'normal';
                 }
                 target.style.fontStyle = fontStyle;
+                pushHistory();
             }
         } else {
             if (e.altKey && e.keyCode === 71) { // 切换group状态
                 toggleTargetGroup();
             }
         }
+
     }
     if (e.altKey && e.keyCode === 83) { // s
         saveMarkdown();
+    } else if (e.altKey && e.keyCode === 90) { // alt + z
+        popHistory();
+    } else if (e.altKey && e.keyCode === 89) { // alt + y
+        recoverHistory();
     } else if (e.keyCode === 18) { // alt
         isAltKeyPress = true;
     }
@@ -232,7 +270,7 @@ function onDocumentKeyUp(e) {
     }
 }
 window.onload = function () {
-    getInitGroupId();
+    initialize();
     document.onmousedown = onDocumentMouseDown;
     document.onmousemove = onDocumentMouseMove;
     document.onmouseup = onDocumentMouseUp;
