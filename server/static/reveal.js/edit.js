@@ -163,6 +163,7 @@ function onDocumentMouseDown(e) {
     if (classNameList.indexOf('target') !== -1) {
         createReferents(e.target);
     }
+    e.stopPropagation();
 }
 function toggleTargetGroup() {
     if (referents.length < 2) {
@@ -201,6 +202,19 @@ function saveMarkdown(e) {
         text.push('');
     }
     console.log(text.join('\n'));
+}
+function onColorPickerClose (picker) {
+    console.log(picker);
+}
+function showColorPicker (target, referent) {
+    const input = document.createElement('INPUT');
+    const picker = new jscolor(input)
+    picker.fromString('FF6699');
+    input.style.position = 'absolute';
+    input.style.left = (referent.offsetLeft +referent.offsetWidth) + "px";
+    input.style.top = referent.offsetTop + "px";
+    document.body.appendChild(input);
+    picker.show();
 }
 function onDocumentKeyDown(e) {
     console.log(e)
@@ -246,9 +260,11 @@ function onDocumentKeyDown(e) {
                 }
                 target.style.fontStyle = fontStyle;
                 pushHistory();
+            } else if (e.altKey && e.keyCode === 67) { // alt + c 设置颜色
+                showColorPicker(target, referents[0]);
             }
         } else {
-            if (e.altKey && e.keyCode === 71) { // 切换group状态
+            if (e.altKey && e.keyCode === 85) { // alt + u 切换group状态
                 toggleTargetGroup();
             }
         }
