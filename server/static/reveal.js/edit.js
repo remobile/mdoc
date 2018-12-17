@@ -302,6 +302,12 @@ function onDocumentKeyUp(e) {
 }
 window.onload = function () {
     initialize();
+    document.getElementById('info').innerHTML = `
+    <ol>
+        <li>点击元素进行选中，可以拖动位置，改变大小</li>
+        <li></li>
+    </ol>
+    `;
     document.onmousedown = onDocumentMouseDown;
     document.onmousemove = onDocumentMouseMove;
     document.onmouseup = onDocumentMouseUp;
