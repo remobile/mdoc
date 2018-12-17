@@ -6,6 +6,8 @@ let isAltKeyPress = false; // alt是否被按住
 let clickX = 0; // 保留上次的X轴位置
 let clickY = 0; // 保留上次的Y轴位置©
 let groupId = -1; // 集合的id最小值
+let copiedTarget = null; // 复制的target
+let colorPicker = null; // 颜色取色器
 let root;
 
 function getLocation(e) {
@@ -50,7 +52,7 @@ function onReferentMouseDown(e, type) {
     clickX = location.x;
     actions = { operateType: type, node: e.target };
     e.stopPropagation();
-    isAltKeyPress && type === 'move' && copyTarget(e.target);
+    isAltKeyPress && type === 'move' && copyTarget(e.target.target);
 }
 function onDocumentMouseUp() {
     document.body.style.cursor = "auto";
@@ -203,23 +205,32 @@ function saveMarkdown(e) {
     }
     console.log(text.join('\n'));
 }
-function onColorPickerClose (picker) {
-    console.log(picker);
+function copyTargetAcctribute (target) {
+    copiedTarget = target;
+}
+function pasteTargetAcctribute (target) {
+    if (copiedTarget) {
+        target.style.color = copiedTarget.style.color;
+    }
 }
 function showColorPicker (target, referent) {
     const input = document.createElement('INPUT');
-    const picker = new jscolor(input)
-    picker.fromString('FF6699');
+    colorPicker = new jscolor(input, { closable:true, closeText:'确定' });
+    colorPicker.fromString(getComputedStyle(target).color);
+    input.onchange = function() {
+        target.style.color = `${colorPicker.toRGBString()}`;
+    };
     input.style.position = 'absolute';
+    input.style.visibility = 'hidden';
     input.style.left = (referent.offsetLeft +referent.offsetWidth) + "px";
-    input.style.top = referent.offsetTop + "px";
+    input.style.top = (referent.offsetTop - 25) + "px";
     document.body.appendChild(input);
-    picker.show();
+    colorPicker.show();
 }
 function onDocumentKeyDown(e) {
     console.log(e)
     if (referents.length) {
-        if (e.keyCode === 27) { // esc
+        if (e.keyCode === 27 && !colorPicker) { // esc
             removeAllReferents();
             pushHistory();
         } else if (referents.length === 1) {
@@ -262,6 +273,10 @@ function onDocumentKeyDown(e) {
                 pushHistory();
             } else if (e.altKey && e.keyCode === 67) { // alt + c 设置颜色
                 showColorPicker(target, referents[0]);
+            } else if (e.altKey && e.keyCode === 80) { // alt + p 复制属性
+                copyTargetAcctribute(target);
+            } else if (e.altKey && e.keyCode === 86) { // alt + v 粘贴属性
+                pasteTargetAcctribute(target);
             }
         } else {
             if (e.altKey && e.keyCode === 85) { // alt + u 切换group状态

@@ -537,7 +537,7 @@ var jsc = {
 			jsc.onControlPointerStart(e, target, target._jscControlName, 'mouse');
 		} else {
 			// Mouse is outside the picker controls -> hide the color picker!
-			if (jsc.picker && jsc.picker.owner) {
+			if (jsc.picker && jsc.picker.owner && !jsc.picker.owner.closable) {
 				jsc.picker.owner.hide();
 			}
 		}
