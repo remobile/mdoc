@@ -1,5 +1,7 @@
 #container { position:absolute; left:-1px; top:-1px; width: 1066.67px; height: 600px; border: 1px solid red;}
 #info { position:absolute; left:1100px; top:1px; width: 300px; height: 598px; border: 1px solid red;}
+#info li { margin-top: 10px; font-size: 14px; font-weight: 400; }
+#info>ol>span { font-size: 18px; font-weight: 600; }
 .referent { position:absolute; border:1px dashed gray; z-index:10000; cursor:move; }
 .referent.group { border:1px solid gray; }
 .referent_node { position:absolute; background:#CDC9C9; width:9px; height:9px; z-index:3; }
