@@ -195,10 +195,41 @@ function saveMarkdown(e) {
         const y = el.offsetTop;
         const w = el.offsetWidth;
         const h = el.offsetHeight;
-        const img = el.src ? ' img' : '';
+        const isImg = !!el.src;
+        const img = isImg ? ' img' : '';
+        let style = '';
+        if (!isImg) {
+            const fontSize = el.style.fontSize;
+            if (fontSize) {
+                style = `${style}font-size:${fontSize};`;
+            }
+            const fontWeight = el.style.fontWeight;
+            if (fontWeight) {
+                style = `${style}font-weight:${fontWeight};`;
+            }
+            const fontStyle = el.style.fontStyle;
+            if (fontStyle === 'italic') {
+                style = `${style}font-style:${fontStyle};`;
+            }
+            const color = el.style.color;
+            if (color) {
+                style = `${style}color:${color};`;
+            }
+        }
+        let attr = '';
+        const groupId = el.dataset.groupId;
+        if (groupId !== undefined) {
+            attr = `{data-group=${groupId}`;
+        }
+        if (style) {
+            attr = attr ? `${attr} style="${style}"` : `{style="${style}"`;
+        }
+        if (attr) {
+            attr = `${attr}}`
+        }
 
-        text.push('::: fm' + img + ' x='+x+' y='+y+' w='+w+' h='+h);
-        text.push(img ? el.src : el.innerHTML);
+        text.push('::: fm' + img + ' x='+x+' y='+y+' w='+w+' h='+h+attr);
+        text.push(isImg ? el.src : el.innerHTML);
         text.push(':::');
         text.push('');
         text.push('');
@@ -228,7 +259,6 @@ function showColorPicker (target, referent) {
     colorPicker.show();
 }
 function onDocumentKeyDown(e) {
-    console.log(e)
     if (referents.length) {
         if (e.keyCode === 27 && !colorPicker) { // esc
             removeAllReferents();
