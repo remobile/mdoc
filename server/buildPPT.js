@@ -107,6 +107,17 @@ function buildMarkdown(port, configPath, build, index) {
             );
         }
     });
+    app.post('/saveMarkdown', (req, res) => {
+        let text = '';
+        // req.setEncoding('utf8');
+        req.on('data', function(chunk) {
+            text += chunk;
+        });
+        req.on('end', function() {
+            fs.writeFileSync(getDocumentPath(config.pages[index].path), text, 'utf8');
+            res.sendStatus(200);
+        });
+    });
     app.get('*', (req, res) => {
         res.sendStatus(404);
     });

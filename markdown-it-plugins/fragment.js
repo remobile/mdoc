@@ -32,17 +32,22 @@ module.exports = function fragment_plugin(md, page) {
             style = `${style}${(options.x < 0) ? `right:${-options.x}px;` : `left:${options.x}px;`}`;
             style = `${style}${(options.y < 0) ? `bottom:${-options.y}px;` : `top:${options.y}px;`}`;
             options.style && (style = `${style}${options.style}`);
-            let className = page.edit ? 'target' : '';
+            let className = `${options.className} ${page.edit ? 'target' : ''}`;
             if (options.animate) {
                 className = `${className} fragment ${options.animate}`;
+            }
+            className = className.trim();
+            let dataset = '';
+            if (options.group) {
+                dataset = ` data-group=${options.group}`;
             }
 
             let html = '';
             if (options.img) {
-                html = `<img class="${className}" src="${content}" ${append} style="${style}" />`;
+                html = `<img class="${className}"${dataset} src="${content}" ${append} style="${style}" />`;
             } else {
                 html = `
-                <div class="text ${className}" style="${style}">
+                <div class="text ${className}"${dataset} style="${style}">
                     ${content}
                 </div>
                 `;
@@ -53,7 +58,18 @@ module.exports = function fragment_plugin(md, page) {
             const token = tokens[idx];
             if (token.type === 'container_fm_open') {
                 const params = token.info.trim().split(/\s+/).slice(1).join(' ');
-                options = parseParams(params, { x:0, y: 0 });
+                let style = '', className = '', group = '';
+                console.log(token);
+                for (const attr of token.attrs||[]) {
+                    if (attr[0] === 'style') {
+                        style = attr[1];
+                    } else if (attr[0] === 'class') {
+                        className = attr[1];
+                    } else if (attr[0] === 'group') {
+                        group = attr[1];
+                    }
+                }
+                options = parseParams(params, { x:0, y: 0, style, className, group });
             }
             return '';
         },

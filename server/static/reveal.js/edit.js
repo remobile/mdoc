@@ -5,7 +5,7 @@ let depHistory = []; // 回滚的历史记录
 let isAltKeyPress = false; // alt是否被按住
 let clickX = 0; // 保留上次的X轴位置
 let clickY = 0; // 保留上次的Y轴位置©
-let groupId = -1; // 集合的id最小值
+let group = -1; // 集合的id最小值
 let copiedTarget = null; // 复制的target
 let colorPicker = null; // 颜色取色器
 let root;
@@ -40,7 +40,7 @@ function initialize() {
     history.push(root.innerHTML);
     const list = document.querySelectorAll('.target');
     for (const el of list) {
-        groupId = Math.max(groupId, +el.dataset.groupId||0);
+        group = Math.max(group, +el.dataset.group||0);
     }
 }
 function copyTarget(target) {
@@ -151,10 +151,10 @@ function createReferents(target) {
     if (!isAltKeyPress) {
         removeAllReferents();
     }
-    if (!target.dataset.groupId) {
+    if (!target.dataset.group) {
         createReferentForTarget(target);
     } else {
-        const list = document.querySelectorAll(`.target[data-group-id = "${target.dataset.groupId}"]`);
+        const list = document.querySelectorAll(`.target[data-group = "${target.dataset.group}"]`);
         for (const el of list) {
             createReferentForTarget(el, true);
         }
@@ -171,21 +171,31 @@ function toggleTargetGroup() {
     if (referents.length < 2) {
         return;
     }
-    if (referents[0].target.dataset.groupId === undefined) {
-        groupId++;
+    if (referents[0].target.dataset.group === undefined) {
+        group++;
         for (const refrent of referents) {
-            refrent.target.dataset.groupId = groupId;
+            refrent.target.dataset.group = group;
             refrent.className = `${refrent.className} group`;
         }
         console.log("add group");
     } else {
         for (const refrent of referents) {
-            delete refrent.target.dataset.groupId;
+            delete refrent.target.dataset.group;
             refrent.className = refrent.className.replace('group', '');
         }
         console.log("delete group");
     }
     pushHistory();
+}
+function post (url, data, fn) {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+            fn && fn.call(this, xhr.responseText);
+        }
+    };
+    xhr.send(data);
 }
 function saveMarkdown(e) {
     const text = [];
@@ -217,9 +227,9 @@ function saveMarkdown(e) {
             }
         }
         let attr = '';
-        const groupId = el.dataset.groupId;
-        if (groupId !== undefined) {
-            attr = `{data-group=${groupId}`;
+        const group = el.dataset.group;
+        if (group !== undefined) {
+            attr = `{group=${group}`;
         }
         if (style) {
             attr = attr ? `${attr} style="${style}"` : `{style="${style}"`;
@@ -229,12 +239,11 @@ function saveMarkdown(e) {
         }
 
         text.push('::: fm' + img + ' x='+x+' y='+y+' w='+w+' h='+h+attr);
-        text.push(isImg ? el.src : el.innerHTML);
+        text.push(isImg ? el.src : el.innerText);
         text.push(':::');
         text.push('');
-        text.push('');
     }
-    console.log(text.join('\n'));
+    post('/saveMarkdown', text.join('\n'));
 }
 function copyTargetAcctribute (target) {
     copiedTarget = target;
@@ -334,20 +343,20 @@ window.onload = function () {
     initialize();
     document.getElementById('info').innerHTML = `
     <ol>
-        <span>帮助：<span>
-        <li>点击元素进行选中，可以拖动位置，改变大小，按esc取消选择</li>
-        <li>按住alt用鼠标拖动一个元素，可以复制该元素，</li>
-        <li>按住alt，可以选择多个元素，alt+u和合并组和拆开组</li>
-        <li>按+号可以增大字体，按住alt按+号可以更快的增加字体</li>
-        <li>按-号可以减小字体，按住alt按-号可以更快的减少字体</li>
-        <li>alt+b: 切换字体加粗</li>
-        <li>alt+i: 切换字体斜体</li>
-        <li>alt+c: 设置字体的颜色</li>
-        <li>alt+p: 复制元素属性</li>
-        <li>alt+v: 粘贴元素属性</li>
-        <li>alt+z: 回滚历史操作</li>
-        <li>alt+y: 取消回滚历史</li>
-        <li>alt+s: 保存文件至md</li>
+    <span>帮助：<span>
+    <li>点击元素进行选中，可以拖动位置，改变大小，按esc取消选择</li>
+    <li>按住alt用鼠标拖动一个元素，可以复制该元素，</li>
+    <li>按住alt，可以选择多个元素，alt+u和合并组和拆开组</li>
+    <li>按+号可以增大字体，按住alt按+号可以更快的增加字体</li>
+    <li>按-号可以减小字体，按住alt按-号可以更快的减少字体</li>
+    <li>alt+b: 切换字体加粗</li>
+    <li>alt+i: 切换字体斜体</li>
+    <li>alt+c: 设置字体的颜色</li>
+    <li>alt+p: 复制元素属性</li>
+    <li>alt+v: 粘贴元素属性</li>
+    <li>alt+z: 回滚历史操作</li>
+    <li>alt+y: 取消回滚历史</li>
+    <li>alt+s: 保存文件至md</li>
     </ol>
     `;
     document.onmousedown = onDocumentMouseDown;
