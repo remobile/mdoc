@@ -9,7 +9,7 @@ module.exports = function fragment_plugin(md, page) {
     let options = {};
     md.use(container, 'fm', {
         validate: function(params) {
-            return params.trim().match(/^fm\s+(.*)$/);
+            return params.trim().match(/^fm\s*/);
         },
         content: function (tokens, idx) {
             const content = tokens[idx].markup;
@@ -69,7 +69,7 @@ module.exports = function fragment_plugin(md, page) {
                         group = attr[1];
                     }
                 }
-                options = parseParams(params, { x:0, y: 0, style, className, group });
+                options = parseParams(params, { x:0, y: 0, w:100, h:30, style, className, group });
             }
             return '';
         },
