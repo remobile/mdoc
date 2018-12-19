@@ -59,7 +59,6 @@ module.exports = function fragment_plugin(md, page) {
             if (token.type === 'container_fm_open') {
                 const params = token.info.trim().split(/\s+/).slice(1).join(' ');
                 let style = '', className = '', group = '';
-                console.log(token);
                 for (const attr of token.attrs||[]) {
                     if (attr[0] === 'style') {
                         style = attr[1];
