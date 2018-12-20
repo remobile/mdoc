@@ -206,7 +206,7 @@ function saveMarkdown(e) {
         const w = el.offsetWidth;
         const h = el.offsetHeight;
         const isImg = !!el.src;
-        const img = isImg ? ' img' : '';
+        const type = isImg ? ' img' : '';
         let style = '';
         if (!isImg) {
             const fontSize = el.style.fontSize;
@@ -225,20 +225,14 @@ function saveMarkdown(e) {
             if (color) {
                 style = `${style}color:${color};`;
             }
+            if (style) {
+                style = ` ${style.replace(/\s/g, '')}`;
+            }
         }
-        let attr = '';
-        const group = el.dataset.group;
-        if (group !== undefined) {
-            attr = `{group=${group}`;
-        }
-        if (style) {
-            attr = attr ? `${attr} style="${style}"` : `{style="${style}"`;
-        }
-        if (attr) {
-            attr = `${attr}}`
-        }
+        const group = el.dataset.group !== undefined ? ` group=${el.dataset.group}` : '';
 
         text.push('::: fm' + img + ' x='+x+' y='+y+' w='+w+' h='+h+attr);
+        text.push(`::: fm${type} x=${x} y=${y} w=${w} h=${h}${style}${group}`);
         text.push(isImg ? el.src : el.innerText);
         text.push(':::');
         text.push('');

@@ -58,17 +58,7 @@ module.exports = function fragment_plugin(md, page) {
             const token = tokens[idx];
             if (token.type === 'container_fm_open') {
                 const params = token.info.trim().split(/\s+/).slice(1).join(' ');
-                let style = '', className = '', group = '';
-                for (const attr of token.attrs||[]) {
-                    if (attr[0] === 'style') {
-                        style = attr[1];
-                    } else if (attr[0] === 'class') {
-                        className = attr[1];
-                    } else if (attr[0] === 'group') {
-                        group = attr[1];
-                    }
-                }
-                options = parseParams(params, { x:0, y: 0, w:100, h:30, style, className, group });
+                options = parseParams(params, page.edit ? { x:0, y: 0, w:100, h:30 } : { x:0, y: 0 } );
             }
             return '';
         },
