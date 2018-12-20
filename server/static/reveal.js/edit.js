@@ -18,13 +18,11 @@ function getLocation(e) {
 }
 function pushHistory() {
     history.push(root.innerHTML);
-    console.log(history);
     depHistory = [];
 }
 function popHistory() {
     if (history.length > 1) {
         depHistory.push(history.pop());
-        console.log(history);
         root.innerHTML = history[history.length-1];
     }
 }
@@ -226,12 +224,11 @@ function saveMarkdown(e) {
                 style = `${style}color:${color};`;
             }
             if (style) {
-                style = ` ${style.replace(/\s/g, '')}`;
+                style = ` style=${style.replace(/\s/g, '')}`;
             }
         }
         const group = el.dataset.group !== undefined ? ` group=${el.dataset.group}` : '';
 
-        text.push('::: fm' + img + ' x='+x+' y='+y+' w='+w+' h='+h+attr);
         text.push(`::: fm${type} x=${x} y=${y} w=${w} h=${h}${style}${group}`);
         text.push(isImg ? el.src : el.innerText);
         text.push(':::');
