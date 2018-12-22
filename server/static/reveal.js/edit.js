@@ -9,6 +9,7 @@ let group = -1; // 集合的id最小值
 let copiedTarget = null; // 复制的target
 let colorPicker = null; // 颜色取色器
 let animateSelector = null; //动画选择器
+let targetTextInput = null; //输入框
 let root;
 
 function rgb2hex(color) {
@@ -167,6 +168,10 @@ function createReferents(target) {
             document.body.removeChild(animateSelector);
             animateSelector = null;
         }
+        if (targetTextInput) {
+            document.body.removeChild(targetTextInput);
+            targetTextInput = null;
+        }
     }
     if (!target.dataset.group) {
         createReferentForTarget(target);
@@ -312,6 +317,48 @@ function setFragmentAnimate (target, referent) {
         animateSelector = null;
     };
 }
+function editTargetText (target, referent) {
+    if (targetTextInput) {
+        return;
+    }
+    const isImg = !/text/.test(target.className);
+    targetTextInput = document.createElement('INPUT');
+    targetTextInput.type = 'text';
+    targetTextInput.value = !isImg ? target.innerText : target.src;
+    targetTextInput.className = 'target_input';
+    targetTextInput.style.left = (referent.offsetLeft +referent.offsetWidth) + "px";
+    targetTextInput.style.top = referent.offsetTop + "px";
+    document.body.appendChild(targetTextInput);
+    targetTextInput.oninput = function(e) {
+        if (!isImg) {
+            target.innerText = e.target.value;
+        } else {
+            target.src = e.target.value;
+        }
+    };
+}
+function createTextTarget() {
+    const target = document.createElement('DIV');
+    target.className = 'target text';
+    target.style.position = "absolute";
+    target.style.left = "30px";
+    target.style.top = "30px";
+    target.style.width = "100px";
+    target.style.height = "30px";
+    document.body.appendChild(target);
+    createReferentForTarget(target);
+}
+function createImageTarget() {
+    const target = document.createElement('IMG');
+    target.className = 'target';
+    target.style.position = "absolute";
+    target.style.left = "30px";
+    target.style.top = "30px";
+    target.style.width = "100px";
+    target.style.height = "100px";
+    document.body.appendChild(target);
+    createReferentForTarget(target);
+}
 function onDocumentKeyDown(e) {
     if (referents.length) {
         if (e.keyCode === 27) { // esc
@@ -323,6 +370,10 @@ function onDocumentKeyDown(e) {
             if (animateSelector) {
                 document.body.removeChild(animateSelector);
                 animateSelector = null;
+            }
+            if (targetTextInput) {
+                document.body.removeChild(targetTextInput);
+                targetTextInput = null;
             }
             pushHistory();
         } else if (referents.length === 1) {
@@ -367,6 +418,8 @@ function onDocumentKeyDown(e) {
                 showColorPicker(target, referents[0]);
             } else if (e.altKey && e.keyCode === 65) { // alt + a 设置动画
                 setFragmentAnimate(target, referents[0]);
+            } else if (e.altKey && e.keyCode === 69) { // alt + e 编辑文字
+                editTargetText(target, referents[0]);
             } else if (e.altKey && e.keyCode === 80) { // alt + p 复制属性
                 copyTargetAcctribute(target);
             } else if (e.altKey && e.keyCode === 86) { // alt + v 粘贴属性
@@ -379,12 +432,16 @@ function onDocumentKeyDown(e) {
         }
 
     }
-    if (e.altKey && e.keyCode === 83) { // alt + s
+    if (e.altKey && e.keyCode === 83) { // alt + s 保存
         saveMarkdown();
-    } else if (e.altKey && e.keyCode === 90) { // alt + z
+    } else if (e.altKey && e.keyCode === 90) { // alt + z 回退
         popHistory();
-    } else if (e.altKey && e.keyCode === 89) { // alt + y
+    } else if (e.altKey && e.keyCode === 89) { // alt + y 取消回退
         recoverHistory();
+    } else if (e.altKey && e.keyCode === 84) { // alt + t 添加文字元素
+        createTextTarget();
+    } else if (e.altKey && e.keyCode === 77) { // alt + m 添加图片元素
+        createImageTarget();
     } else if (e.keyCode === 18) { // alt
         isAltKeyPress = true;
     }
@@ -398,12 +455,14 @@ window.onload = function () {
     initialize();
     document.getElementById('info').innerHTML = `
     <ol>
-    <span>帮助：<span>
     <li>点击元素进行选中，可以拖动位置，改变大小，按esc取消选择</li>
-    <li>按住alt用鼠标拖动一个元素，可以复制该元素，</li>
+    <li>按住alt用鼠标拖动一个元素，可以复制该元素</li>
     <li>按住alt，可以选择多个元素，alt+u和合并组和拆开组</li>
     <li>按+号可以增大字体，按住alt按+号可以更快的增加字体</li>
     <li>按-号可以减小字体，按住alt按-号可以更快的减少字体</li>
+    <li>alt+a: 设置动画</li>
+    <li>alt+t: 添加文字元素</li>
+    <li>alt+m: 添加图片元素</li>
     <li>alt+b: 切换字体加粗</li>
     <li>alt+i: 切换字体斜体</li>
     <li>alt+c: 设置字体的颜色</li>
