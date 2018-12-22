@@ -386,6 +386,16 @@ function createImageTarget() {
     document.body.appendChild(target);
     createReferentForTarget(target);
 }
+function removeTarget(target) {
+    target.remove();
+    removeAllReferents();
+}
+function removeTargets(referents) {
+    for (const refrent of referents) {
+        refrent.target.remove();
+    }
+    removeAllReferents();
+}
 function onDocumentKeyDown(e) {
     if (referents.length) {
         if (e.keyCode === 27) { // esc
@@ -442,11 +452,16 @@ function onDocumentKeyDown(e) {
                 copyTargetAcctribute(target);
             } else if (e.altKey && e.keyCode === 86) { // alt + v 粘贴属性
                 pasteTargetAcctribute(target);
+            } else if (e.altKey && e.keyCode === 46) { // alt + delete 删除元素
+                removeTarget(target);
             }
         } else {
             if (e.altKey && e.keyCode === 85) { // alt + u 切换group状态
                 toggleTargetGroup();
+            } else if (e.altKey && e.keyCode === 46) { // alt + delete 删除元素
+                removeTargets(referents);
             }
+
         }
 
     }
