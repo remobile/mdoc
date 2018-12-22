@@ -324,7 +324,7 @@ function editTargetText (target, referent) {
     const isImg = !/text/.test(target.className);
     targetTextInput = document.createElement('INPUT');
     targetTextInput.type = 'text';
-    targetTextInput.value = !isImg ? target.innerText : target.src;
+    targetTextInput.value = !isImg ? target.innerText : target.src.replace(window.location.href, '');
     targetTextInput.className = 'target_input';
     targetTextInput.style.left = (referent.offsetLeft +referent.offsetWidth) + "px";
     targetTextInput.style.top = referent.offsetTop + "px";
