@@ -298,9 +298,24 @@ function setFragmentAnimate (target, referent) {
         return;
     }
     const animates = [
-        { value: 'grow', name: '增大' },
-        { value: 'shrink', name: '摆动' },
-        { value: 'fade-out', name: '消失' },
+        { value: 'grow', name: 'grow' },
+        { value: 'zoom-in', name: 'zoom' },
+        { value: 'fade-out', name: 'fade-out' },
+        { value: 'fade-up', name: 'fade-up' },
+        { value: 'fade-down', name: 'fade-down' },
+        { value: 'fade-right', name: 'fade-right' },
+        { value: 'fade-left', name: 'fade-left' },
+        { value: 'semi-fade-out', name: 'semi-fade-out' },
+        { value: 'fade-in-then-out', name: 'fade-in-then-out' },
+        { value: 'fade-in-then-semi-out', name: 'fade-in-then-semi-out' },
+        { value: 'shrink', name: 'shrink' },
+        { value: 'strike', name: 'strike' },
+        { value: 'highlight-red', name: 'highlight-red' },
+        { value: 'highlight-current-red', name: 'highlight-current-red' },
+        { value: 'highlight-current-green', name: 'highlight-current-green' },
+        { value: 'highlight-green', name: 'highlight-green' },
+        { value: 'highlight-current-blue', name: 'highlight-current-blue' },
+        { value: 'highlight-blue', name: 'highlight-blue' },
     ];
     animateSelector = document.createElement('DIV');
     animateSelector.style.position = 'absolute';
