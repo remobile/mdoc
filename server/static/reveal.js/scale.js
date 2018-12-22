@@ -1,5 +1,22 @@
-
-window.onload = function () {
+let fullscreen = false;
+function fixFullScreen() {
+    const W = 1066.67, H = 600;
+    const container = document.getElementById('container');
+    const bWidth = parseInt(getComputedStyle(document.body).width);
+    const bHeight = parseInt(getComputedStyle(document.body).height);
+    const scaleX = bWidth / W;
+    const scaleY = bHeight / H;
+    container.style.width = `${bWidth}px`;
+    container.style.height = `${bHeight}px`;
+    container.style.top = `0px`;
+    container.style.left = `0px`;
+    const list = document.querySelectorAll('.ppt-frame');
+    for (const el of list) {
+        el.style.transformOrigin = `top left`;
+        el.style.transform = `scale(${scaleX}, ${scaleY}) translate(-1px, -1px)`;
+    }
+}
+function fix16_9Screen() {
     const W = 1066.67, H = 600;
     const container = document.getElementById('container');
     const bWidth = parseInt(getComputedStyle(document.body).width);
@@ -24,4 +41,22 @@ window.onload = function () {
         el.style.transformOrigin = `top left`;
         el.style.transform = `scale(${scale}) translate(-1px, -1px)`;
     }
+}
+function fixScreen() {
+    if (fullscreen) {
+        fixFullScreen();
+    } else {
+        fix16_9Screen();
+    }
+}
+function onDocumentKeyDown(e) {
+    if (e.altKey && e.keyCode === 70) { // alt + f
+        fullscreen = !fullscreen;
+        fixScreen();
+    }
+}
+window.onload = function () {
+    fixScreen();
+    document.body.onresize = fixScreen;
+    document.onkeydown = onDocumentKeyDown;
 }

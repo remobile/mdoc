@@ -10,6 +10,16 @@ let copiedTarget = null; // 复制的target
 let colorPicker = null; // 颜色取色器
 let root;
 
+function rgb2hex(color) {
+    if (!color || !/^rgb/.test(color)) {
+        return color;
+    }
+    const rgb = color.split(',');
+    const r = parseInt(rgb[0].split('(')[1]);
+    const g = parseInt(rgb[1]);
+    const b = parseInt(rgb[2].split(')')[0]);
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
 function getLocation(e) {
     return {
         x: e.x || e.clientX,
@@ -219,9 +229,13 @@ function saveMarkdown(e) {
             if (fontStyle === 'italic') {
                 style = `${style}font-style:${fontStyle};`;
             }
-            const color = el.style.color;
-            if (color) {
+            const color = rgb2hex(el.style.color);
+            if (color && color !== '#000000') {
                 style = `${style}color:${color};`;
+            }
+            const bgcolor = rgb2hex(el.style.backgroundColor);
+            if (bgcolor && color !== '#FFFFFF') {
+                style = `${style}background-color:${bgcolor};`;
             }
             if (style) {
                 style = ` style=${style.replace(/\s/g, '')}`;
@@ -230,7 +244,7 @@ function saveMarkdown(e) {
         const group = el.dataset.group !== undefined ? ` group=${el.dataset.group}` : '';
 
         text.push(`::: fm${type} x=${x} y=${y} w=${w} h=${h}${style}${group}`);
-        text.push(isImg ? el.src : el.innerText);
+        (el.src || el.innerText) && text.push(isImg ? el.src : el.innerText);
         text.push(':::');
         text.push('');
     }
