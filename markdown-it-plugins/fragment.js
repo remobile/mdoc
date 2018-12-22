@@ -33,8 +33,8 @@ module.exports = function fragment_plugin(md, page) {
             style = `${style}${(options.y < 0) ? `bottom:${-options.y}px;` : `top:${options.y}px;`}`;
             options.style && (style = `${style}${options.style}`);
             let className = `${options.className} ${page.edit ? 'target' : ''}`;
-            if (options.animate) {
-                className = `${className} fragment ${options.animate}`;
+            if (options.a) {
+                className = `${className} fragment ${options.a}`;
             }
             className = className.trim();
             let dataset = '';
