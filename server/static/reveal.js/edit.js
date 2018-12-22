@@ -8,6 +8,7 @@ let clickY = 0; // 保留上次的Y轴位置©
 let group = -1; // 集合的id最小值
 let copiedTarget = null; // 复制的target
 let colorPicker = null; // 颜色取色器
+let animateSelector = null; //动画选择器
 let root;
 
 function rgb2hex(color) {
@@ -158,6 +159,14 @@ function createReferentForTarget(target, isGroup) {
 function createReferents(target) {
     if (!isAltKeyPress) {
         removeAllReferents();
+        if (colorPicker) {
+            colorPicker.jscolor.hide();
+            colorPicker = null;
+        }
+        if (animateSelector) {
+            document.body.removeChild(animateSelector);
+            animateSelector = null;
+        }
     }
     if (!target.dataset.group) {
         createReferentForTarget(target);
@@ -242,8 +251,9 @@ function saveMarkdown(e) {
             }
         }
         const group = el.dataset.group !== undefined ? ` group=${el.dataset.group}` : '';
+        const animate = el.dataset.animate !== undefined ? ` animate=${el.dataset.animate}` : '';
 
-        text.push(`::: fm${type} x=${x} y=${y} w=${w} h=${h}${style}${group}`);
+        text.push(`::: fm${type} x=${x} y=${y} w=${w} h=${h}${style}${group}${animate}`);
         (el.src || el.innerText) && text.push(isImg ? el.src : el.innerText);
         text.push(':::');
         text.push('');
@@ -259,23 +269,61 @@ function pasteTargetAcctribute (target) {
     }
 }
 function showColorPicker (target, referent) {
-    const input = document.createElement('INPUT');
-    colorPicker = new jscolor(input, { closable:true, closeText:'确定' });
-    colorPicker.fromString(getComputedStyle(target).color);
-    input.onchange = function() {
-        target.style.color = `${colorPicker.toRGBString()}`;
+    if (colorPicker) {
+        return;
+    }
+    colorPicker = document.createElement('INPUT');
+    colorPicker.jscolor = new jscolor(colorPicker, { closable:true, closeText:'确定' });
+    colorPicker.jscolor.fromString(getComputedStyle(target).color);
+    colorPicker.onchange = function() {
+        target.style.color = `${colorPicker.jscolor.toRGBString()}`;
     };
-    input.style.position = 'absolute';
-    input.style.visibility = 'hidden';
-    input.style.left = (referent.offsetLeft +referent.offsetWidth) + "px";
-    input.style.top = (referent.offsetTop - 25) + "px";
-    document.body.appendChild(input);
-    colorPicker.show();
+    colorPicker.jscolor.onClose = function() {
+        document.body.removeChild(colorPicker);
+        colorPicker = null;
+    };
+    colorPicker.style.position = 'absolute';
+    colorPicker.style.visibility = 'hidden';
+    colorPicker.style.left = (referent.offsetLeft +referent.offsetWidth) + "px";
+    colorPicker.style.top = (referent.offsetTop - 25) + "px";
+    document.body.appendChild(colorPicker);
+    colorPicker.jscolor.show();
+}
+function setFragmentAnimate (target, referent) {
+    if (animateSelector) {
+        return;
+    }
+    const animates = [
+        { value: 'grow', name: '增大' },
+        { value: 'shrink', name: '摆动' },
+        { value: 'fade-out', name: '消失' },
+    ];
+    animateSelector = document.createElement('DIV');
+    animateSelector.style.position = 'absolute';
+    animateSelector.style.left = (referent.offsetLeft +referent.offsetWidth) + "px";
+    animateSelector.style.top = referent.offsetTop + "px";
+    document.body.appendChild(animateSelector);
+    animateSelector.innerHTML = `<select id="animate-select">${animates.map(o=>`<option value ="${o.value}" ${o.value===target.dataset.animate?'selected':''}>${o.name}</option>`)}</select>`;
+    document.getElementById('animate-select').onchange = function(e) {
+        const index = e.target.selectedIndex;
+		const value = e.target.options[index].value;
+        target.dataset.animate = value;
+        document.body.removeChild(animateSelector);
+        animateSelector = null;
+    };
 }
 function onDocumentKeyDown(e) {
     if (referents.length) {
-        if (e.keyCode === 27 && !colorPicker) { // esc
+        if (e.keyCode === 27) { // esc
             removeAllReferents();
+            if (colorPicker) {
+                colorPicker.jscolor.hide();
+                colorPicker = null;
+            }
+            if (animateSelector) {
+                document.body.removeChild(animateSelector);
+                animateSelector = null;
+            }
             pushHistory();
         } else if (referents.length === 1) {
             const target = referents[0].target;
@@ -317,6 +365,8 @@ function onDocumentKeyDown(e) {
                 pushHistory();
             } else if (e.altKey && e.keyCode === 67) { // alt + c 设置颜色
                 showColorPicker(target, referents[0]);
+            } else if (e.altKey && e.keyCode === 65) { // alt + a 设置动画
+                setFragmentAnimate(target, referents[0]);
             } else if (e.altKey && e.keyCode === 80) { // alt + p 复制属性
                 copyTargetAcctribute(target);
             } else if (e.altKey && e.keyCode === 86) { // alt + v 粘贴属性
@@ -357,6 +407,7 @@ window.onload = function () {
     <li>alt+b: 切换字体加粗</li>
     <li>alt+i: 切换字体斜体</li>
     <li>alt+c: 设置字体的颜色</li>
+    <li>alt+a: 设置fragment动画</li>
     <li>alt+p: 复制元素属性</li>
     <li>alt+v: 粘贴元素属性</li>
     <li>alt+z: 回滚历史操作</li>

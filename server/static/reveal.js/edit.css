@@ -14,3 +14,4 @@
 .referent_node[data-dir = "sw"] { bottom:-4px; left:-4px; cursor:sw-resize; }
 .referent_node[data-dir = "se"] { bottom:-4px; right:-4px; cursor:se-resize; }
 .text { overflow: hidden; }
+#animate-select { position: absolute;font-size: 20px;background-color:#FAFDFE; height:28px; width:180px; line-height:28px; border:1px solid #9bc0dd; border-radius:2px; }

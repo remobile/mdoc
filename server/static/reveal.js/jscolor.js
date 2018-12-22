@@ -1367,6 +1367,7 @@ var jsc = {
 		function detachPicker () {
 			jsc.unsetClass(THIS.targetElement, THIS.activeClass);
 			jsc.picker.wrap.parentNode.removeChild(jsc.picker.wrap);
+			jsc.picker.owner.onClose && jsc.picker.owner.onClose(jsc.picker.owner);
 			delete jsc.picker.owner;
 		}
 

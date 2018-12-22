@@ -33,13 +33,16 @@ module.exports = function fragment_plugin(md, page) {
             style = `${style}${(options.y < 0) ? `bottom:${-options.y}px;` : `top:${options.y}px;`}`;
             options.style && (style = `${style}${options.style}`);
             let className = `${options.className} ${page.edit ? 'target' : ''}`;
-            if (options.a) {
-                className = `${className} fragment ${options.a}`;
+            if (options.animate) {
+                className = `${className} fragment ${options.animate}`;
             }
             className = className.trim();
             let dataset = '';
             if (options.group) {
                 dataset = ` data-group=${options.group}`;
+            }
+            if (page.edit && options.animate) {
+                dataset = `${dataset} data-animate=${options.animate}`;
             }
 
             let html = '';
