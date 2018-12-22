@@ -160,18 +160,9 @@ function createReferentForTarget(target, isGroup) {
 function createReferents(target) {
     if (!isAltKeyPress) {
         removeAllReferents();
-        if (colorPicker) {
-            colorPicker.jscolor.hide();
-            colorPicker = null;
-        }
-        if (animateSelector) {
-            document.body.removeChild(animateSelector);
-            animateSelector = null;
-        }
-        if (targetTextInput) {
-            document.body.removeChild(targetTextInput);
-            targetTextInput = null;
-        }
+        removeColorPicker();
+        removeAnimateSelector();
+        removeTargetTextInput();
     }
     if (!target.dataset.group) {
         createReferentForTarget(target);
@@ -275,6 +266,7 @@ function pasteTargetAcctribute (target) {
 }
 function showColorPicker (target, referent) {
     if (colorPicker) {
+        removeColorPicker();
         return;
     }
     colorPicker = document.createElement('INPUT');
@@ -294,8 +286,15 @@ function showColorPicker (target, referent) {
     document.body.appendChild(colorPicker);
     colorPicker.jscolor.show();
 }
+function removeColorPicker () {
+    if (colorPicker) {
+        colorPicker.jscolor.hide();
+        colorPicker = null;
+    }
+}
 function setFragmentAnimate (target, referent) {
     if (animateSelector) {
+        removeAnimateSelector();
         return;
     }
     const animates = [
@@ -317,8 +316,15 @@ function setFragmentAnimate (target, referent) {
         animateSelector = null;
     };
 }
+function removeAnimateSelector () {
+    if (animateSelector) {
+        document.body.removeChild(animateSelector);
+        animateSelector = null;
+    }
+}
 function editTargetText (target, referent) {
     if (targetTextInput) {
+        removeTargetTextInput();
         return;
     }
     const isImg = !/text/.test(target.className);
@@ -336,6 +342,12 @@ function editTargetText (target, referent) {
             target.src = e.target.value;
         }
     };
+}
+function removeTargetTextInput() {
+    if (targetTextInput) {
+        document.body.removeChild(targetTextInput);
+        targetTextInput = null;
+    }
 }
 function createTextTarget() {
     const target = document.createElement('DIV');
@@ -363,18 +375,9 @@ function onDocumentKeyDown(e) {
     if (referents.length) {
         if (e.keyCode === 27) { // esc
             removeAllReferents();
-            if (colorPicker) {
-                colorPicker.jscolor.hide();
-                colorPicker = null;
-            }
-            if (animateSelector) {
-                document.body.removeChild(animateSelector);
-                animateSelector = null;
-            }
-            if (targetTextInput) {
-                document.body.removeChild(targetTextInput);
-                targetTextInput = null;
-            }
+            removeColorPicker();
+            removeAnimateSelector();
+            removeTargetTextInput();
             pushHistory();
         } else if (referents.length === 1) {
             const target = referents[0].target;
