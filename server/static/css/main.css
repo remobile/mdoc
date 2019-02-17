@@ -1598,6 +1598,7 @@ input::placeholder {
   box-sizing: border-box;
   height: 4px;
   width: 4px;
+  top: 15px;
 }
 
 .icon-toc:before,
@@ -1621,6 +1622,7 @@ input::placeholder {
   height: 16px;
   transform: rotate(45deg);
   width: 3px;
+  top: 10px;
 }
 
 .tocActive .icon-toc:before {
