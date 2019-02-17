@@ -82,6 +82,11 @@ const config = {
                             name: 'button',
                             path: 'common/button.md',
                         },
+                        {
+                            name: 'toc',
+                            path: 'common/toc.md',
+                            tocList: ['h2', 'h3'], // 可选的值有: ['h2', 'h3'], true（true默认为['h2', 'h3']）
+                        },
                     ]
                 },
                 {
@@ -276,6 +281,24 @@ Usage: script [options]
 默认情况下，以`http(s):`开头的会在新窗口打开，其他的在本窗口打开。
 
 在config中设置 `urlTarget: '_blank'`，都在新窗口打开；设置 `urlTarget: '_self'`，都在本窗口打开。
+
+## 折叠侧边栏
+在 config 中配置如下：
+```
+sideNavCollapsible: true, // 侧边栏是否可以折叠
+```
+
+## 右边导航栏
+
+在 config 中的 page 配置如下：
+```js
+    {
+        name: 'toc',
+        path: 'common/toc.md',
+        tocList: ['h2', 'h3'], // 可选的值有: ['h2', 'h3'], true（true默认为['h2', 'h3']）
+    },
+```
+其中 tocList 如果为 true, 则右边导航栏采取 h2 和 h3 两级来显示，也可以配置为 `['h3', 'h4']`，采取 h3 和 h4 两级来显示。
 
 ## 关联
 
