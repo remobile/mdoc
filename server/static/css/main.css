@@ -543,6 +543,7 @@ blockquote {
 
 .mainContainer .wrapper .post {
   position: relative;
+  min-height: 80%;
 }
 
 .mainContainer .wrapper .post.basicPost {
@@ -756,7 +757,7 @@ input::placeholder {
   }
 
   .gridBlock .twoByGridBlock {
-    flex: 1 0 40%;
+    flex: 1 0 80%;
   }
 
   .gridBlock .threeByGridBlock {
@@ -1273,51 +1274,18 @@ input::placeholder {
 
 /* Start of Docs Navigation */
 .docs-prevnext {
-  margin: 20px 0;
+    margin: 20px 0;
 }
-
-.docs-prevnext:after {
-  clear: both;
-  content: ' ';
-  display: table; /* clearfix */
-}
-
 .docs-next {
-  float: right;
-}
-
-.docs-prev {
-  float: left;
-}
-
-@media only screen and (max-width: 735px) {
-  .docs-next {
-    clear: both;
-    float: left;
-    margin: 10px 0;
-  }
-
-  .docs-prev {
-    margin: 10px 0;
-  }
-
-  .arrow-next {
     float: right;
-    margin-left: 10px;
-  }
-
-  .arrow-prev {
+}
+.docs-prev {
     float: left;
-    margin-right: 10px;
-  }
-
-  .function-name-prevnext {
-    width: 200px;
-    display: inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+}
+@media only screen and (max-width: 735px) {
+    .docs-prev, .docs-prevnext {
+        height: 40px;
+    }
 }
 /* End of Docs Navigation */
 
