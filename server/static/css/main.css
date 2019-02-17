@@ -1006,7 +1006,6 @@ input::placeholder {
   align-items: center;
   box-sizing: border-box;
   color: $primaryColor;
-  color: inherit;
   display: flex;
   font-size: 0.9em;
   height: auto;
