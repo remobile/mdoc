@@ -9,10 +9,15 @@ function startServer(port, verbose) {
     const color = require('color');
     const chalk = require('chalk');
     const babel = require("babel-core");
+    const _ = require("lodash");
     const { support } = require("../lib/utils");
     const CWD = process.cwd() + '/';
     const { removeModuleAndChildrenFromCache } = require('../lib/utils');
 
+    function showError(text) {
+        console.error(chalk.red(text));
+        process.exit(0);
+    }
     function getDocumentPath(file) {
         return CWD + config.documentPath + '/' + file;
     }
@@ -24,6 +29,50 @@ function startServer(port, verbose) {
     function getPathFromReqPath(path) {
         return  decodeURI(path).replace(new RegExp(`^${config.baseUrl}`), '');
     }
+    function showDirectoryMenus(menus, dir, node) {
+        fs.readdirSync(dir).forEach((file, index)=>{
+            const level = node.length;
+            const fullname = path.join(dir, file);
+            const isDirectory = fs.statSync(fullname).isDirectory();
+            const name = /^[\d-]+$/.test(file) ? file : file.replace(/^\d*/, '');
+            if (/^\./.test(name)) {
+                return;
+            }
+            if (level === 0) { // 展示在 menus 上
+                if(isDirectory) {
+                    menus.push({ name, groups: [] });
+                    showDirectoryMenus(menus, fullname, [name]);
+                } else {
+                    showError('展示目录的层次有误');
+                }
+            } else if (level === 1) {
+                if(isDirectory) { // 展示在 menu.groups 上
+                    const menu = _.find(menus, o=>o.name === node[0]);
+                    if (!menu) {
+                        showError('展示目录的层次有误');
+                    }
+                    menu.groups.push({ name, pages: [] });
+                    showDirectoryMenus(menus, fullname, [...node, name]);
+                } else {
+                    showError('展示目录的层次有误');
+                }
+            } else if (level === 2) {
+                if(isDirectory) { // 展示在 group.pages 上
+                    const menu = _.find(menus, o=>o.name === node[0]);
+                    if (!menu) {
+                        showError('展示目录的层次有误');
+                    }
+                    const group = _.find(menu.groups, o=>o.name === node[1]);
+                    if (!group) {
+                        showError('展示目录的层次有误');
+                    }
+                    group.pages.push({ name, supports: ['dir'] });
+                } else {
+                    showError('展示目录的层次有误');
+                }
+            }
+        });
+    }
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + 'config.js');
         config = require(CWD + 'config.js');
@@ -34,6 +83,14 @@ function startServer(port, verbose) {
         config.documentPath = (config.documentPath || 'doc').replace(/\/$/, '');
         // 设置 baseUrl
         config.baseUrl = `/${config.projectName}/`;
+
+        // 如果需要展示目录文件，写展示目录文件的各个文件
+        if (config.showDirectory) {
+            const dir = path.join(CWD, 'static', config.showDirectory.path);
+            showDirectoryMenus(menus, dir, config.showDirectory.node || []);
+        }
+        console.log(JSON.stringify(menus, 0, 2));
+        process.exit(0);
 
         // 为每个 page 添加 id
         for (const menu of menus) {
@@ -200,12 +257,13 @@ function startServer(port, verbose) {
                                 __html: `
                                 $(document).ready(function(){
                                     var viewer = new Viewer(document.getElementById("mdoc_image_container"), {
-                                    inline:true,
-                                    navbar:false,
-                                    toolbar: false
-                                })})
-                                `,
-                            }}
+                                        inline:true,
+                                        navbar:false,
+                                        toolbar: false
+                                    })})
+                                    `,
+                                }
+                            }
                             />
                     </DocsLayout>
                 )
