@@ -32,8 +32,8 @@ function startServer(port, verbose) {
     function showDirectoryMenus(menus, dir, node) {
         fs.readdirSync(dir).forEach((file, index)=>{
             const level = node.length;
-            const fullname = path.join(dir, file);
-            const isDirectory = fs.statSync(fullname).isDirectory();
+            const fullPath = path.join(dir, file);
+            const isDirectory = fs.statSync(fullPath).isDirectory();
             const name = /^[\d-]+$/.test(file) ? file : file.replace(/^\d*/, '');
             if (/^\./.test(name)) {
                 return;
@@ -41,7 +41,7 @@ function startServer(port, verbose) {
             if (level === 0) { // 展示在 menus 上
                 if(isDirectory) {
                     menus.push({ name, groups: [] });
-                    showDirectoryMenus(menus, fullname, [name]);
+                    showDirectoryMenus(menus, fullPath, [name]);
                 } else {
                     showError('展示目录的层次有误');
                 }
@@ -52,7 +52,7 @@ function startServer(port, verbose) {
                         showError('展示目录的层次有误');
                     }
                     menu.groups.push({ name, pages: [] });
-                    showDirectoryMenus(menus, fullname, [...node, name]);
+                    showDirectoryMenus(menus, fullPath, [...node, name]);
                 } else {
                     showError('展示目录的层次有误');
                 }
@@ -66,7 +66,7 @@ function startServer(port, verbose) {
                     if (!group) {
                         showError('展示目录的层次有误');
                     }
-                    group.pages.push({ name, supports: ['dir'] });
+                    group.pages.push({ name, path: fullPath.replace(CWD, ''), fullPath, supports: ['dir'] });
                 } else {
                     showError('展示目录的层次有误');
                 }
@@ -89,8 +89,6 @@ function startServer(port, verbose) {
             const dir = path.join(CWD, 'static', config.showDirectory.path);
             showDirectoryMenus(menus, dir, config.showDirectory.node || []);
         }
-        console.log(JSON.stringify(menus, 0, 2));
-        process.exit(0);
 
         // 为每个 page 添加 id
         for (const menu of menus) {
@@ -167,7 +165,8 @@ function startServer(port, verbose) {
     function renderFile(page, res) {
         removeModuleAndChildrenFromCache('../lib/DocsLayout.js');
         const DocsLayout = require('../lib/DocsLayout.js');
-        const file =  getDocumentPath(page.current.path);
+        const hasDir = support(page.current, 'dir');
+        const file = hasDir ? path.join(CWD, page.current.path) : getDocumentPath(page.current.path);
         verbose && console.log('render file: ', file);
         if (!fs.existsSync(file)) {
             removeModuleAndChildrenFromCache('../lib/ErrorPage.js');
@@ -179,6 +178,13 @@ function startServer(port, verbose) {
                             文件不存在
                         </ErrorPage>
                     </DocsLayout>
+                )
+            );
+        }
+        if (hasDir) {
+            return res.send(
+                renderToStaticMarkup(
+                    <DocsLayout page={page} />
                 )
             );
         }
@@ -194,7 +200,7 @@ function startServer(port, verbose) {
             );
         } else if (extension === '.html') {
             const rawContent = fs.readFileSync(file, 'utf8');
-            res.send(
+            return res.send(
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
                         <div dangerouslySetInnerHTML={{ __html: rawContent }} />
@@ -206,7 +212,7 @@ function startServer(port, verbose) {
             if (hasReact) { // 动态网页
                 const content = fs.readFileSync(file, 'utf8');
                 const script = babel.transform(content, { plugins:['transform-react-jsx'], presets: ['es2015']}).code;
-                res.send(
+                return res.send(
                     renderToStaticMarkup(
                         <DocsLayout page={page}>
                             <div id="mdoc_react_root" />
@@ -224,7 +230,7 @@ function startServer(port, verbose) {
             } else {
                 removeModuleAndChildrenFromCache(file);
                 const ReactComp = require(file);
-                res.send(
+                return res.send(
                     renderToStaticMarkup(
                         <DocsLayout page={page}>
                             <ReactComp />
@@ -246,7 +252,7 @@ function startServer(port, verbose) {
             } else if (page.current.supports.indexOf('viewer') < 0) {
                 page.current.supports.push('viewer');
             }
-            res.send(
+            return res.send(
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
                         <div id="mdoc_image_container">
