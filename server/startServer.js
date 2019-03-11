@@ -257,7 +257,7 @@ function startServer(port, verbose) {
                 );
             }
         } else if (extension === '.pdf') {
-            res.send(
+            return res.send(
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
                         <iframe src={`pdfjs/viewer.html?file=${config.baseUrl+page.current.path}`} width="80%" height="80%"></iframe>

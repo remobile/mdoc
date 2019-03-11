@@ -11,10 +11,15 @@ function buildProject() {
     const DocsLayout = require('../lib/DocsLayout');
     const ErrorPage = require('../lib/ErrorPage');
     const babel = require("babel-core");
+    const _ = require("lodash");
     const { support } = require("../lib/utils");
     const CWD = process.cwd() + '/';
     const { removeModuleAndChildrenFromCache } = require('../lib/utils');
 
+    function showError(text) {
+        console.error(chalk.red(text));
+        process.exit(0);
+    }
     function getDocumentPath(file) {
         return CWD + config.documentPath + '/' + file;
     }
@@ -22,6 +27,50 @@ function buildProject() {
         const hash = crypto.createHash('md5');
         hash.update(path);
         return hash.digest('hex');
+    }
+    function showDirectoryMenus(menus, dir, node) {
+        fs.readdirSync(dir).forEach(file=>{
+            const level = node.length;
+            const fullPath = path.join(dir, file);
+            const isDirectory = fs.statSync(fullPath).isDirectory();
+            const name = /^[\d-]+$/.test(file) ? file : file.replace(/^\d*/, '');
+            if (/^\./.test(name)) {
+                return;
+            }
+            if (level === 0) { // 展示在 menus 上
+                if(isDirectory) {
+                    menus.push({ name, groups: [] });
+                    showDirectoryMenus(menus, fullPath, [name]);
+                } else {
+                    showError('展示目录的层次有误');
+                }
+            } else if (level === 1) {
+                if(isDirectory) { // 展示在 menu.groups 上
+                    const menu = _.find(menus, o=>o.name === node[0]);
+                    if (!menu) {
+                        showError('展示目录的层次有误');
+                    }
+                    menu.groups.push({ name, pages: [] });
+                    showDirectoryMenus(menus, fullPath, [...node, name]);
+                } else {
+                    showError('展示目录的层次有误');
+                }
+            } else if (level === 2) {
+                if(isDirectory) { // 展示在 group.pages 上
+                    const menu = _.find(menus, o=>o.name === node[0]);
+                    if (!menu) {
+                        showError('展示目录的层次有误');
+                    }
+                    const group = _.find(menu.groups, o=>o.name === node[1]);
+                    if (!group) {
+                        showError('展示目录的层次有误');
+                    }
+                    group.pages.push({ name, path: fullPath.replace(CWD, ''), supports: ['dir', 'viewer'] });
+                } else {
+                    showError('展示目录的层次有误');
+                }
+            }
+        });
     }
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + 'config.js');
@@ -32,6 +81,12 @@ function buildProject() {
         config.documentPath = (config.documentPath || 'doc').replace(/\/$/, '');
         // 设置 baseUrl
         config.baseUrl = `/${config.projectName}/`;
+
+        // 如果需要展示目录文件，写展示目录文件的各个文件
+        if (config.showDirectory) {
+            const dir = path.join(CWD, 'static', config.showDirectory.path);
+            showDirectoryMenus(menus, dir, config.showDirectory.node || []);
+        }
 
         // 为每个 page 添加 id
         for (const menu of menus) {
@@ -79,7 +134,8 @@ function buildProject() {
         fs.copySync(getDocumentPath(file), targetFile);
     }
     function createFile(page) {
-        const file =  getDocumentPath(page.current.path);
+        const hasDir = support(page.current, 'dir');
+        const file = hasDir ? path.join(CWD, page.current.path) : getDocumentPath(page.current.path);
         if (!fs.existsSync(file)) {
             return writeFileWithPage(page,
                 renderToStaticMarkup(
@@ -87,6 +143,31 @@ function buildProject() {
                         <ErrorPage>
                             文件不存在
                         </ErrorPage>
+                    </DocsLayout>
+                )
+            );
+        }
+        if (hasDir) {
+            const { current } = page;
+            const list = [];
+            fs.readdirSync(current.path).forEach(file=>{
+                const fullPath = path.join(current.path, file);
+                const isDirectory = fs.statSync(fullPath).isDirectory();
+                if (/^\./.test(file) || isDirectory) {
+                    return;
+                }
+                const extname = path.extname(file);
+                const name = (/^[\d-]+$/.test(file) ? file : file.replace(/^\d*/, '')).replace(extname, '');
+                list.push({
+                    name,
+                    extname,
+                    url: fullPath.replace(/^static\//, ''),
+                });
+            });
+            return writeFileWithPage(page,
+                renderToStaticMarkup(
+                    <DocsLayout page={page}>
+                        {list}
                     </DocsLayout>
                 )
             );
@@ -103,7 +184,7 @@ function buildProject() {
             );
         } else if (extension === '.html') {
             const rawContent = fs.readFileSync(file, 'utf8');
-            writeFileWithPage(page,
+            return writeFileWithPage(page,
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
                         <div dangerouslySetInnerHTML={{ __html: rawContent }} />
@@ -115,7 +196,7 @@ function buildProject() {
             if (hasReact) { // 动态网页
                 const content = fs.readFileSync(file, 'utf8');
                 const script = babel.transform(content, { plugins:['transform-react-jsx'], presets: ['es2015']}).code;
-                writeFileWithPage(page,
+                return writeFileWithPage(page,
                     renderToStaticMarkup(
                         <DocsLayout page={page}>
                             <div id="mdoc_react_root" />
@@ -133,7 +214,7 @@ function buildProject() {
             } else {
                 removeModuleAndChildrenFromCache(file);
                 const ReactComp = require(file);
-                writeFileWithPage(page,
+                return writeFileWithPage(page,
                     renderToStaticMarkup(
                         <DocsLayout page={page}>
                             <ReactComp />
@@ -143,7 +224,7 @@ function buildProject() {
             }
         } else if (extension === '.pdf') {
             copyResourceFile(page.current.path);
-            writeFileWithPage(page,
+            return writeFileWithPage(page,
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
                         <iframe src={`pdfjs/viewer.html?file=${config.baseUrl+page.current.path}`} width="80%" height="80%"></iframe>
@@ -157,7 +238,7 @@ function buildProject() {
             } else if (page.current.supports.indexOf('viewer') < 0) {
                 page.current.supports.push('viewer');
             }
-            writeFileWithPage(page,
+            return writeFileWithPage(page,
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
                         <div id="mdoc_image_container">
