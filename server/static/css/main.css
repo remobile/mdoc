@@ -2043,6 +2043,8 @@ input::placeholder {
     flex-direction: row;
     flex-wrap: wrap;
     min-height: 80%;
+    overflow: hidden;
+    padding-bottom: 20px;
 }
 
 .photoItemContainer {
@@ -2069,5 +2071,5 @@ input::placeholder {
     height: 12px;
     overflow: scroll;
     word-break: keep-all;
-    top: 150px;
+    top: 146px;
 }
