@@ -29,7 +29,7 @@ function startServer(port, verbose) {
     function getPathFromReqPath(path) {
         return  decodeURI(path).replace(new RegExp(`^${config.baseUrl}`), '');
     }
-    function showDirectoryMenus(menus, dir, node) {
+    function showDirectoryMenus(menus, dir, node, isStatic) {
         fs.readdirSync(dir).forEach(file=>{
             const level = node.length;
             const fullPath = path.join(dir, file);
@@ -41,7 +41,7 @@ function startServer(port, verbose) {
             if (level === 0) { // 展示在 menus 上
                 if(isDirectory) {
                     menus.push({ name, groups: [] });
-                    showDirectoryMenus(menus, fullPath, [name]);
+                    showDirectoryMenus(menus, fullPath, [name], isStatic);
                 } else {
                     showError('展示目录的层次有误');
                 }
@@ -52,12 +52,15 @@ function startServer(port, verbose) {
                         showError('展示目录的层次有误');
                     }
                     menu.groups.push({ name, pages: [] });
-                    showDirectoryMenus(menus, fullPath, [...node, name]);
+                    showDirectoryMenus(menus, fullPath, [...node, name], isStatic);
                 } else {
                     showError('展示目录的层次有误');
                 }
             } else if (level === 2) {
                 if(isDirectory) { // 展示在 group.pages 上
+                    if (!isStatic) {
+                        showError('展示目录的层次有误');
+                    }
                     const menu = _.find(menus, o=>o.name === node[0]);
                     if (!menu) {
                         showError('展示目录的层次有误');
@@ -66,9 +69,21 @@ function startServer(port, verbose) {
                     if (!group) {
                         showError('展示目录的层次有误');
                     }
-                    group.pages.push({ name, path: fullPath.replace(CWD, ''), supports: ['dir', 'viewer'] });
+                    group.pages.push({ name, path: fullPath, supports: ['dir', 'viewer'] });
                 } else {
-                    showError('展示目录的层次有误');
+                    if (isStatic) {
+                        showError('展示目录的层次有误');
+                    } else {
+                        const menu = _.find(menus, o=>o.name === node[0]);
+                        if (!menu) {
+                            showError('展示目录的层次有误');
+                        }
+                        const group = _.find(menu.groups, o=>o.name === node[1]);
+                        if (!group) {
+                            showError('展示目录的层次有误');
+                        }
+                        group.pages.push({ name: name.replace(/\.[^.]*$/, ''), path: fullPath.replace(new RegExp(`^${config.documentPath}/`), '') });
+                    }
                 }
             }
         });
@@ -86,10 +101,11 @@ function startServer(port, verbose) {
 
         // 如果需要展示目录文件，写展示目录文件的各个文件
         if (config.showDirectory) {
-            const dir = path.join(CWD, 'static', config.showDirectory.path);
-            showDirectoryMenus(menus, dir, config.showDirectory.node || []);
+            const dir = path.join(config.showDirectory.static ? 'static' : config.documentPath, config.showDirectory.path);
+            showDirectoryMenus(menus, dir, config.showDirectory.node || [], config.showDirectory.static);
         }
-
+        // console.log(JSON.stringify(menus, 0, 2));
+        // process.exit(0);
         // 为每个 page 添加 id
         for (const menu of menus) {
             if (!menu.mainPage && menu.groups) {
@@ -166,7 +182,7 @@ function startServer(port, verbose) {
         removeModuleAndChildrenFromCache('../lib/DocsLayout.js');
         const DocsLayout = require('../lib/DocsLayout.js');
         const hasDir = support(page.current, 'dir');
-        const file = hasDir ? path.join(CWD, page.current.path) : getDocumentPath(page.current.path);
+        const file = hasDir ? page.current.path : getDocumentPath(page.current.path);
         verbose && console.log('render file: ', file);
         if (!fs.existsSync(file)) {
             removeModuleAndChildrenFromCache('../lib/ErrorPage.js');
