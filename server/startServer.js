@@ -30,7 +30,7 @@ function startServer(port, verbose) {
         return  decodeURI(path).replace(new RegExp(`^${config.baseUrl}`), '');
     }
     function showDirectoryMenus(menus, dir, node) {
-        fs.readdirSync(dir).forEach((file, index)=>{
+        fs.readdirSync(dir).forEach(file=>{
             const level = node.length;
             const fullPath = path.join(dir, file);
             const isDirectory = fs.statSync(fullPath).isDirectory();
@@ -66,7 +66,7 @@ function startServer(port, verbose) {
                     if (!group) {
                         showError('展示目录的层次有误');
                     }
-                    group.pages.push({ name, path: fullPath.replace(CWD, ''), fullPath, supports: ['dir'] });
+                    group.pages.push({ name, path: fullPath.replace(CWD, ''), supports: ['dir', 'viewer'] });
                 } else {
                     showError('展示目录的层次有误');
                 }
@@ -182,9 +182,27 @@ function startServer(port, verbose) {
             );
         }
         if (hasDir) {
+            const { current } = page;
+            const list = [];
+            fs.readdirSync(current.path).forEach(file=>{
+                const fullPath = path.join(current.path, file);
+                const isDirectory = fs.statSync(fullPath).isDirectory();
+                if (/^\./.test(file) || isDirectory) {
+                    return;
+                }
+                const extname = path.extname(file);
+                const name = (/^[\d-]+$/.test(file) ? file : file.replace(/^\d*/, '')).replace(extname, '');
+                list.push({
+                    name,
+                    extname,
+                    url: fullPath.replace(/^static\//, ''),
+                });
+            });
             return res.send(
                 renderToStaticMarkup(
-                    <DocsLayout page={page} />
+                    <DocsLayout page={page}>
+                        {list}
+                    </DocsLayout>
                 )
             );
         }

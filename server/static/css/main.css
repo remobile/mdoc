@@ -2036,3 +2036,38 @@ input::placeholder {
 .swiper-slide p {
     padding: 0 !important;
 }
+
+/*photo*/
+#mdoc_photo_container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    min-height: 80%;
+}
+
+.photoItemContainer {
+    position:relative;
+    width:144px;
+    height: 144px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    padding:2px;
+    background-color: #EBEBEB;
+}
+
+.photoItem {
+    max-width: 140px;
+    max-height: 140px;
+}
+
+.photoName {
+    position: absolute;
+    font-size: 10px;
+    max-width: 140px;
+    height: 12px;
+    overflow: scroll;
+    word-break: keep-all;
+    top: 150px;
+}

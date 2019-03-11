@@ -168,12 +168,13 @@ function buildProject() {
                                 __html: `
                                 $(document).ready(function(){
                                     var viewer = new Viewer(document.getElementById("mdoc_image_container"), {
-                                    inline:true,
-                                    navbar:false,
-                                    toolbar: false
-                                })})
-                                `,
-                            }}
+                                        inline:true,
+                                        navbar:false,
+                                        toolbar: false
+                                    })})
+                                    `,
+                                }
+                            }
                             />
                     </DocsLayout>
                 )
