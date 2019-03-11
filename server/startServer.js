@@ -225,10 +225,19 @@ function startServer(port, verbose) {
         const extension = path.extname(file);
         if (extension === '.md') {
             const rawContent = fs.readFileSync(file, 'utf8');
+            const lines = rawContent.split(/\r?\n/);
+            let i = 1;
+            if (/^::: invisible\s*/.test(lines[0])) {
+                for (let i = 1, len = lines.length - 1; i < len; ++i) {
+                    if (/^:::\s*$/.test(lines[i])) {
+                        break;
+                    }
+                }
+            }
             return res.send(
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
-                        {rawContent}
+                        {lines.slice(i + 1).join('\n')}
                     </DocsLayout>
                 )
             );
