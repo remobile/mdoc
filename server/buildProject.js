@@ -201,7 +201,7 @@ function buildProject(verbose) {
         if (extension === '.md') {
             const rawContent = fs.readFileSync(file, 'utf8');
             const lines = rawContent.split(/\r?\n/);
-            if (/^::: invisible\s*/.test(lines[0])) {
+            if (/^::: meta\s*/.test(lines[0])) {
                 let i = 1;
                 for (let len = lines.length - 1; i < len; ++i) {
                     if (/^:::\s*$/.test(lines[i])) {

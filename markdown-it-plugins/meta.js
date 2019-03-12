@@ -1,10 +1,10 @@
 'use strict';
 const container = require('./container');
 
-module.exports = function invisible_plugin(md, page) {
-    md.use(container, 'invisible', {
+module.exports = function meta_plugin(md, page) {
+    md.use(container, 'meta', {
         validate: function(params) {
-            return params.trim().match(/^invisible\s*/);
+            return params.trim().match(/^meta\s*/);
         },
         content: function (tokens, idx) {
             return '';

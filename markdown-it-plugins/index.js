@@ -4,7 +4,7 @@ const emoji = require('markdown-it-emoji');
 const footnote = require('markdown-it-footnote');
 const tasklists = require('markdown-it-task-lists');
 const attrs = require('markdown-it-attrs');
-const invisible = require('./invisible');
+const meta = require('./meta');
 const fence = require('./fence');
 const variable = require('./variable');
 const katex = require('./katex');
@@ -44,8 +44,8 @@ function escapeHtml(str) {
 function disable_plugin(md) {
     md.block.ruler.disable('code');
 }
-function invisible_plugin(md, page) {
-    md.use(invisible, page);
+function meta_plugin(md, page) {
+    md.use(meta, page);
 }
 function fence_plugin(md, page) {
     md.use(fence, page);
@@ -124,7 +124,7 @@ function rewrite_plugin(md) {
 
 module.exports = [
     disable_plugin,
-    invisible_plugin,
+    meta_plugin,
     fence_plugin,
     variable_plugin,
     katex_plugin,
