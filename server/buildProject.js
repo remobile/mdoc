@@ -1,4 +1,4 @@
-function buildProject() {
+function buildProject(verbose) {
     const React = require('react');
     const renderToStaticMarkup = require('react-dom/server').renderToStaticMarkup;
     const fs = require('fs-extra');
@@ -12,7 +12,7 @@ function buildProject() {
     const ErrorPage = require('../lib/ErrorPage');
     const babel = require("babel-core");
     const _ = require("lodash");
-    const { support } = require("../lib/utils");
+    const { support, parseParams } = require("../lib/utils");
     const CWD = process.cwd() + '/';
     const { removeModuleAndChildrenFromCache } = require('../lib/utils');
 
@@ -28,7 +28,7 @@ function buildProject() {
         hash.update(path);
         return hash.digest('hex');
     }
-    function showDirectoryMenus(menus, dir, node) {
+    function showDirectoryMenus(menus, dir, node, isStatic) {
         fs.readdirSync(dir).forEach(file=>{
             const level = node.length;
             const fullPath = path.join(dir, file);
@@ -40,7 +40,7 @@ function buildProject() {
             if (level === 0) { // 展示在 menus 上
                 if(isDirectory) {
                     menus.push({ name, groups: [] });
-                    showDirectoryMenus(menus, fullPath, [name]);
+                    showDirectoryMenus(menus, fullPath, [name], isStatic);
                 } else {
                     showError('展示目录的层次有误');
                 }
@@ -51,12 +51,15 @@ function buildProject() {
                         showError('展示目录的层次有误');
                     }
                     menu.groups.push({ name, pages: [] });
-                    showDirectoryMenus(menus, fullPath, [...node, name]);
+                    showDirectoryMenus(menus, fullPath, [...node, name], isStatic);
                 } else {
                     showError('展示目录的层次有误');
                 }
             } else if (level === 2) {
                 if(isDirectory) { // 展示在 group.pages 上
+                    if (!isStatic) {
+                        showError('展示目录的层次有误');
+                    }
                     const menu = _.find(menus, o=>o.name === node[0]);
                     if (!menu) {
                         showError('展示目录的层次有误');
@@ -65,18 +68,31 @@ function buildProject() {
                     if (!group) {
                         showError('展示目录的层次有误');
                     }
-                    group.pages.push({ name, path: fullPath.replace(CWD, ''), supports: ['dir', 'viewer'] });
+                    group.pages.push({ name, path: fullPath, supports: ['dir', 'viewer'] });
                 } else {
-                    showError('展示目录的层次有误');
+                    if (isStatic) {
+                        showError('展示目录的层次有误');
+                    } else {
+                        const menu = _.find(menus, o=>o.name === node[0]);
+                        if (!menu) {
+                            showError('展示目录的层次有误');
+                        }
+                        const group = _.find(menu.groups, o=>o.name === node[1]);
+                        if (!group) {
+                            showError('展示目录的层次有误');
+                        }
+                        group.pages.push({ name: name.replace(/\.[^.]*$/, ''), path: fullPath.replace(new RegExp(`^${config.documentPath}/`), '') });
+                    }
                 }
             }
         });
     }
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + 'config.js');
-        const config = require(CWD + 'config.js');
+        config = require(CWD + 'config.js');
         !config.menus && ( config.menus = [] );
         const { homePage, menus } = config;
+
         // 设置 documentPath
         config.documentPath = (config.documentPath || 'doc').replace(/\/$/, '');
         // 设置 baseUrl
@@ -84,8 +100,8 @@ function buildProject() {
 
         // 如果需要展示目录文件，写展示目录文件的各个文件
         if (config.showDirectory) {
-            const dir = path.join(CWD, 'static', config.showDirectory.path);
-            showDirectoryMenus(menus, dir, config.showDirectory.node || []);
+            const dir = path.join(config.showDirectory.static ? 'static' : config.documentPath, config.showDirectory.path);
+            showDirectoryMenus(menus, dir, config.showDirectory.node || [], config.showDirectory.static);
         }
 
         // 为每个 page 添加 id
@@ -120,7 +136,16 @@ function buildProject() {
         }
         config.homePage.id = 'index';
 
-        return config;
+        if (verbose) {
+            console.log("============== config start ==============");
+            console.log(JSON.stringify(config, 0, 2));
+            console.log("============== config end ==============");
+        }
+
+        if (!config.colors || !config.colors.primaryColor || !config.colors.secondaryColor) {
+            console.error(chalk.red('缺少颜色配置'));
+            process.exit(0);
+        }
     }
     function writeFileWithPage(page, content) {
         const targetFile = path.join(buildDir, page.current.id+'.html');
@@ -175,6 +200,19 @@ function buildProject() {
         const extension = path.extname(file);
         if (extension === '.md') {
             const rawContent = fs.readFileSync(file, 'utf8');
+            const lines = rawContent.split(/\r?\n/);
+            if (/^::: invisible\s*/.test(lines[0])) {
+                let i = 1;
+                for (let len = lines.length - 1; i < len; ++i) {
+                    if (/^:::\s*$/.test(lines[i])) {
+                        break;
+                    }
+                }
+                const params = parseParams(lines.slice(1, i).join(' '));
+                page.current.supports = [ ...(page.current.supports || []), ...(params.supports || []) ];
+                page.current.styles = [ ...(page.current.styles || []), ...(params.styles || []) ];
+                page.current.scripts = [ ...(page.current.scripts || []), ...(params.scripts || []) ];
+            }
             return writeFileWithPage(page,
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
@@ -297,11 +335,9 @@ function buildProject() {
     }
 
     console.log('开始编译...');
-    const config = reloadSiteConfig();
-    if (!config.colors || !config.colors.primaryColor || !config.colors.secondaryColor) {
-        console.error(chalk.red('缺少颜色配置'));
-        process.exit(0);
-    }
+    let config;
+    reloadSiteConfig();
+
     const buildDir = path.join(CWD, 'build', config.projectName);
     fs.removeSync(path.join(CWD, 'build'));
     mkdirp.sync(buildDir);

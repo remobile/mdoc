@@ -1,4 +1,4 @@
-function startServer(port, verbose) {
+function startServer(port, verbose, open) {
     const React = require('react');
     const express = require('express');
     const morgan = require('morgan');
@@ -10,7 +10,7 @@ function startServer(port, verbose) {
     const chalk = require('chalk');
     const babel = require("babel-core");
     const _ = require("lodash");
-    const { support } = require("../lib/utils");
+    const { support, parseParams } = require("../lib/utils");
     const CWD = process.cwd() + '/';
     const { removeModuleAndChildrenFromCache } = require('../lib/utils');
 
@@ -104,8 +104,7 @@ function startServer(port, verbose) {
             const dir = path.join(config.showDirectory.static ? 'static' : config.documentPath, config.showDirectory.path);
             showDirectoryMenus(menus, dir, config.showDirectory.node || [], config.showDirectory.static);
         }
-        // console.log(JSON.stringify(menus, 0, 2));
-        // process.exit(0);
+
         // 为每个 page 添加 id
         for (const menu of menus) {
             if (!menu.mainPage && menu.groups) {
@@ -226,18 +225,22 @@ function startServer(port, verbose) {
         if (extension === '.md') {
             const rawContent = fs.readFileSync(file, 'utf8');
             const lines = rawContent.split(/\r?\n/);
-            let i = 1;
             if (/^::: invisible\s*/.test(lines[0])) {
-                for (let i = 1, len = lines.length - 1; i < len; ++i) {
+                let i = 1;
+                for (let len = lines.length - 1; i < len; ++i) {
                     if (/^:::\s*$/.test(lines[i])) {
                         break;
                     }
                 }
+                const params = parseParams(lines.slice(1, i).join(' '));
+                page.current.supports = [ ...(page.current.supports || []), ...(params.supports || []) ];
+                page.current.styles = [ ...(page.current.styles || []), ...(params.styles || []) ];
+                page.current.scripts = [ ...(page.current.scripts || []), ...(params.scripts || []) ];
             }
             return res.send(
                 renderToStaticMarkup(
                     <DocsLayout page={page}>
-                        {lines.slice(i + 1).join('\n')}
+                        {rawContent}
                     </DocsLayout>
                 )
             );
@@ -400,7 +403,7 @@ function startServer(port, verbose) {
                 proxy: url,
                 files: [CWD + config.documentPath],
                 notify: false,
-                open: true,
+                open,
             });
         });
         gulp.task('server', function() {
