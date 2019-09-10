@@ -28,7 +28,7 @@ function buildProject(verbose) {
         hash.update(path);
         return hash.digest('hex');
     }
-    function showDirectoryMenus(menus, dir, node, isStatic) {
+    function showDirectoryMenus(menus, dir, node, isStatic, origin) {
         fs.readdirSync(dir).forEach(file=>{
             const level = node.length;
             const fullPath = path.join(dir, file);
@@ -40,7 +40,7 @@ function buildProject(verbose) {
             if (level === 0) { // 展示在 menus 上
                 if(isDirectory) {
                     menus.push({ name, groups: [] });
-                    showDirectoryMenus(menus, fullPath, [name], isStatic);
+                    showDirectoryMenus(menus, fullPath, [name], isStatic, origin);
                 } else {
                     showError('展示目录的层次有误');
                 }
@@ -51,7 +51,7 @@ function buildProject(verbose) {
                         showError('展示目录的层次有误');
                     }
                     menu.groups.push({ name, pages: [] });
-                    showDirectoryMenus(menus, fullPath, [...node, name], isStatic);
+                    showDirectoryMenus(menus, fullPath, [...node, name], isStatic, origin);
                 } else {
                     showError('展示目录的层次有误');
                 }
@@ -68,7 +68,7 @@ function buildProject(verbose) {
                     if (!group) {
                         showError('展示目录的层次有误');
                     }
-                    group.pages.push({ name, path: fullPath, supports: ['dir', 'viewer'] });
+                    group.pages.push({ name, path: fullPath, origin, supports: ['dir', 'viewer'] });
                 } else {
                     if (isStatic) {
                         showError('展示目录的层次有误');
@@ -81,7 +81,11 @@ function buildProject(verbose) {
                         if (!group) {
                             showError('展示目录的层次有误');
                         }
-                        group.pages.push({ name: name.replace(/\.[^.]*$/, ''), path: fullPath.replace(new RegExp(`^${config.documentPath}/`), '') });
+                        group.pages.push({
+                            name: name.replace(/\.[^.]*$/, ''),
+                            path: fullPath.replace(new RegExp(`^${config.documentPath}/`), ''),
+                            origin,
+                        });
                     }
                 }
             }
@@ -99,9 +103,11 @@ function buildProject(verbose) {
         config.baseUrl = `/${config.projectName}/`;
 
         // 如果需要展示目录文件，写展示目录文件的各个文件
-        if (config.showDirectory) {
-            const dir = path.join(config.showDirectory.static ? 'static' : config.documentPath, config.showDirectory.path);
-            showDirectoryMenus(menus, dir, config.showDirectory.node || [], config.showDirectory.static);
+        if (config.dirs) {
+            for (const item of config.dirs) {
+                const dir = path.join(item.static ? 'static' : config.documentPath, item.path);
+                showDirectoryMenus(menus, dir, item.node || [], item.static, item.origin);
+            }
         }
 
         // 为每个 page 添加 id
@@ -187,6 +193,7 @@ function buildProject(verbose) {
                     name,
                     extname,
                     url: fullPath.replace(/^static\//, ''),
+                    origin: current.origin,
                 });
             });
             return writeFileWithPage(page,

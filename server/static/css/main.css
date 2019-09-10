@@ -2068,7 +2068,7 @@ input::placeholder {
     position: absolute;
     font-size: 10px;
     max-width: 140px;
-    height: 12px;
+    height: 16px;
     overflow: scroll;
     word-break: keep-all;
     top: 146px;
