@@ -193,7 +193,7 @@ function buildProject(verbose) {
                     name,
                     extname,
                     url: fullPath.replace(/^static\//, ''),
-                    origin: current.origin,
+                    origin: `${current.origin.replace(/\/$/, '')}/${fullPath}`,
                 });
             });
             return writeFileWithPage(page,
