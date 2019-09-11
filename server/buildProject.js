@@ -16,7 +16,7 @@ function buildProject(verbose) {
     const CWD = process.cwd() + '/';
     const { removeModuleAndChildrenFromCache } = require('../lib/utils');
 
-    function showError(text) {
+    function showError(...text) {
         console.error(chalk.red(text));
         process.exit(0);
     }
