@@ -45,7 +45,7 @@ function startServer(port, verbose, open) {
         if (!isDirectory) {
             showError(`${dir}应该为文件夹`);
         }
-        const files = fs.readdirSync(dir);
+        const files = fs.readdirSync(dir).filter(o=>!/^\./.test(o));
         if (!files.length) {
             showError(`${dir}不能为空文件夹`);
         }

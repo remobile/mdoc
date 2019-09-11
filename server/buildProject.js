@@ -28,68 +28,80 @@ function buildProject(verbose) {
         hash.update(path);
         return hash.digest('hex');
     }
-    function showDirectoryMenus(menus, dir, node, isStatic, origin) {
-        fs.readdirSync(dir).forEach(file=>{
-            const level = node.length;
-            const fullPath = path.join(dir, file);
-            const isDirectory = fs.statSync(fullPath).isDirectory();
-            const name = /^[\d-]+$/.test(file) ? file : file.replace(/^\d*/, '');
-            if (/^\./.test(name)) {
-                return;
+    function showDirectoryMenus(parents, index, level) {
+        const item = parents[index];
+        const dir = path.join(item.static ? 'static' : config.documentPath, item.folder);
+        const isDirectory = fs.statSync(dir).isDirectory();
+        if (level === 2 && !item.expand) { // page层
+            Object.assign(item, {
+                path: item.folder,
+                folder: dir,
+                origin: item.origin,
+                supports: [ isDirectory ? 'dir' : '', 'viewer'],
+            });
+            return 0;
+        }
+        if (!isDirectory) {
+            showError(`${dir}应该为文件夹`);
+        }
+        const files = fs.readdirSync(dir).filter(o=>!/^\./.test(o));
+        if (!files.length) {
+            showError(`${dir}不能为空文件夹`);
+        }
+        if (level === 2) {
+            parents.splice(index, 1, ...(files.map(o=>({
+                name: o,
+                path: path.join(item.folder, o),
+                folder: path.join(dir, o),
+                origin: item.origin,
+                supports: [ fs.statSync(path.join(dir, o)).isDirectory() ? 'dir' : '', 'viewer'],
+            }))));
+        } else if (level === 0) { // menu层
+            if (!item.expand) {
+                item.groups = files.map(o=>({
+                    name: o,
+                    static: item.static,
+                    origin: item.origin,
+                    folder: path.join(item.folder, o),
+                }));
+                for (let i in item.groups) {
+                    showDirectoryMenus(item.groups, i, 1);
+                }
+            } else {
+                const memus = files.map(o=>({
+                    name: o,
+                    static: item.static,
+                    origin: item.origin,
+                    folder: path.join(item.folder, o),
+                }));
+                for (let i in memus) {
+                    showDirectoryMenus(memus, i, 0);
+                }
+                parents.splice(index, 1, ...memus);
             }
-            if (level === 0) { // 展示在 menus 上
-                if(isDirectory) {
-                    menus.push({ name, groups: [] });
-                    showDirectoryMenus(menus, fullPath, [name], isStatic, origin);
-                } else {
-                    showError('展示目录的层次有误');
+        } else if (level === 1) { // group层
+            if (!item.expand) {
+                item.pages = files.map(o=>({
+                    name: o,
+                    path: path.join(item.folder, o),
+                    folder: path.join(dir, o),
+                    origin: item.origin,
+                    supports: [ fs.statSync(path.join(dir, o)).isDirectory() ? 'dir' : '', 'viewer'],
+                }));
+            } else {
+                const groups = files.map(o=>({
+                    name: o,
+                    static: item.static,
+                    origin: item.origin,
+                    folder: path.join(item.folder, o),
+                }));
+                for (let i in groups) {
+                    showDirectoryMenus(groups, i, 1);
                 }
-            } else if (level === 1) {
-                if(isDirectory) { // 展示在 menu.groups 上
-                    const menu = _.find(menus, o=>o.name === node[0]);
-                    if (!menu) {
-                        showError('展示目录的层次有误');
-                    }
-                    menu.groups.push({ name, pages: [] });
-                    showDirectoryMenus(menus, fullPath, [...node, name], isStatic, origin);
-                } else {
-                    showError('展示目录的层次有误');
-                }
-            } else if (level === 2) {
-                if(isDirectory) { // 展示在 group.pages 上
-                    if (!isStatic) {
-                        showError('展示目录的层次有误');
-                    }
-                    const menu = _.find(menus, o=>o.name === node[0]);
-                    if (!menu) {
-                        showError('展示目录的层次有误');
-                    }
-                    const group = _.find(menu.groups, o=>o.name === node[1]);
-                    if (!group) {
-                        showError('展示目录的层次有误');
-                    }
-                    group.pages.push({ name, path: fullPath, origin, supports: ['dir', 'viewer'] });
-                } else {
-                    if (isStatic) {
-                        showError('展示目录的层次有误');
-                    } else {
-                        const menu = _.find(menus, o=>o.name === node[0]);
-                        if (!menu) {
-                            showError('展示目录的层次有误');
-                        }
-                        const group = _.find(menu.groups, o=>o.name === node[1]);
-                        if (!group) {
-                            showError('展示目录的层次有误');
-                        }
-                        group.pages.push({
-                            name: name.replace(/\.[^.]*$/, ''),
-                            path: fullPath.replace(new RegExp(`^${config.documentPath}/`), ''),
-                            origin,
-                        });
-                    }
-                }
+                parents.splice(index, 1, ...groups);
             }
-        });
+        }
+        return item.expand && files.length ? files.length-1 : 0;
     }
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + 'config.js');
@@ -102,11 +114,29 @@ function buildProject(verbose) {
         // 设置 baseUrl
         config.baseUrl = `/${config.projectName}/`;
 
-        // 如果需要展示目录文件，写展示目录文件的各个文件
-        if (config.dirs) {
-            for (const item of config.dirs) {
-                const dir = path.join(item.static ? 'static' : config.documentPath, item.path);
-                showDirectoryMenus(menus, dir, item.node || [], item.static, item.origin);
+        // 检测各个文件时候存在，同时展开文件夹
+        for (let i = 0; menus[i] !== undefined; i++) {
+            const menu = menus[i];
+            if (menu.folder) {
+                i += showDirectoryMenus(menus, i, 0);
+            } else {
+                const groups = menu.groups;
+                if (groups) {
+                    for (let j = 0; groups[j] !== undefined; j++) {
+                        const group = groups[j];
+                        if (group.folder) {
+                            j += showDirectoryMenus(groups, j, 1);
+                        } else {
+                            const pages = group.pages;
+                            for (let k = 0; pages[k] !== undefined; k++) {
+                                const page = pages[k];
+                                if (page.folder) {
+                                    k += showDirectoryMenus(pages, k, 2);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -166,7 +196,7 @@ function buildProject(verbose) {
     }
     function createFile(page) {
         const hasDir = support(page.current, 'dir');
-        const file = hasDir ? path.join(CWD, page.current.path) : getDocumentPath(page.current.path);
+        const file = hasDir ? path.join(CWD, page.current.folder) : getDocumentPath(page.current.path);
         if (!fs.existsSync(file)) {
             return writeFileWithPage(page,
                 renderToStaticMarkup(
@@ -181,8 +211,9 @@ function buildProject(verbose) {
         if (hasDir) {
             const { current } = page;
             const list = [];
-            fs.readdirSync(current.path).forEach(file=>{
-                const fullPath = path.join(current.path, file);
+            fs.readdirSync(current.folder).forEach(file=>{
+                const fullPath = path.join(current.folder, file);
+                const url = path.join(current.path, file);
                 const isDirectory = fs.statSync(fullPath).isDirectory();
                 if (/^\./.test(file) || isDirectory) {
                     return;
@@ -192,8 +223,8 @@ function buildProject(verbose) {
                 list.push({
                     name,
                     extname,
-                    url: fullPath.replace(/^static\//, ''),
-                    origin: `${current.origin.replace(/\/$/, '')}/${fullPath}`,
+                    url,
+                    origin: current.origin ? `${current.origin.replace(/\/$/, '')}/${fullPath}` : '',
                 });
             });
             return writeFileWithPage(page,
