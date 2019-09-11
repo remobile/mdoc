@@ -35,7 +35,8 @@ function startServer(port, verbose, open) {
         const isDirectory = fs.statSync(dir).isDirectory();
         if (level === 2 && !item.expand) { // page层
             Object.assign(item, {
-                path: dir,
+                path: item.folder,
+                folder: dir,
                 origin: item.origin,
                 supports: [ isDirectory ? 'dir' : '', 'viewer'],
             });
@@ -51,7 +52,8 @@ function startServer(port, verbose, open) {
         if (level === 2) {
             parents.splice(index, 1, ...(files.map(o=>({
                 name: o,
-                path: path.join(dir, o),
+                path: path.join(item.folder, o),
+                folder: path.join(dir, o),
                 origin: item.origin,
                 supports: [ fs.statSync(path.join(dir, o)).isDirectory() ? 'dir' : '', 'viewer'],
             }))));
@@ -83,6 +85,7 @@ function startServer(port, verbose, open) {
                 item.pages = files.map(o=>({
                     name: o,
                     path: path.join(item.folder, o),
+                    folder: path.join(dir, o),
                     origin: item.origin,
                     supports: [ fs.statSync(path.join(dir, o)).isDirectory() ? 'dir' : '', 'viewer'],
                 }));
@@ -214,7 +217,7 @@ function startServer(port, verbose, open) {
         removeModuleAndChildrenFromCache('../lib/DocsLayout.js');
         const DocsLayout = require('../lib/DocsLayout.js');
         const hasDir = support(page.current, 'dir');
-        const file = hasDir ? page.current.path : getDocumentPath(page.current.path);
+        const file = hasDir ? page.current.folder : getDocumentPath(page.current.path);
         verbose && console.log('render file: ', file);
         if (!fs.existsSync(file)) {
             removeModuleAndChildrenFromCache('../lib/ErrorPage.js');
@@ -232,8 +235,9 @@ function startServer(port, verbose, open) {
         if (hasDir) {
             const { current } = page;
             const list = [];
-            fs.readdirSync(current.path).forEach(file=>{
-                const fullPath = path.join(current.path, file);
+            fs.readdirSync(current.folder).forEach(file=>{
+                const fullPath = path.join(current.folder, file);
+                const url = path.join(current.path, file);
                 const isDirectory = fs.statSync(fullPath).isDirectory();
                 if (/^\./.test(file) || isDirectory) {
                     return;
@@ -243,7 +247,7 @@ function startServer(port, verbose, open) {
                 list.push({
                     name,
                     extname,
-                    url: fullPath.replace(/^static\//, ''),
+                    url,
                     origin: current.origin ? `${current.origin.replace(/\/$/, '')}/${fullPath}` : '',
                 });
             });
