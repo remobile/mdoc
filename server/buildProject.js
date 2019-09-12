@@ -142,13 +142,25 @@ function buildProject(verbose) {
 
         // 为每个 page 添加 id
         for (const menu of menus) {
-            if (!menu.mainPage && menu.groups) {
-                menu.mainPage = menu.groups[0].pages[0].path;
+            if (!menu.mainPage) {
+                menu.mainPage = menu.groups && menu.groups[0] && menu.groups[0].pages && menu.groups[0].pages[0] && menu.groups[0].pages[0].path;
+            }
+            if (!menu.name) {
+                if (menu.groups && menu.groups[0]) {
+                    menu.name = menu.groups[0].name;
+                } else if (menu.pages && menu.pages[0]) {
+                    menu.name = menu.pages[0].name;
+                } else {
+                    menu.name = '未定义';
+                }
             }
             if (menu.mainPage) {
                 menu.mainPageId = getPageId(menu.mainPage);
                 menu.id = menu.mainPageId;
                 for (const group of (menu.groups||[])) {
+                    if (!group.name) {
+                        group.name = group.pages && group.pages[0] && group.pages[0].name || '未定义';
+                    }
                     for (const page of group.pages) {
                         if (!page.id) {
                             page.id = getPageId(page.path);
