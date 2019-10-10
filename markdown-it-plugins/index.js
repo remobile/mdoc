@@ -17,6 +17,7 @@ const images = require('./images');
 const swiper = require('./swiper');
 const fragment = require('./fragment');
 const tabs = require('./tabs');
+const untree = require('./untree');
 const react = require('./react');
 const artical = require('./artical');
 const toc = require('./toc');
@@ -83,6 +84,9 @@ function fragment_plugin(md, page) {
 function tabs_plugin(md, page) {
     md.use(tabs, page);
 }
+function untree_plugin(md, page) {
+    md.use(untree, page);
+}
 function react_plugin(md, page) {
     md.use(react, page);
 }
@@ -137,6 +141,7 @@ module.exports = [
     swiper_plugin,
     fragment_plugin,
     tabs_plugin,
+    untree_plugin,
     react_plugin,
     artical_plugin,
     emoji_plugin,

@@ -114,6 +114,11 @@ const config = {
                     name: '插件',
                     pages: [
                         {
+                            name: 'untree',
+                            path: 'md/untree.md',
+                            supports: ['untree'], // 垂直树形控件的支持
+                        },
+                        {
                             name: 'list',
                             path: 'md/list.md',
                         },
