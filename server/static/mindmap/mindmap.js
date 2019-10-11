@@ -1,6 +1,5 @@
 //https://github.com/Youjingyu/web_mind_mapping
 window.showMindMap = function (id, data, width, height, duration) {
-    duration = 0;
     var engine = d3.layout.tree().setNodeSizes(true);
     // sizing
     engine.nodeSize(function (t) {
@@ -27,15 +26,14 @@ window.showMindMap = function (id, data, width, height, duration) {
     // add zoom event
     svg.call(d3.behavior.zoom().scaleExtent([0.5,3]).on("zoom", redraw));
 
-    update(data);
+    update(data, 0);
     data.children.forEach(collapse);
-    update(data);
-    d3.select(id).style({'visibility': "visible"});
+    update(data, 0);
     d3.selectAll(".mindmap_node").each(function(d, i){
         i > 0 && (d3.select(this).select(".vertical-line").style('display', 'block'));
     });
 
-    function update(source){
+    function update(source, duration){
         // get nodes array
         var nodes = d3.layout.hierarchy()(data);
         var last_id = 0;
@@ -51,7 +49,7 @@ window.showMindMap = function (id, data, width, height, duration) {
             var x_size = source.x_size ? source.x_size : 0;
             return "translate(" + source.y0 + "," + (source.x0 - x_size / 2) + ")";
         });
-        //.on("click", click);
+
         // add text
         var text_elements = nodeEnter.append("text")
         .attr({
@@ -72,7 +70,6 @@ window.showMindMap = function (id, data, width, height, duration) {
 
         // do the layout
         nodes = engine.nodes(data);
-
         // get the extents, average node area, etc.
         function node_extents(n) {
             return [n.x - n.x_size / 2, n.y, n.x + n.x_size / 2, n.y + n.y_size];
@@ -267,7 +264,7 @@ window.showMindMap = function (id, data, width, height, duration) {
             d.children = d._children;
             d._children = null;
         }
-        update(d);
+        update(d, duration);
     }
     // wrap text line, control image ang highlight code
     function parseText(text_tag, d){

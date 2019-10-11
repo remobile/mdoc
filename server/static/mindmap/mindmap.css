@@ -1,12 +1,5 @@
 .mindmap_svg{
-    visibility: hidden;
-    font-weight: bold;
     border: 1px solid #ccc;
-    animation: drawingframe;
-    animation-duration: 1s;
-    animation-timing-function: linear;
-    animation-delay: 1s;
-    -webkit-animation: drawingframe 1s linear 1s;
 }
 @keyframes drawingframe
 {

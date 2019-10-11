@@ -14,7 +14,6 @@ module.exports = function mindmap_plugin(md) {
         } else {
             data = parseSimpleObject(content);
         }
-        console.log("=======", data);
 
         return `
         <svg id="mdoc_mindmap_${mindmap_id}" class="mindmap_svg"></svg>
@@ -23,7 +22,7 @@ module.exports = function mindmap_plugin(md) {
             var data = ${JSON.stringify(data)};
             var width = ${options.width||800};
             var height = ${options.height||600};
-            var duration = ${options.duration||750};
+            var duration = ${options.duration||100};
             window.showMindMap('#mdoc_mindmap_${mindmap_id}', data, width, height, duration);
         });
         </script>
