@@ -2072,4 +2072,5 @@ input::placeholder {
     overflow: scroll;
     word-break: keep-all;
     top: 146px;
+    cursor: hand;
 }
