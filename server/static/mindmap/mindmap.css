@@ -1,0 +1,49 @@
+.mindmap_svg{
+    visibility: hidden;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    animation: drawingframe;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-delay: 1s;
+    -webkit-animation: drawingframe 1s linear 1s;
+}
+@keyframes drawingframe
+{
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+@-webkit-keyframes drawingframe
+{
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+.mindmap_node g{
+    cursor: pointer;
+}
+
+.mindmap_node circle {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}
+
+.mindmap_node line{
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}
+
+.mindmap_link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1.5px;
+}
+
+tspan{
+    font-size: 14px;
+}
+text{
+    dominant-baseline: middle;
+}

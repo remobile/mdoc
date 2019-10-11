@@ -1,50 +1,7 @@
 'use strict';
 
-const { parseParams } = require('../lib/utils');
+const { parseParams, parseSimpleArray } = require('../lib/utils');
 
-function parseArray(line) {
-    const list = [];
-    let i = -1, max = line.length - 1, item = '';
-    let amatch = 0;
-    while (i++ < max) {
-        const ch = line[i];
-        if (ch === '[') {
-            amatch++;
-        } else if (ch === ']') {
-            amatch--;
-        }
-        if (ch === ',' && amatch === 0) {
-            item && list.push(/\]\s*$/.test(item) ? item.trim() : item);
-            item='';
-        } else {
-            item=`${item}${ch}`;
-        }
-    }
-    if (amatch === 0) {
-        item && list.push(/\]\s*$/.test(item) ? item.trim() : item);
-    }
-    return list;
-}
-function parseItem(line) {
-    if (!line) {
-        return null;
-    }
-    let i = -1, max = line.length - 1, item = '';
-    while (i++ < max) {
-        const ch = line[i];
-        if (ch === '[') {
-            return {
-                text: item,
-                children: parseArray(line.substring(i+1, max)).map(o=>parseItem(o)).filter(o=>o),
-            };
-        }
-        item=`${item}${ch}`;
-    }
-    return { text: item };
-}
-function parse(line) {
-    return parseArray(line).map(o=>parseItem(o)).filter(o=>o);
-}
 function addId(data, parentId) {
     if (data instanceof Array) {
         for (const k in data) {
@@ -66,19 +23,18 @@ module.exports = function untree_plugin(md) {
         if (options.json) {
             data = (new Function('','return '+content))();
         } else {
-            data = parse(content);
+            data = parseSimpleArray(content);
         }
         addId(data, `mdoc_untree_id_${untree_id}`);
 
         return `
-        <div id="mdoc_untree_${untree_id}" style="width:${options.width}px;" >${content}</div>
+        <div id="mdoc_untree_${untree_id}" style="width:${options.width}px;"></div>
         <script>
         $(document).ready(function(){
-            var tree = new UNTree({
+            var tree = new window.UNTree({
                 el: document.getElementById('mdoc_untree_${untree_id}'),
                 jsonArr: ${JSON.stringify(data)},
                 type: 'tree',
-
                 viewClass: '${options.viewClass||''}',
                 itemClass: '${options.itemClass||''}',
                 click: ${options.click},

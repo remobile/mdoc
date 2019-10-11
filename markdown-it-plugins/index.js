@@ -18,6 +18,7 @@ const swiper = require('./swiper');
 const fragment = require('./fragment');
 const tabs = require('./tabs');
 const untree = require('./untree');
+const mindmap = require('./mindmap');
 const react = require('./react');
 const artical = require('./artical');
 const toc = require('./toc');
@@ -87,6 +88,9 @@ function tabs_plugin(md, page) {
 function untree_plugin(md, page) {
     md.use(untree, page);
 }
+function mindmap_plugin(md, page) {
+    md.use(mindmap, page);
+}
 function react_plugin(md, page) {
     md.use(react, page);
 }
@@ -142,6 +146,7 @@ module.exports = [
     fragment_plugin,
     tabs_plugin,
     untree_plugin,
+    mindmap_plugin,
     react_plugin,
     artical_plugin,
     emoji_plugin,

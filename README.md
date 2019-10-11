@@ -114,6 +114,11 @@ const config = {
                     name: '插件',
                     pages: [
                         {
+                            name: 'mindmap',
+                            path: 'md/mindmap.md',
+                            supports: ['mindmap'], // 思维导图的支持
+                        },
+                        {
                             name: 'untree',
                             path: 'md/untree.md',
                             supports: ['untree'], // 垂直树形控件的支持
