@@ -16,7 +16,7 @@ function addId(data, parentId) {
 module.exports = function untree_plugin(md) {
     let untree_id = 0;
     md.renderer.rules.fence_custom.untree = function(params, tokens, idx) {
-        const options = parseParams(params, { width: 600 });
+        const options = parseParams(params);
         const content = tokens[idx].content.split('\n').filter(o=>!!o).map(o=>`${o.trim()}`).join('');
         untree_id ++;
         let data;
@@ -26,9 +26,13 @@ module.exports = function untree_plugin(md) {
             data = parseSimpleArray(content);
         }
         addId(data, `mdoc_untree_id_${untree_id}`);
+        let style = '';
+        if (options.width) {
+            style= `style="width:${options.width}px;"`;
+        }
 
         return `
-        <div id="mdoc_untree_${untree_id}" style="width:${options.width}px;"></div>
+        <div id="mdoc_untree_${untree_id}" ${style}"></div>
         <script>
         $(document).ready(function(){
             var tree = new window.UNTree({
