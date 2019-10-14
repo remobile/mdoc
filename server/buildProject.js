@@ -392,6 +392,11 @@ function buildProject(verbose) {
     fs.removeSync(path.join(CWD, 'build'));
     mkdirp.sync(buildDir);
 
+    // 创建domain的文件CNAME
+    if (config.domain) {
+        fs.writeFileSync(path.join(buildDir, 'CNAME'), config.domain);
+    }
+    return;
     // 创建首页
     createFile({ current: config.homePage, config });
 

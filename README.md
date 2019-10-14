@@ -29,6 +29,7 @@ const markdownPlugins = require('./lib/markdownPlugins');
 
 const config = {
     projectName: 'mdoc-example', // 工程名称，访问网站的时候会使用到：http://localhost:4000/mdoc-example
+    domain: 'fang.smtwl.com.cn', // gh-pages 对应的网址，可以不设置，如果需要重定向域名
     title: '四面通物流大超市', // html 的 title
     favicon: 'img/favicon.ico', // html 的 favicon
     logo: 'img/logo.png', // logo
