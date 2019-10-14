@@ -302,7 +302,7 @@ function buildProject(verbose) {
                 );
             } else if (hasUntree) { // 处理js文件显示js文件
                 const rawContent = fs.readFileSync(file, 'utf8');
-                return res.send(
+                return writeFileWithPage(page,
                     renderToStaticMarkup(
                         <DocsLayout page={page}>
                             { '``` untree json\n' + rawContent + '\n```' }
