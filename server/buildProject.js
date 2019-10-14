@@ -281,6 +281,7 @@ function buildProject(verbose) {
             );
         } else if (extension === '.js') {
             const hasReact = support(page.current, 'react');
+            const hasUntree = support(page.current, 'untree');
             if (hasReact) { // 动态网页
                 const content = fs.readFileSync(file, 'utf8');
                 const script = babel.transform(content, { plugins:['transform-react-jsx'], presets: ['es2015']}).code;
@@ -296,6 +297,15 @@ function buildProject(verbose) {
                                     `,
                                 }}
                                 />
+                        </DocsLayout>
+                    )
+                );
+            } else if (hasUntree) { // 处理js文件显示js文件
+                const rawContent = fs.readFileSync(file, 'utf8');
+                return res.send(
+                    renderToStaticMarkup(
+                        <DocsLayout page={page}>
+                            { '``` untree json\n' + rawContent + '\n```' }
                         </DocsLayout>
                     )
                 );
@@ -396,7 +406,6 @@ function buildProject(verbose) {
     if (config.domain) {
         fs.writeFileSync(path.join(buildDir, 'CNAME'), config.domain);
     }
-    return;
     // 创建首页
     createFile({ current: config.homePage, config });
 
