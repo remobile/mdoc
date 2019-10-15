@@ -2068,8 +2068,10 @@ input::placeholder {
     position: absolute;
     font-size: 10px;
     max-width: 140px;
+    padding-left: 2px;
+    padding-right: 2px;
+    overflow: hidden;
     height: 16px;
-    overflow: scroll;
     word-break: keep-all;
     top: 146px;
     cursor: hand;
