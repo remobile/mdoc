@@ -236,7 +236,7 @@ function buildProject(verbose) {
                     name,
                     extname,
                     url,
-                    origin: current.origin ? `${current.origin.replace(/\/$/, '')}/${fullPath}` : '',
+                    origin: current.origin ? `${current.origin.replace(/\/$/, '')}/${current.path}` : '',
                 });
             });
             return writeFileWithPage(page,

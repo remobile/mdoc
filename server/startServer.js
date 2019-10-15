@@ -260,7 +260,7 @@ function startServer(port, verbose, open) {
                     name,
                     extname,
                     url,
-                    origin: current.origin ? `${current.origin.replace(/\/$/, '')}/${fullPath}` : '',
+                    origin: current.origin ? `${current.origin.replace(/\/$/, '')}/${current.path}` : '',
                 });
             });
             return res.send(
