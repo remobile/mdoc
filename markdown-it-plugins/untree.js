@@ -26,9 +26,23 @@ module.exports = function untree_plugin(md) {
             data = parseSimpleArray(content);
         }
         addId(data, `mdoc_untree_id_${untree_id}`);
-        let style = '';
+        let style = '', itemClass = '', text = '';
         if (options.width) {
             style= `style="width:${options.width}px;"`;
+        }
+        if (options.itemClass) {
+            if (/^__function_start__.*__function_end__$/.test(options.itemClass)) {
+                text = `text: ${options.itemClass.replace(/__function_start__|____function_end__/g, '')},`;
+            } else {
+                itemClass = `itemClass: '${options.itemClass}',`;
+            }
+        }
+        if (options.text) {
+            if (/^__function_start__.*__function_end__$/.test(options.text)) {
+                text = `text: ${options.text.replace(/__function_start__|____function_end__/g, '')},`;
+            } else {
+                text = `text: '${options.text}',`;
+            }
         }
 
         return `
@@ -39,8 +53,7 @@ module.exports = function untree_plugin(md) {
                 el: document.getElementById('mdoc_untree_${untree_id}'),
                 jsonArr: ${JSON.stringify(data)},
                 type: 'tree',
-                viewClass: '${options.viewClass||''}',
-                itemClass: '${options.itemClass||''}',
+                viewClass: '${options.viewClass||''}',${itemClass}${text}
                 click: ${options.click},
             });
             tree.render();
