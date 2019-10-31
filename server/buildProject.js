@@ -12,7 +12,7 @@ function buildProject(verbose) {
     const ErrorPage = require('../lib/ErrorPage');
     const babel = require("babel-core");
     const _ = require("lodash");
-    const { support, parseParams, removeModuleAndChildrenFromCache } = require("../lib/utils");
+    const { support, parseParams, formatObject, removeModuleAndChildrenFromCache } = require("../lib/utils");
     const CWD = process.cwd() + '/';
 
     function showError(...text) {
@@ -301,10 +301,12 @@ function buildProject(verbose) {
                 );
             } else if (hasUntree) { // 处理js文件显示js文件
                 const rawContent = fs.readFileSync(file, 'utf8');
+                const options = formatObject(page.current.options);
+                const html = page.current.html ? page.current.html.split(/\n\r|\n|\t/).map(o=>o.trim()).join('') + '\n' : '';
                 return writeFileWithPage(page,
                     renderToStaticMarkup(
                         <DocsLayout page={page}>
-                            { '``` untree json\n' + rawContent + '\n```' }
+                            { html + '``` untree json ' + options +'\n' + rawContent + '\n```' }
                         </DocsLayout>
                     )
                 );
