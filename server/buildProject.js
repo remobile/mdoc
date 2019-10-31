@@ -12,9 +12,8 @@ function buildProject(verbose) {
     const ErrorPage = require('../lib/ErrorPage');
     const babel = require("babel-core");
     const _ = require("lodash");
-    const { support, parseParams } = require("../lib/utils");
+    const { support, parseParams, removeModuleAndChildrenFromCache } = require("../lib/utils");
     const CWD = process.cwd() + '/';
-    const { removeModuleAndChildrenFromCache } = require('../lib/utils');
 
     function showError(...text) {
         console.error(chalk.red(text));
