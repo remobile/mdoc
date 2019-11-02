@@ -325,7 +325,7 @@ function startServer(port, verbose, open) {
             } else if (hasUntree) { // 处理js文件显示js文件
                 const rawContent = fs.readFileSync(file, 'utf8');
                 const options = formatObject(page.current.options);
-                const html = page.current.html ? page.current.html.split(/\n\r|\n|\t/).map(o=>o.trim()).join('') + '\n' : '';
+                const html = page.current.html ? page.current.html.split(/\n\r|\n|\t/).map(o=>o.trim()).join('') + '\n\n' : '';
                 return res.send(
                     renderToStaticMarkup(
                         <DocsLayout page={page}>
