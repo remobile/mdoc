@@ -8,6 +8,7 @@ module.exports = function tagcloud_plugin(md) {
         const options = parseParams(params, {
             width: 600,
             height: 600,
+            className: '',
             textFont : 'Trebuchet MS, Helvetica',
             textColour : '#333',
             textHeight : 18,
@@ -31,7 +32,7 @@ module.exports = function tagcloud_plugin(md) {
         const list = options.line ? parseArray(tokens[idx].content.split('\n').filter(o=>!!o).join(' ')): tokens[idx].content.split('\n').filter(o=>!!o);
         tagcloud_id ++;
         return `
-        <canvas id="mdoc_tagcloud_${tagcloud_id}" width="${options.width}" height="${options.height}">
+        <canvas id="mdoc_tagcloud_${tagcloud_id}" width="${options.width}" height="${options.height}" class="${options.className}">
             ${list.map(o=>`<a href="javascript:void(0);">${o}</a>`).join('')}
         </canvas>
         <script>$(document).ready(function(){
