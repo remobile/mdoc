@@ -26,6 +26,7 @@ const link = require('./link');
 const media = require('./media');
 const tools = require('./tools');
 const list = require('./list');
+const tagcloud = require('./tagcloud');
 
 const HTML_REPLACEMENTS = {
     '&': '&amp;',
@@ -124,6 +125,9 @@ function tools_plugin(md, page) {
 function list_plugin(md, page) {
     md.use(list, page);
 }
+function tagcloud_plugin(md, page) {
+    md.use(tagcloud, page);
+}
 function rewrite_plugin(md) {
     md.renderer.rules.text = function (tokens, idx /*, options, env */) {
         return escapeHtml(tokens[idx].content);;
@@ -158,5 +162,6 @@ module.exports = [
     media_plugin,
     tools_plugin,
     list_plugin,
+    tagcloud_plugin,
     rewrite_plugin,
 ];

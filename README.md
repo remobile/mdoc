@@ -120,6 +120,16 @@ const config = {
                             supports: ['mindmap'], // 思维导图的支持
                         },
                         {
+                            name: 'tagcloud',
+                            path: 'md/tagcloud.md',
+                            supports: ['tagcloud'], // 云标签的支持
+                        },
+                        {
+                            name: 'untreejs',
+                            path: 'md/untree.js',
+                            supports: ['untree'], // 垂直树形控件的js格式的支持
+                        },
+                        {
                             name: 'untree',
                             path: 'md/untree.md',
                             supports: ['untree'], // 垂直树形控件的支持
@@ -270,7 +280,7 @@ const config = {
             folder: 'dir/menu', // 指定的路径
             static: false, // 是否为static里面的文件
             expand: false, // 如果为true,则该文件夹中的子文件夹在顶部展示为各个 menuItem，此时 name 无效，否则，以 name 为 menuItem，子文件夹为 group
-            // origin: 'https://raw.githubusercontent.com/blogoo/photo/master/', // 原始文件的链接
+            // origin: 'https://pan.baidu.com/s/19n_i8LN74SSXRwB1AtRiHA#list/path=/', // 原始文件的链接
         },
         {
             name: '文件夹展示2',
@@ -280,7 +290,7 @@ const config = {
                     folder: 'dir/group', // 指定的路径
                     static: false, // 是否为static里面的文件
                     expand: false, // 如果为true,则该文件夹中的子文件夹在顶部展示为各个 group，此时 name 无效，否则，以 name 为 group，子文件夹为 group 的内容
-                    // origin: 'https://raw.githubusercontent.com/blogoo/photo/master/', // 原始文件的链接
+                    // origin: 'https://pan.baidu.com/s/19n_i8LN74SSXRwB1AtRiHA#list/path=/', // 原始文件的链接
                 },
                 {
                     name: '文件夹展示实例2',
@@ -294,7 +304,7 @@ const config = {
                             folder: 'dir/page', // 指定的路径
                             static: false, // 是否为static里面的文件
                             expand: true, // 如果为true,则该文件夹中的子文件夹在顶部展示为各个 page，此时 name 无效，否则，以 name 为 page，子文件夹为 page 的内容
-                            // origin: 'https://raw.githubusercontent.com/blogoo/photo/master/', // 原始文件的链接
+                            // origin: 'https://pan.baidu.com/s/19n_i8LN74SSXRwB1AtRiHA#list/path=/', // 原始文件的链接
                         },
                         {
                             name: 'fragment',
