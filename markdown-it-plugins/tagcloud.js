@@ -1,6 +1,6 @@
 'use strict';
 
-const { parseParams } = require('../lib/utils');
+const { parseParams, parseArray } = require('../lib/utils');
 
 module.exports = function tagcloud_plugin(md) {
     let tagcloud_id = 0;
@@ -28,8 +28,7 @@ module.exports = function tagcloud_plugin(md) {
             fadeIn : 1000,
             clickToFront : 600,
         });
-        const list = tokens[idx].content.split('\n').filter(o=>!!o);
-        console.log("=======", list);
+        const list = options.line ? parseArray(tokens[idx].content.split('\n').filter(o=>!!o).join(' ')): tokens[idx].content.split('\n').filter(o=>!!o);
         tagcloud_id ++;
         return `
         <canvas id="mdoc_tagcloud_${tagcloud_id}" width="${options.width}" height="${options.height}">
