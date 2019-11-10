@@ -27,6 +27,7 @@ const media = require('./media');
 const tools = require('./tools');
 const list = require('./list');
 const tagcloud = require('./tagcloud');
+const rotateWord = require('./rotateWord');
 
 const HTML_REPLACEMENTS = {
     '&': '&amp;',
@@ -128,6 +129,9 @@ function list_plugin(md, page) {
 function tagcloud_plugin(md, page) {
     md.use(tagcloud, page);
 }
+function rotateWord_plugin(md, page) {
+    md.use(rotateWord, page);
+}
 function rewrite_plugin(md) {
     md.renderer.rules.text = function (tokens, idx /*, options, env */) {
         return escapeHtml(tokens[idx].content);;
@@ -163,5 +167,6 @@ module.exports = [
     tools_plugin,
     list_plugin,
     tagcloud_plugin,
+    rotateWord_plugin,
     rewrite_plugin,
 ];

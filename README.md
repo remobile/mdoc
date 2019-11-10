@@ -115,6 +115,11 @@ const config = {
                     name: '插件',
                     pages: [
                         {
+                            name: 'rotateWord',
+                            path: 'md/rotateWord.md',
+                            supports: ['rotateWord'], // 旋转字体的支持
+                        },
+                        {
                             name: 'mindmap',
                             path: 'md/mindmap.md',
                             supports: ['mindmap'], // 思维导图的支持
