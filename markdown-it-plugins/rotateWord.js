@@ -21,7 +21,7 @@ module.exports = function rotateWord_plugin(md) {
         const words = tokens[idx].content.split('\n').filter(o=>!!o).join('');
         rotateWord_id ++;
         return `
-        <div id="mdoc_rotateWord_${rotateWord_id}" class="${options.className}">
+        <div id="mdoc_rotateWord_${rotateWord_id}" class="${options.className||''}">
         </div>
         <script>$(document).ready(function(){
             showRotateWord('#mdoc_rotateWord_${rotateWord_id}', '${words}', ${JSON.stringify(options)});

@@ -1,6 +1,6 @@
 function addStyle(style, i, c1, c2) {
-    style.appendChild(document.createTextNode('.rotate-word-color'+i+' { color:'+c2+';animation: light'+i+' 1.5s ease infinite alternate;}'));
-    style.appendChild(document.createTextNode('@keyframes light'+i+' { from { text-shadow: 0 0 10px '+c1+', 0 0 20px '+c1+', 0 0 30px '+c1+', 0 0 40px '+c2+', 0 0 70px '+c2+', 0 0 80px '+c2+', 0 0 100px '+c2+', 0 0 150px '+c2+'; } to { text-shadow: 0 0 10px '+c1+', 0 0 20px '+c1+', 0 0 30px '+c1+', 0 0 40px '+c2+', 0 0 70px '+c2+', 0 0 80px '+c2+', 0 0 100px '+c2+', 0 0 150px '+c2+'; }}'));
+    style.appendChild(document.createTextNode('.rotate-word-color'+i+' { color:'+c2+';animation: rotate-word-light'+i+' 1.5s ease infinite alternate;}'));
+    style.appendChild(document.createTextNode('@keyframes rotate-word-light'+i+' { from { text-shadow: 0 0 10px '+c1+', 0 0 20px '+c1+', 0 0 30px '+c1+', 0 0 40px '+c2+', 0 0 70px '+c2+', 0 0 80px '+c2+', 0 0 100px '+c2+', 0 0 150px '+c2+'; } to { text-shadow: 0 0 10px '+c1+', 0 0 20px '+c1+', 0 0 30px '+c1+', 0 0 40px '+c2+', 0 0 70px '+c2+', 0 0 80px '+c2+', 0 0 100px '+c2+', 0 0 150px '+c2+'; }}'));
 }
 function showRotateWord(id, letters, options) {
     var children = [];
@@ -43,7 +43,7 @@ function showRotateWord(id, letters, options) {
         children.push(child);
     }
     // 设置旋转动画
-    setInterval(function() {
+    function draw() {
         degree = degree >= 360 ? 0 : degree + options.speed;
         children.forEach(function(child, index){
             var el = $(child);
@@ -58,5 +58,11 @@ function showRotateWord(id, letters, options) {
                 zIndex: Math.floor(rate * 10 * count)
             });
         });
-    }, 10);
+    }
+
+    function loop() {
+        draw();
+        requestAnimationFrame(loop);
+    }
+    loop();
 }
