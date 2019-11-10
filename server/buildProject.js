@@ -1,4 +1,4 @@
-function buildProject(verbose) {
+function buildProject(hasDomain, verbose) {
     const React = require('react');
     const renderToStaticMarkup = require('react-dom/server').renderToStaticMarkup;
     const fs = require('fs-extra');
@@ -105,6 +105,7 @@ function buildProject(verbose) {
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + 'config.js');
         config = require(CWD + 'config.js');
+        config.hasDomain = hasDomain;
         !config.menus && ( config.menus = [] );
         const { homePage, menus } = config;
 

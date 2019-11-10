@@ -14,6 +14,7 @@ program
 .version('0.0.1')
 .option('-s, --start', 'start server for project')
 .option('-b, --build', 'build release for project or single file')
+.option('-d, --hasDomain', 'if has domain')
 .option('-f, --file <config file>', 'start server single file with config')
 .option('-t, --ppt <config file>', 'start server single file with ppt')
 .option('-i, --index <ppt index file>', 'edit ppt file')
@@ -53,7 +54,7 @@ require('babel-register')({
     presets: ['react'],
 });
 
-const { port, start, build, file, ppt, index, verbose, open } = program;
+const { port, start, build, hasDomain, file, ppt, index, verbose, open } = program;
 if (file) {
     const buildFile = require('./server/buildFile.js');
     buildFile(port*1, file, build);
@@ -62,7 +63,7 @@ if (file) {
     buildPPT(port*1, ppt, build, index);
 } else if (build) {
     const buildProject = require('./server/buildProject.js');
-    buildProject(verbose);
+    buildProject(hasDomain, verbose);
 } else {
     const startServer = require('./server/startServer.js');
     startServer(port*1, verbose, open);
