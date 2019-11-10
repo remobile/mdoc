@@ -36,27 +36,19 @@ module.exports = function tagcloud_plugin(md) {
             ${list.map(o=>`<a href="javascript:void(0);">${o}</a>`).join('')}
         </canvas>
         <script>$(document).ready(function(){
-            TagCanvas.textFont = "${options.textFont}";
-            TagCanvas.textColour = "${options.textColour}";
-            TagCanvas.textHeight = ${options.textHeight};
-            TagCanvas.outlineColour = "${options.outlineColour}";
-            TagCanvas.maxSpeed = ${options.maxSpeed};
-            TagCanvas.outlineMethod = "${options.outlineMethod}";
-            TagCanvas.minBrightness = ${options.minBrightness};
-            TagCanvas.depth = ${options.depth};
-            TagCanvas.pulsateTo = ${options.pulsateTo};
-            TagCanvas.initial = ${options.initial};
-            TagCanvas.decel = ${options.decel};
-            TagCanvas.reverse = ${options.reverse};
-            TagCanvas.hideTags = ${options.hideTags};
-            TagCanvas.shadow = "${options.shadow}";
-            TagCanvas.shadowBlur = ${options.shadowBlur};
-            TagCanvas.weight = ${options.weight};
-            TagCanvas.imageScale = ${options.imageScale};
-            TagCanvas.fadeIn = ${options.fadeIn};
-            TagCanvas.clickToFront = ${options.clickToFront};
-            TagCanvas.Start("mdoc_tagcloud_${tagcloud_id}");
-            TagCanvas.tc["mdoc_tagcloud_${tagcloud_id}"].Wheel(false);
+            TagCanvas.Start('mdoc_tagcloud_${tagcloud_id}', 'mdoc_tagcloud_${tagcloud_id}', {
+        		textColour: '#222',
+        		outlineColour: '#fff',
+        		reverse: true,
+        		hideTags: false,
+        		noMouse: true,
+        		weight: true,
+        		wheelZoom: false,
+        		depth: 0.8,
+        		decel:0.95,
+        		maxSpeed: 0.05,
+        		initial: [-0.2, 0]
+        	});
         })</script>
         `;
     };

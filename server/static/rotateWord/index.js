@@ -58,5 +58,5 @@ function showRotateWord(id, letters, options) {
                 zIndex: Math.floor(rate * 10 * count)
             });
         });
-    }, 30);
+    }, 10);
 }
