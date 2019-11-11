@@ -8,6 +8,8 @@ module.exports = function tagcloud_plugin(md) {
         const options = parseParams(params, {
             textColour: '#222',
             outlineColour: '#fff',
+            maxSpeed: 0.05,
+            initial: [-0.2, 0],
         });
         const list = options.line ? parseArray(tokens[idx].content.split('\n').filter(o=>!!o).join(' ')): tokens[idx].content.split('\n').filter(o=>!!o);
         tagcloud_id ++;
@@ -17,18 +19,18 @@ module.exports = function tagcloud_plugin(md) {
         </canvas>
         <script>$(document).ready(function(){
             TagCanvas.Start('mdoc_tagcloud_${tagcloud_id}', 'mdoc_tagcloud_${tagcloud_id}', {
-        		textColour: '${options.textColour}',
-        		outlineColour: '${options.outlineColour}',
-        		reverse: true,
-        		hideTags: false,
-        		noMouse: true,
-        		weight: true,
-        		wheelZoom: false,
-        		depth: 0.8,
-        		decel:0.95,
-        		maxSpeed: 0.05,
-        		initial: [-0.2, 0]
-        	});
+                textColour: '${options.textColour}',
+                outlineColour: '${options.outlineColour}',
+                reverse: true,
+                hideTags: false,
+                noMouse: true,
+                weight: true,
+                wheelZoom: false,
+                depth: 0.8,
+                decel:0.95,
+                maxSpeed: ${options.maxSpeed},
+                initial: ${options.initial}
+            });
         })</script>
         `;
     };
