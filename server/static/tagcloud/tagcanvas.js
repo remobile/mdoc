@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
+ * https://github.com/goat1000/TagCanvas
  * TagCanvas 2.9
  * For more information, please contact <graham@goat1000.com>
  */
