@@ -8,9 +8,10 @@ module.exports = function tagcloud_plugin(md) {
         const options = parseParams(params, {
             textColour: '#222',
             outlineColour: '#fff',
-            maxSpeed: 0.05,
-            initial: [-0.2, 0],
+            maxSpeed: 0.005,
+            depth: 0.8,
         });
+        const initial = options.initial || [ Math.random()<1/3?1:Math.random()<2/3?0:-1, Math.random()<1/3?1:Math.random()<2/3?0:-1 ];
         const list = options.line ? parseArray(tokens[idx].content.split('\n').filter(o=>!!o).join(' ')): tokens[idx].content.split('\n').filter(o=>!!o);
         tagcloud_id ++;
         return `
@@ -26,10 +27,9 @@ module.exports = function tagcloud_plugin(md) {
                 noMouse: true,
                 weight: true,
                 wheelZoom: false,
-                depth: 0.8,
-                decel:0.95,
+                depth: ${options.depth},
                 maxSpeed: ${options.maxSpeed},
-                initial: ${options.initial}
+                initial: ${JSON.stringify(initial)}
             });
         })</script>
         `;
