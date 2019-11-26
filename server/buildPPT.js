@@ -31,6 +31,13 @@ function buildMarkdown(port, configPath, build, index) {
             console.error(chalk.red('缺少颜色配置'));
             process.exit(0);
         }
+        if (path.extname(config.dist) === '.html') {
+            distFile = path.join(CWD, config.dist);
+        } else {
+            distFile = path.join(CWD, config.dist, config.projectName, '.html');
+        }
+        fs.removeSync(distFile);
+        mkdirp.sync(path.dirname(distFile));
     }
 
     let config;
@@ -127,13 +134,12 @@ function buildMarkdown(port, configPath, build, index) {
         const url = 'http://localhost:' + port + config.baseUrl;
         console.log('Open', url);
         if (build) {
-            new inliner(url, { images: true}, function (error, html) {
+            new inliner(url, { images: true }, function (error, html) {
                 if (error) {
                     console.log(chalk.red(event));
                 } else {
-                    fs.writeFileSync(distFile, html);
-
                     console.log('output:', distFile);
+                    fs.writeFileSync(distFile, html);
                     process.exit(0);
                 }
             })
