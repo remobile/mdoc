@@ -29,6 +29,9 @@ const list = require('./list');
 const tagcloud = require('./tagcloud');
 const rotateWord = require('./rotateWord');
 const clockRotate = require('./clockRotate');
+const amtitle = require('./amtitle');
+const amimage = require('./amimage');
+const amtext = require('./amtext');
 
 const HTML_REPLACEMENTS = {
     '&': '&amp;',
@@ -136,6 +139,15 @@ function rotateWord_plugin(md, page) {
 function clockRotate_plugin(md, page) {
     md.use(clockRotate, page);
 }
+function amtitle_plugin(md, page) {
+    md.use(amtitle, page);
+}
+function amimage_plugin(md, page) {
+    md.use(amimage, page);
+}
+function amtext_plugin(md, page) {
+    md.use(amtext, page);
+}
 function rewrite_plugin(md) {
     md.renderer.rules.text = function (tokens, idx /*, options, env */) {
         return escapeHtml(tokens[idx].content);;
@@ -173,5 +185,8 @@ module.exports = [
     tagcloud_plugin,
     rotateWord_plugin,
     clockRotate_plugin,
+    amtitle_plugin,
+    amimage_plugin,
+    amtext_plugin,
     rewrite_plugin,
 ];

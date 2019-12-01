@@ -1,0 +1,21 @@
+.amtitle {
+    border-radius: 2px;
+    color: #FFF;
+    width: 70%;
+    font-size: 20px;
+    padding-left: 10px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    background: -webkit-linear-gradient(left, #1E90FF, #99C8FF, #FFF);
+}
+.amtext {
+    font-size: 16px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.amimage {
+    height: auto;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
