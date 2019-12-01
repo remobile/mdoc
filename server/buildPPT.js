@@ -125,6 +125,27 @@ function buildMarkdown(port, configPath, build, index) {
             res.sendStatus(200);
         });
     });
+    app.post('/getHistory', (req, res) => {
+        let text = '';
+        const file = `.${config.projectName}_${index}_history.log`;
+        req.on('data', function(chunk) {
+            text += chunk;
+        });
+        req.on('end', function() {
+            res.send(fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '');
+        });
+    });
+    app.post('/updateHistory', (req, res) => {
+        let text = '';
+        const file = `.${config.projectName}_${index}_history.log`;
+        req.on('data', function(chunk) {
+            text += chunk;
+        });
+        req.on('end', function() {
+            fs.writeFileSync(file, text, 'utf8');
+            res.sendStatus(200);
+        });
+    });
     app.get('*', (req, res) => {
         res.sendStatus(404);
     });
@@ -176,7 +197,7 @@ function buildMarkdown(port, configPath, build, index) {
         }
     });
     server.on('error', function (err) {
-        buildMarkdown(port+1, configPath, build);
+        buildMarkdown(port+1, configPath, build, index);
     });
 }
 

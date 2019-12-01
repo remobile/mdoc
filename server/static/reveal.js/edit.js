@@ -1,7 +1,7 @@
 let actions = null; // 当前操作的对象
 let referents = []; // 当前选中的refrent列表
 let history = []; // 历史记录
-let depHistory = []; // 回滚的历史记录
+let historyIndex = 0; // 当前历史记录的指针
 let isAltKeyPress = false; // alt是否被按住
 let clickX = 0; // 保留上次的X轴位置
 let clickY = 0; // 保留上次的Y轴位置©
@@ -11,6 +11,7 @@ let colorPicker = null; // 颜色取色器
 let animateSelector = null; //动画选择器
 let targetTextInput = null; //输入框
 let root;
+let moveMode;
 
 function rgb2hex(color) {
     if (!color || !/^rgb/.test(color)) {
@@ -28,26 +29,53 @@ function getLocation(e) {
         y: e.y || e.clientY,
     }
 }
-function pushHistory() {
-    history.push(root.innerHTML);
-    depHistory = [];
+function showHistory() {
+    document.getElementById('history').innerHTML = history.map((o, k)=>(
+        `<div class="history-item"${k>historyIndex?' style="color:gray;" ':' '}onclick="setTopHistory(${k})">${k+1}. ${o.name}</div>`
+    )).join('');
+}
+function getHistory() {
+    post('/getHistory', '', (text)=>{
+        if (!text) {
+            history.push({ name: '创建文件', html: root.innerHTML});
+            historyIndex = 0;
+        } else {
+            history = JSON.parse(text);
+            historyIndex = history.length - 1;
+        }
+        showHistory();
+    });
+}
+function pushHistory(name) {
+    historyIndex++;
+    history.length = historyIndex;
+    history.push({ name, html: root.innerHTML });
+    post('/updateHistory', JSON.stringify(history));
+    showHistory();
+}
+function setTopHistory(index) {
+    historyIndex = index;
+    root.innerHTML = history[historyIndex].html;
+    showHistory();
+    removeAll();
 }
 function popHistory() {
-    if (history.length > 1) {
-        depHistory.push(history.pop());
-        root.innerHTML = history[history.length-1];
+    if (history.length > 2) {
+        historyIndex--;
+        root.innerHTML = history[historyIndex].html;
+        removeAll();
     }
 }
 function recoverHistory() {
-    if (depHistory.length) {
-        const html = depHistory.pop();
-        history.push(html);
-        root.innerHTML = html;
+    if (history.length > historyIndex + 1) {
+        historyIndex++;
+        root.innerHTML = history[historyIndex].html;
+        removeAll();
     }
 }
 function initialize() {
     root = document.body;
-    history.push(root.innerHTML);
+    getHistory();
     const list = document.querySelectorAll('.target');
     for (const el of list) {
         group = Math.max(group, +el.dataset.group||0);
@@ -66,8 +94,9 @@ function onReferentMouseDown(e, type) {
 }
 function onDocumentMouseUp() {
     document.body.style.cursor = "auto";
-    if (actions) {
-        pushHistory();
+    if (actions && moveMode !== -1) {
+        pushHistory(['移动结束', '改变大小'][moveMode]);
+        moveMode = -1;
         actions = null;
     }
 }
@@ -75,6 +104,7 @@ function resize(referent, operateType, location) {
     document.body.style.cursor = location + "_resize";
     switch (operateType) {
         case "e": {
+            moveMode = 1;
             const add_length = clickX - location.x;
             clickX = location.x;
             const length = parseInt(referent.style.width) - add_length;
@@ -82,6 +112,7 @@ function resize(referent, operateType, location) {
             break;
         }
         case "s": {
+            moveMode = 1;
             const add_length = clickY - location.y;
             clickY = location.y;
             const length = parseInt(referent.style.height) - add_length;
@@ -89,6 +120,7 @@ function resize(referent, operateType, location) {
             break;
         }
         case "w": {
+            moveMode = 1;
             const add_length = clickX - location.x;
             clickX = location.x;
             const length = parseInt(referent.style.width) + add_length;
@@ -97,6 +129,7 @@ function resize(referent, operateType, location) {
             break;
         }
         case "n":  {
+            moveMode = 1;
             const add_length = clickY - location.y;
             clickY = location.y;
             const length = parseInt(referent.style.height) + add_length;
@@ -107,6 +140,7 @@ function resize(referent, operateType, location) {
     }
 }
 function move(location) {
+    moveMode = 0;
     const deltaX = clickX - location.x;
     const deltaY = clickY - location.y;
     for (const referent of referents) {
@@ -157,12 +191,15 @@ function createReferentForTarget(target, isGroup) {
     !referents.push(referent);
     console.log("create referent");
 };
+function removeAll() {
+    removeAllReferents();
+    removeColorPicker();
+    removeAnimateSelector();
+    removeTargetTextInput();
+}
 function createReferents(target) {
     if (!isAltKeyPress) {
-        removeAllReferents();
-        removeColorPicker();
-        removeAnimateSelector();
-        removeTargetTextInput();
+        removeAll();
     }
     if (!target.dataset.group) {
         createReferentForTarget(target);
@@ -191,14 +228,15 @@ function toggleTargetGroup() {
             refrent.className = `${refrent.className} group`;
         }
         console.log("add group");
+        pushHistory('添加组合');
     } else {
         for (const refrent of referents) {
             delete refrent.target.dataset.group;
             refrent.className = refrent.className.replace('group', '');
         }
         console.log("delete group");
+        pushHistory('解除组合');
     }
-    pushHistory();
 }
 function post (url, data, fn) {
     const xhr = new XMLHttpRequest();
@@ -399,11 +437,8 @@ function removeTargets(referents) {
 function onDocumentKeyDown(e) {
     if (referents.length) {
         if (e.keyCode === 27) { // esc
-            removeAllReferents();
-            removeColorPicker();
-            removeAnimateSelector();
-            removeTargetTextInput();
-            pushHistory();
+            removeAll();
+            pushHistory('取消选择');
         } else if (referents.length === 1) {
             const target = referents[0].target;
             if (e.keyCode === 189) { // -
@@ -413,7 +448,7 @@ function onDocumentKeyDown(e) {
                     fontSize = 5;
                 }
                 target.style.fontSize = fontSize + 'px';
-                pushHistory();
+                pushHistory('减小字体');
             } else if (e.keyCode === 187) { // +
                 let fontSize = parseInt(getComputedStyle(target).fontSize);
                 fontSize = !e.altKey ? fontSize + 1 : fontSize + 3;
@@ -421,7 +456,7 @@ function onDocumentKeyDown(e) {
                     fontSize = 100;
                 }
                 target.style.fontSize = fontSize + 'px';
-                pushHistory();
+                pushHistory('增加字体');
             } else if (e.keyCode === 66) { // b
                 let fontWeight = parseInt(getComputedStyle(target).fontWeight);
                 fontWeight = !e.altKey ? fontWeight + 100 : fontWeight + 300;
@@ -432,7 +467,7 @@ function onDocumentKeyDown(e) {
                     fontWeight = 100;
                 }
                 target.style.fontWeight = fontWeight;
-                pushHistory();
+                pushHistory('切换加粗');
             } else if (e.keyCode === 73) { // i 斜体
                 let fontStyle = getComputedStyle(target).fontStyle;
                 if (fontStyle === 'normal') {
@@ -441,7 +476,7 @@ function onDocumentKeyDown(e) {
                     fontStyle = 'normal';
                 }
                 target.style.fontStyle = fontStyle;
-                pushHistory();
+                pushHistory('切换斜体');
             } else if (e.altKey && e.keyCode === 67) { // alt + c 设置颜色
                 showColorPicker(target, referents[0]);
             } else if (e.altKey && e.keyCode === 65) { // alt + a 设置动画
