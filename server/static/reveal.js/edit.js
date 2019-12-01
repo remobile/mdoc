@@ -1,4 +1,4 @@
-const hasLog = false; // 是否有日志
+const hasLog = true; // 是否有日志
 let actions = null; // 当前操作的对象
 let referents = []; // 当前选中的refrent列表
 let history = []; // 历史记录
@@ -32,6 +32,23 @@ function getLocation(e) {
         x: e.x || e.clientX,
         y: e.y || e.clientY,
     }
+}
+function optimizeHistory() {
+    const length = history.length;
+    if (length > 20) {
+        const ret = confirm(`是否优化历史记录，优化了之后不能再恢复，是否修复?`);
+        let newHistory = [];
+        if (ret) {
+            for (let i = 0; i < length - 10; i += 10) {
+                newHistory.push(history[i]);
+            }
+            history = newHistory.concat(history.slice(history.length-10));
+            historyIndex = history.length - 1;
+            post('/updateHistory', JSON.stringify(history));
+            showHistory();
+        }
+    }
+
 }
 function showHistory() {
     document.getElementById('history').innerHTML = history.map((o, k)=>(
@@ -483,27 +500,25 @@ function onDocumentKeyDown(e) {
                 target.style.fontSize = fontSize + 'px';
                 log("fontSize:", fontSize);
                 pushHistory('增加字体');
-            } else if (e.keyCode === 66) { // b
-                let fontWeight = parseInt(getComputedStyle(target).fontWeight);
-                fontWeight = !e.altKey ? fontWeight + 100 : fontWeight + 300;
-                if (fontWeight < 100) {
-                    fontWeight = 900;
-                }
-                if (fontWeight > 900) {
-                    fontWeight = 100;
+            } else if (e.altKey && e.keyCode === 66) { // b
+                let fontWeight = getComputedStyle(target).fontWeight;
+                if (fontWeight === 'bold') {
+                    fontWeight = 'normal';
+                } else {
+                    fontWeight = 'bold';
                 }
                 target.style.fontWeight = fontWeight;
                 log("fontWeight:", fontWeight);
                 pushHistory('切换加粗');
-            } else if (e.keyCode === 73) { // i 斜体
+            } else if (e.altKey && e.keyCode === 73) { // i 斜体
                 let fontStyle = getComputedStyle(target).fontStyle;
-                if (fontStyle === 'normal') {
-                    fontStyle = 'italic';
-                } else if (fontStyle === 'italic') {
+                if (fontStyle === 'italic') {
                     fontStyle = 'normal';
+                } else {
+                    fontStyle = 'italic';
                 }
-                log("fontStyle:", fontStyle);
                 target.style.fontStyle = fontStyle;
+                log("fontStyle:", fontStyle);
                 pushHistory('切换斜体');
             } else if (e.altKey && e.keyCode === 82) { // alt + r 设置颜色
                 showColorPicker(target, referents[0]);
@@ -530,6 +545,8 @@ function onDocumentKeyDown(e) {
     }
     if (e.altKey && e.keyCode === 83) { // alt + s 保存
         saveMarkdown();
+    } else if (e.altKey && e.keyCode === 72) { // alt + h 优化历史记录
+        optimizeHistory();
     } else if (e.altKey && e.keyCode === 90) { // alt + z 回退
         popHistory();
     } else if (e.altKey && e.keyCode === 89) { // alt + y 取消回退
@@ -568,6 +585,7 @@ window.onload = function () {
     <li>alt+v: 粘贴元素属性</li>
     <li>alt+z: 回滚历史操作</li>
     <li>alt+y: 取消回滚历史</li>
+    <li>alt+h: 优化历史记录</li>
     <li>alt+s: 保存文件至md</li>
     </ol>
     `;
