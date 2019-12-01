@@ -1,3 +1,4 @@
+const hasLog = false; // 是否有日志
 let actions = null; // 当前操作的对象
 let referents = []; // 当前选中的refrent列表
 let history = []; // 历史记录
@@ -13,6 +14,9 @@ let targetTextInput = null; //输入框
 let root;
 let moveMode;
 
+function log(...args) {
+    hasLog && console.log(...args);
+}
 function rgb2hex(color) {
     if (!color || !/^rgb/.test(color)) {
         return color;
@@ -152,6 +156,15 @@ function move(location) {
     clickX = location.x;
     clickY = location.y;
 }
+function moveByStep(location) {
+    for (const referent of referents) {
+        referent.style.left = (referent.offsetLeft + location.x) + "px";
+        referent.style.top = (referent.offsetTop + location.y) + "px";
+        referent.target.style.top = (referent.offsetTop+1) + "px";
+        referent.target.style.left = (referent.offsetLeft+1) + "px";
+    }
+    pushHistory('移动结束');
+}
 function onDocumentMouseMove(e) {
     if (actions) {
         const operateType = actions.operateType;
@@ -189,7 +202,7 @@ function createReferentForTarget(target, isGroup) {
     referent.target = target;
     document.body.appendChild(referent);
     !referents.push(referent);
-    console.log("create referent");
+    log("create referent");
 };
 function removeAll() {
     removeAllReferents();
@@ -227,14 +240,14 @@ function toggleTargetGroup() {
             refrent.target.dataset.group = group;
             refrent.className = `${refrent.className} group`;
         }
-        console.log("add group");
+        log("add group");
         pushHistory('添加组合');
     } else {
         for (const refrent of referents) {
             delete refrent.target.dataset.group;
             refrent.className = refrent.className.replace('group', '');
         }
-        console.log("delete group");
+        log("delete group");
         pushHistory('解除组合');
     }
 }
@@ -300,6 +313,9 @@ function copyTargetAcctribute (target) {
 function pasteTargetAcctribute (target) {
     if (copiedTarget) {
         target.style.color = copiedTarget.style.color;
+        target.style.fontWeight = copiedTarget.style.fontWeight;
+        target.style.fontSize = copiedTarget.style.fontSize;
+        target.style.fontStyle = copiedTarget.style.fontStyle;
     }
 }
 function showColorPicker (target, referent) {
@@ -439,6 +455,14 @@ function onDocumentKeyDown(e) {
         if (e.keyCode === 27) { // esc
             removeAll();
             pushHistory('取消选择');
+        } else if (e.altKey && e.keyCode === 37) { // alt + left key
+            moveByStep({ x: -1, y: 0 });
+        } else if (e.altKey && e.keyCode === 38) { // alt + up key
+            moveByStep({ x: 0, y: -1 });
+        } else if (e.altKey && e.keyCode === 39) { // alt + right key
+            moveByStep({ x: 1, y: 0 });
+        } else if (e.altKey && e.keyCode === 40) { // alt + down key
+            moveByStep({ x: 0, y: 1 });
         } else if (referents.length === 1) {
             const target = referents[0].target;
             if (e.keyCode === 189) { // -
@@ -448,6 +472,7 @@ function onDocumentKeyDown(e) {
                     fontSize = 5;
                 }
                 target.style.fontSize = fontSize + 'px';
+                log("fontSize:", fontSize);
                 pushHistory('减小字体');
             } else if (e.keyCode === 187) { // +
                 let fontSize = parseInt(getComputedStyle(target).fontSize);
@@ -456,6 +481,7 @@ function onDocumentKeyDown(e) {
                     fontSize = 100;
                 }
                 target.style.fontSize = fontSize + 'px';
+                log("fontSize:", fontSize);
                 pushHistory('增加字体');
             } else if (e.keyCode === 66) { // b
                 let fontWeight = parseInt(getComputedStyle(target).fontWeight);
@@ -467,6 +493,7 @@ function onDocumentKeyDown(e) {
                     fontWeight = 100;
                 }
                 target.style.fontWeight = fontWeight;
+                log("fontWeight:", fontWeight);
                 pushHistory('切换加粗');
             } else if (e.keyCode === 73) { // i 斜体
                 let fontStyle = getComputedStyle(target).fontStyle;
@@ -475,17 +502,18 @@ function onDocumentKeyDown(e) {
                 } else if (fontStyle === 'italic') {
                     fontStyle = 'normal';
                 }
+                log("fontStyle:", fontStyle);
                 target.style.fontStyle = fontStyle;
                 pushHistory('切换斜体');
-            } else if (e.altKey && e.keyCode === 67) { // alt + c 设置颜色
+            } else if (e.altKey && e.keyCode === 82) { // alt + r 设置颜色
                 showColorPicker(target, referents[0]);
             } else if (e.altKey && e.keyCode === 65) { // alt + a 设置动画
                 setFragmentAnimate(target, referents[0]);
-            } else if (e.altKey && e.keyCode === 69) { // alt + e 编辑文字
+            } else if (e.altKey && e.keyCode === 69) { // alt + e 编辑文字/图片
                 editTargetText(target, referents[0]);
             } else if (e.altKey && e.keyCode === 80) { // alt + p 复制属性
                 copyTargetAcctribute(target);
-            } else if (e.altKey && e.keyCode === 86) { // alt + v 粘贴属性
+            } else if (e.altKey && e.keyCode === 67) { // alt + c 粘贴属性
                 pasteTargetAcctribute(target);
             } else if (e.altKey && e.keyCode === 46) { // alt + delete 删除元素
                 removeTarget(target);
@@ -526,6 +554,7 @@ window.onload = function () {
     <li>点击元素进行选中，可以拖动位置，改变大小，按esc取消选择</li>
     <li>按住alt用鼠标拖动一个元素，可以复制该元素</li>
     <li>按住alt，可以选择多个元素，alt+u和合并组和拆开组</li>
+    <li>按住alt，上下左右键可以移动元素</li>
     <li>按+号可以增大字体，按住alt按+号可以更快的增加字体</li>
     <li>按-号可以减小字体，按住alt按-号可以更快的减少字体</li>
     <li>alt+a: 设置动画</li>
@@ -533,9 +562,9 @@ window.onload = function () {
     <li>alt+m: 添加图片元素</li>
     <li>alt+b: 切换字体加粗</li>
     <li>alt+i: 切换字体斜体</li>
-    <li>alt+c: 设置字体的颜色</li>
-    <li>alt+a: 设置fragment动画</li>
-    <li>alt+p: 复制元素属性</li>
+    <li>alt+r: 设置字体的颜色</li>
+    <li>alt+e: 编辑文字/图片</li>
+    <li>alt+c: 复制元素属性</li>
     <li>alt+v: 粘贴元素属性</li>
     <li>alt+z: 回滚历史操作</li>
     <li>alt+y: 取消回滚历史</li>
