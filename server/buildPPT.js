@@ -1,4 +1,4 @@
-function buildMarkdown(port, configPath, build, index) {
+function buildMarkdown(port, configPath, build, index, mobile) {
     const React = require('react');
     const express = require('express');
     const inliner = require('inliner');
@@ -76,8 +76,9 @@ function buildMarkdown(port, configPath, build, index) {
 
     app.get(config.baseUrl, (req, res, next) => {
         if (index === undefined) {
-            removeModuleAndChildrenFromCache('../lib/PPTLayout.js');
-            const PPTLayout = require('../lib/PPTLayout.js');
+            const layout = mobile ? '../lib/MPPTLayout.js' : '../lib/PPTLayout.js';
+            removeModuleAndChildrenFromCache(layout);
+            const PPTLayout = require(layout);
             let ReactComp, rawContent;
             for (const page of config.pages) {
                 const file = getDocumentPath(page.path);
@@ -95,8 +96,9 @@ function buildMarkdown(port, configPath, build, index) {
                 renderToStaticMarkup(<PPTLayout config={config} />)
             );
         } else {
-            removeModuleAndChildrenFromCache('../lib/PPTEditLayout.js');
-            const PPTEditLayout = require('../lib/PPTEditLayout.js');
+            const editLayout = mobile ? '../lib/PPTEditLayout.js' : '../lib/PPTEditLayout.js';
+            removeModuleAndChildrenFromCache(editLayout);
+            const PPTEditLayout = require(editLayout);
             const page = config.pages[index];
             if (!page) {
                 return res.send('错误的index');
