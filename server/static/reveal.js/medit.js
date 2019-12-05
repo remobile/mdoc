@@ -31,8 +31,8 @@ function rgb2hex(color) {
 }
 function getLocation(e) {
     return {
-        x: e.x || e.clientX,
-        y: e.y || e.clientY,
+        x: (e.x || e.clientX) - OFFSET.x,
+        y: (e.y || e.clientY) - OFFSET.y,
     }
 }
 function optimizeHistory() {
@@ -133,6 +133,7 @@ function resize(referent, operateType, location) {
             clickX = location.x;
             const length = parseInt(referent.style.width) - add_length;
             referent.style.width = length + "px";
+            referent.target.style.width = length + "px";
             break;
         }
         case "s": {
@@ -141,6 +142,7 @@ function resize(referent, operateType, location) {
             clickY = location.y;
             const length = parseInt(referent.style.height) - add_length;
             referent.style.height = length + "px";
+            referent.target.style.height = length + "px";
             break;
         }
         case "w": {
@@ -150,6 +152,8 @@ function resize(referent, operateType, location) {
             const length = parseInt(referent.style.width) + add_length;
             referent.style.width = length + "px";
             referent.style.left = clickX + "px";
+            referent.target.style.width = length + "px";
+            referent.target.style.left = (clickX + 1) + "px";
             break;
         }
         case "n":  {
@@ -159,6 +163,8 @@ function resize(referent, operateType, location) {
             const length = parseInt(referent.style.height) + add_length;
             referent.style.height = length + "px";
             referent.style.top = clickY + "px";
+            referent.target.style.height = length + "px";
+            referent.target.style.top = (clickY + 1) + "px";
             break;
         }
     }
@@ -197,8 +203,6 @@ function onDocumentMouseMove(e) {
             referent = actions.node.parentNode;
             resize(referent, operateType[0], location);
             operateType[1] && resize(referent, operateType[1], location);
-            referent.target.style.width = (referent.offsetWidth-2) + "px";
-            referent.target.style.height = (referent.offsetHeight-2) + "px";
         }
     }
     return false;
