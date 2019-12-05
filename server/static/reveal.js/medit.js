@@ -596,9 +596,9 @@ window.onload = function () {
     <li>alt+s: 保存文件至md</li>
     </ol>
     `;
-    root.onmousedown = onDocumentMouseDown;
-    root.onmousemove = onDocumentMouseMove;
-    root.onmouseup = onDocumentMouseUp;
+    document.onmousedown = onDocumentMouseDown;
+    document.onmousemove = onDocumentMouseMove;
+    document.onmouseup = onDocumentMouseUp;
     document.onkeydown = onDocumentKeyDown;
     document.onkeyup = onDocumentKeyUp;
 }
