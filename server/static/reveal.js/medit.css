@@ -1,0 +1,122 @@
+#component {
+    position:absolute;
+    left: 2px;
+    top: 2px;
+    width: 250px;
+    height: 667px;
+    border: 2px solid red;
+    padding-left: 10px;
+    overflow: scroll;
+}
+#container {
+    position:absolute;
+    left: 298px;
+    top: 2px;
+    width: 375px;
+    height: 667px;
+    border: 2px solid blue;
+}
+#history {
+    position:absolute;
+    left: 710px;
+    top: 2px;
+    width: 200px;
+    height: 667px;
+    border: 2px solid red;
+    padding-left: 10px;
+    overflow: scroll;
+}
+.history-item {
+    cursor:pointer;
+    margin-top: 6px;
+}
+#info {
+    position:absolute;
+    left:960px;
+    top:1px;
+    width: 300px;
+    height: 667px;
+    border: 1px solid red;
+    padding-right: 4px;
+    overflow: scroll;
+}
+#info li {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 400;
+}
+.referent {
+    position:absolute;
+    border:1px dashed gray;
+    z-index:10000;
+    cursor:move;
+}
+.referent.group {
+    border:1px solid gray;
+}
+.referent_node {
+    position:absolute;
+    background:#CDC9C9;
+    width:9px;
+    height:9px;
+    z-index:3;
+}
+.referent_node[data-dir = "n"] {
+    top:-4px;
+    left:50%;
+    cursor:n-resize;
+}
+.referent_node[data-dir = "s"] {
+    bottom:-4px;
+    left:50%;
+    cursor:s-resize;
+}
+.referent_node[data-dir = "w"] {
+    top:50%;
+    left:-4px;
+    cursor:w-resize;
+}
+.referent_node[data-dir = "e"] {
+    top:50%;
+    right:-4px;
+    cursor:e-resize;
+}
+.referent_node[data-dir = "nw"] {
+    top:-4px;
+    left:-4px;
+    cursor:nw-resize;
+}
+.referent_node[data-dir = "ne"] {
+    top:-4px;
+    right:-4px;
+    cursor:ne-resize;
+}
+.referent_node[data-dir = "sw"] {
+    bottom:-4px;
+    left:-4px;
+    cursor:sw-resize;
+}
+.referent_node[data-dir = "se"] {
+    bottom:-4px;
+    right:-4px;
+    cursor:se-resize;
+}
+.text {
+    overflow: hidden;
+}
+#animate-select {
+    position: absolute;font-size: 20px;background-color:#FAFDFE;
+    height:28px;
+    width:180px;
+    line-height:28px;
+    border:1px solid #9bc0dd;
+    border-radius:2px;
+}
+.target_input {
+    position: absolute;;
+    font-size: 20px;
+    width: 350px;
+    padding: 6px;
+    border:1px solid #9bc0dd;
+    border-radius:2px;
+}
