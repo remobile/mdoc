@@ -73,6 +73,7 @@ function buildMarkdown(port, configPath, build, index, mobile) {
     app.use(config.baseUrl, express.static(CWD + 'static'));
     app.use(config.baseUrl, express.static(CWD + 'node_modules/highlight.js/styles'));
     app.use(config.baseUrl, express.static(__dirname + '/static'));
+    app.use(config.baseUrl, express.static(__dirname + '/public'));
 
     app.get(config.baseUrl, (req, res, next) => {
         if (index === undefined) {

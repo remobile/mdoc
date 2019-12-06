@@ -1,4 +1,4 @@
-#component {
+#prop {
     position:absolute;
     left: 2px;
     top: 2px;
@@ -16,9 +16,19 @@
     height: 667px;
     border: 2px solid blue;
 }
-#history {
+#component {
     position:absolute;
     left: 710px;
+    top: 2px;
+    width: 200px;
+    height: 667px;
+    border: 2px solid red;
+    padding-left: 10px;
+    overflow: scroll;
+}
+#history {
+    position:absolute;
+    left: 960px;
     top: 2px;
     width: 200px;
     height: 667px;
@@ -32,7 +42,7 @@
 }
 #info {
     position:absolute;
-    left:960px;
+    left:1190px;
     top:1px;
     width: 300px;
     height: 667px;
@@ -119,4 +129,10 @@
     padding: 6px;
     border:1px solid #9bc0dd;
     border-radius:2px;
+}
+.layui-tab-title {
+    width: 240px;
+}
+.layui-tab-title li {
+    width: 90px;
 }
