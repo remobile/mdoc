@@ -1,20 +1,19 @@
 #prop {
     position:absolute;
-    left: 2px;
+    left: 20px;
     top: 2px;
-    width: 250px;
+    width: 320px;
     height: 667px;
-    border: 2px solid red;
-    padding-left: 10px;
+    border: 1px solid #E6E6E6;
     overflow: scroll;
 }
 #container {
     position:absolute;
-    left: 298px;
+    left: 350px;
     top: 2px;
     width: 375px;
     height: 667px;
-    border: 2px solid blue;
+    border: 2px solid gray;
 }
 #component {
     position:absolute;
@@ -135,4 +134,14 @@
 }
 .layui-tab-title li {
     width: 90px;
+}
+.layui-tab-content {
+    padding-left: 2px;
+    padding-right: 2px;
+}
+.layui-form-pane .layui-form-label {
+    width: 60px;
+}
+.layui-form-pane .layui-input-block {
+    margin-left: 60px;
 }
