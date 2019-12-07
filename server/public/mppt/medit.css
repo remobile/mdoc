@@ -112,6 +112,7 @@
 }
 .text {
     overflow: hidden;
+    word-break: break-all;
 }
 #animate-select {
     position: absolute;font-size: 20px;background-color:#FAFDFE;
@@ -128,20 +129,4 @@
     padding: 6px;
     border:1px solid #9bc0dd;
     border-radius:2px;
-}
-.layui-tab-title {
-    width: 240px;
-}
-.layui-tab-title li {
-    width: 90px;
-}
-.layui-tab-content {
-    padding-left: 2px;
-    padding-right: 2px;
-}
-.layui-form-pane .layui-form-label {
-    width: 60px;
-}
-.layui-form-pane .layui-input-block {
-    margin-left: 60px;
 }

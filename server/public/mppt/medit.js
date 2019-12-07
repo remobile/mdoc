@@ -12,7 +12,9 @@ let colorPicker = null; // 颜色取色器
 let animateSelector = null; //动画选择器
 let targetTextInput = null; //输入框
 let root;
-let moveMode;
+let moveMode = -1;
+let doubleClickStartTime; // 双击计时
+let editingTarget; // 正在编辑的target
 
 const OFFSET = { x: 300, y: 4 }; // 编辑页面相对于body的偏移位置
 
@@ -70,11 +72,10 @@ function getHistory() {
     });
 }
 function pushHistory(name) {
-    return;
     historyIndex++;
     history.length = historyIndex;
     history.push({ name, html: root.innerHTML });
-    post('/updateHistory', JSON.stringify(history));
+    // post('/updateHistory', JSON.stringify(history));
     showHistory();
 }
 function setTopHistory(index) {
@@ -108,6 +109,14 @@ function initialize() {
 function copyTarget(target) {
     target.parentNode.insertBefore(target.cloneNode(true), target);
 }
+function onReferentDoubleClick(target) {
+    const isText = target.classList.contains('text');
+    if (isText) {
+        removeAllReferents();
+        target.setAttribute("contenteditable", "true");
+        editingTarget = target;
+    }
+}
 function onReferentMouseDown(e, type) {
     const location = getLocation(e);
     clickY = location.y;
@@ -115,12 +124,20 @@ function onReferentMouseDown(e, type) {
     actions = { operateType: type, node: e.target };
     e.stopPropagation();
     isAltKeyPress && type === 'move' && copyTarget(e.target.target);
+    if (Date.now() - doubleClickStartTime < 500) {
+        onReferentDoubleClick(e.target.target);
+        doubleClickStartTime = undefined;
+    } else {
+        doubleClickStartTime = Date.now();
+    }
 }
 function onDocumentMouseUp() {
     root.style.cursor = "auto";
-    if (actions && moveMode !== -1) {
-        pushHistory(['移动结束', '改变大小'][moveMode]);
-        moveMode = -1;
+    // if (moveMode !== -1) {
+    //     pushHistory(['移动结束', '改变大小'][moveMode]);
+    //     moveMode = -1;
+    // }
+    if (actions) {
         actions = null;
     }
 }
@@ -248,9 +265,10 @@ function createReferents(target) {
     }
 };
 function onDocumentMouseDown(e) {
-    const classNameList = e.target.className.split(' ');
-    if (classNameList.indexOf('target') !== -1) {
-        createReferents(e.target);
+    if (e.target.classList.contains('target')) {
+        if (e.target.getAttribute("contenteditable") !== 'true') {
+            createReferents(e.target);
+        }
     }
     e.stopPropagation();
 }
@@ -262,14 +280,14 @@ function toggleTargetGroup() {
         group++;
         for (const refrent of referents) {
             refrent.target.dataset.group = group;
-            refrent.className = `${refrent.className} group`;
+            refrent.classList.add('group');
         }
         log("add group");
         pushHistory('添加组合');
     } else {
         for (const refrent of referents) {
             delete refrent.target.dataset.group;
-            refrent.className = refrent.className.replace('group', '');
+            refrent.classList.remove('group');
         }
         log("delete group");
         pushHistory('解除组合');
@@ -420,16 +438,16 @@ function editTargetText (target, referent) {
         removeTargetTextInput();
         return;
     }
-    const isImg = !/text/.test(target.className);
+    const isText = target.classList.contains('text');
     targetTextInput = document.createElement('INPUT');
     targetTextInput.type = 'text';
-    targetTextInput.value = !isImg ? target.innerText : target.src.replace(window.location.href, '');
+    targetTextInput.value = isText ? target.innerText : target.src.replace(window.location.href, '');
     targetTextInput.className = 'target_input';
     targetTextInput.style.left = (referent.offsetLeft +referent.offsetWidth) + "px";
     targetTextInput.style.top = referent.offsetTop + "px";
     document.body.appendChild(targetTextInput);
     targetTextInput.oninput = function(e) {
-        if (!isImg) {
+        if (isText) {
             target.innerText = e.target.value;
         } else {
             target.src = e.target.value;
@@ -478,7 +496,6 @@ function onDocumentKeyDown(e) {
     if (referents.length) {
         if (e.keyCode === 27) { // esc
             removeAll();
-            pushHistory('取消选择');
         } else if (e.altKey && e.keyCode === 37) { // alt + left key
             moveByStep({ x: -1, y: 0 });
         } else if (e.altKey && e.keyCode === 38) { // alt + up key
@@ -548,7 +565,13 @@ function onDocumentKeyDown(e) {
             }
 
         }
-
+    } else {
+        if (e.keyCode === 27) { // esc
+            if (editingTarget) {
+                editingTarget.setAttribute('contenteditable', 'false');
+                editingTarget = undefined;
+            }
+        }
     }
     if (e.altKey && e.keyCode === 83) { // alt + s 保存
         saveMarkdown();

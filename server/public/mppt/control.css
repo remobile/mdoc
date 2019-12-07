@@ -3,3 +3,26 @@
     padding-left: 10px;
     padding-right: 10px;
 }
+.layui-tab-title {
+    width: 240px;
+}
+.layui-tab-title li {
+    width: 90px;
+}
+.layui-tab-content {
+    padding-left: 2px;
+    padding-right: 2px;
+}
+.layui-form-pane .layui-form-label {
+    width: 60px;
+}
+.layui-form-pane .layui-input-block {
+    margin-left: 60px;
+}
+.layui-btn-group {
+    padding-top: 4px;
+    padding-left: 10px;
+}
+.layui-form-item .layui-inline {
+    margin-left: 10px;
+}
