@@ -13,6 +13,7 @@ let colorPicker = null; // 颜色取色器
 let animateSelector = null; //动画选择器
 let targetTextInput = null; //输入框
 let root;
+const controls = {}; // 用来保存controls
 let moveMode = -1;
 let doubleClickStartTime; // 双击计时
 let editingTarget; // 正在编辑的target
@@ -261,7 +262,9 @@ function createReferents(target) {
     }
     if (!target.dataset.group) {
         createReferentForTarget(target);
+        controls.updateValues(target);
     } else {
+        controls.updateValues(); // 关闭属性窗口
         const list = root.querySelectorAll(`.target[data-group = "${target.dataset.group}"]`);
         for (const el of list) {
             createReferentForTarget(el, true);
@@ -503,17 +506,6 @@ function removeTargets(referents) {
         refrent.target.remove();
     }
     removeAllReferents();
-}
-function setTargetFontSize(fontSize) {
-    if (referents.length) {
-        for (const referent of referents) {
-            const target = referent.target;
-            if (target.classList.contains('text')) {
-                target.style.fontSize = fontSize + 'px';
-            }
-        }
-        pushHistory('设置字体大小');
-    }
 }
 function onDocumentKeyDown(e) {
     if (referents.length) {

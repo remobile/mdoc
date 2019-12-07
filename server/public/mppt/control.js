@@ -1,26 +1,60 @@
-layui.use(['form', 'colorpicker'], function(){
-        var $ = layui.$;
-        var form = layui.form;
-        var slider = layui.slider;
-        var colorpicker = layui.colorpicker;
+layui.use(['form', 'colorpicker'], function() {
+        const $ = layui.$;
+        const form = layui.form;
+        const slider = layui.slider;
+        const colorpicker = layui.colorpicker;
 
         form.render();
+        // 更新属性的值
+        controls.updateValues = function (target) {
+            const isText = target.classList.contains('text');
+            if (isText) {
+                // 字体大小
+                let fontSize = parseInt(getComputedStyle(target).fontSize);
+                controls.fontSizeSlider.setValue(fontSize - 9);
+                // 行距
+                let lineHeight = getComputedStyle(target).lineHeight;
+                if (lineHeight === 'normal') {
+                    lineHeight = 1.23;
+                } else {
+                    lineHeight = parseInt(lineHeight);
+                }
+                controls.lineHeightSlider.setValue(lineHeight*100 - 50);
+            }
+        };
         // 字体大小的滑块
-        slider.render({
+        controls.fontSizeSlider = slider.render({
             elem: '#fontSizeSlider',
             value: 20,
             min: 9,
             max: 180,
-            change: function(value){
-                setTargetFontSize(value);
+            change: function(fontSize){
+                if (referents.length) {
+                    for (const referent of referents) {
+                        const target = referent.target;
+                        if (target.classList.contains('text')) {
+                            target.style.fontSize = fontSize + 'px';
+                        }
+                    }
+                }
             },
         });
         // 行距的滑块
-        slider.render({
+        controls.lineHeightSlider = slider.render({
             elem: '#lineHeightSlider',
-            value: 20,
-            min: 9,
-            max: 180,
+            value: 123,
+            min: 50,
+            max: 300,
+            change: function(lineHeight){
+                if (referents.length) {
+                    for (const referent of referents) {
+                        const target = referent.target;
+                        if (target.classList.contains('text')) {
+                            target.style.lineHeight = lineHeight/100;
+                        }
+                    }
+                }
+            },
         });
         // 颜色选择器
         colorpicker.render({
