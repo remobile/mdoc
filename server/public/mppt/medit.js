@@ -210,6 +210,9 @@ function moveByStep(location) {
     pushHistory('移动结束');
 }
 function onDocumentMouseMove(e) {
+    if (editingTarget) {
+        return true;
+    }
     if (isShiftKeyPress && actions) {
         const operateType = actions.operateType;
         const location = getLocation(e);
@@ -266,7 +269,15 @@ function createReferents(target) {
     }
 };
 function onDocumentMouseDown(e) {
-    if (e.target.classList.contains('target')) {
+    if (editingTarget && e.target !== editingTarget) {
+        editingTarget.setAttribute('contenteditable', 'false');
+        if (!e.target.classList.contains('target')) {
+            createReferents(editingTarget);
+        } else {
+            createReferents(e.target);
+        }
+        editingTarget = undefined;
+    } else if (e.target.classList.contains('target')) {
         if (e.target.getAttribute("contenteditable") !== 'true') {
             createReferents(e.target);
         }
@@ -564,10 +575,9 @@ function onDocumentKeyDown(e) {
             } else if (e.altKey && e.keyCode === 46) { // alt + delete 删除元素
                 removeTargets(referents);
             }
-
         }
     } else {
-        if (e.keyCode === 27) { // esc
+        if (e.keyCode === 27 || e.keyCode === 13) { // esc |  enter
             if (editingTarget) {
                 editingTarget.setAttribute('contenteditable', 'false');
                 editingTarget = undefined;
