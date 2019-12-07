@@ -12,6 +12,13 @@ layui.use(['form', 'colorpicker'], function(){
             min: 9,
             max: 180,
         });
+        // 行距的滑块
+        slider.render({
+            elem: '#lineHeightSlider',
+            value: 20,
+            min: 9,
+            max: 180,
+        });
         // 颜色选择器
         colorpicker.render({
             elem: '#textColor',
