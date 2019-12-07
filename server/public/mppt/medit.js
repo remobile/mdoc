@@ -4,6 +4,7 @@ let referents = []; // 当前选中的refrent列表
 let history = []; // 历史记录
 let historyIndex = 0; // 当前历史记录的指针
 let isAltKeyPress = false; // alt是否被按住
+let isShiftKeyPress = false; // ctrl是否被按住
 let clickX = 0; // 保留上次的X轴位置
 let clickY = 0; // 保留上次的Y轴位置©
 let group = -1; // 集合的id最小值
@@ -209,7 +210,7 @@ function moveByStep(location) {
     pushHistory('移动结束');
 }
 function onDocumentMouseMove(e) {
-    if (actions) {
+    if (isShiftKeyPress && actions) {
         const operateType = actions.operateType;
         const location = getLocation(e);
         let referent;
@@ -587,11 +588,15 @@ function onDocumentKeyDown(e) {
         createImageTarget();
     } else if (e.keyCode === 18) { // alt
         isAltKeyPress = true;
+    } else if (e.keyCode === 16) { // ctrl
+        isShiftKeyPress = true;
     }
 }
 function onDocumentKeyUp(e) {
     if (e.keyCode === 18) { // alt
         isAltKeyPress = false;
+    } else if (e.keyCode === 16) { // shift
+        isShiftKeyPress = false;
     }
 }
 window.onload = function () {
