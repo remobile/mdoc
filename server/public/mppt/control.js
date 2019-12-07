@@ -11,6 +11,9 @@ layui.use(['form', 'colorpicker'], function(){
             value: 20,
             min: 9,
             max: 180,
+            change: function(value){
+                setTargetFontSize(value);
+            },
         });
         // 行距的滑块
         slider.render({

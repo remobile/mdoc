@@ -323,10 +323,10 @@ function saveMarkdown(e) {
         const y = el.offsetTop;
         const w = el.offsetWidth;
         const h = el.offsetHeight;
-        const isImg = !!el.src;
-        const type = isImg ? ' img' : '';
+        const isText = el.classList.contains('text');
+        const type = !isText ? ' img' : '';
         let style = '';
-        if (!isImg) {
+        if (isText) {
             const fontSize = el.style.fontSize;
             if (fontSize) {
                 style = `${style}font-size:${fontSize};`;
@@ -355,7 +355,7 @@ function saveMarkdown(e) {
         const animate = el.dataset.animate !== undefined ? ` animate=${el.dataset.animate}` : '';
 
         text.push(`::: fm${type} x=${x} y=${y} w=${w} h=${h}${style}${group}${animate}`);
-        (el.src || el.innerText) && text.push(isImg ? el.src : el.innerText);
+        (el.src || el.innerText) && text.push(isText ? el.innerText : el.src);
         text.push(':::');
         text.push('');
     }
@@ -503,6 +503,17 @@ function removeTargets(referents) {
         refrent.target.remove();
     }
     removeAllReferents();
+}
+function setTargetFontSize(fontSize) {
+    if (referents.length) {
+        for (const referent of referents) {
+            const target = referent.target;
+            if (target.classList.contains('text')) {
+                target.style.fontSize = fontSize + 'px';
+            }
+        }
+        pushHistory('设置字体大小');
+    }
 }
 function onDocumentKeyDown(e) {
     if (referents.length) {
