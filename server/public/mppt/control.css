@@ -6,6 +6,14 @@
     padding-left: 10px;
     padding-right: 10px;
 }
+#textPositionSize {
+    font-size: 16px;
+    width: 240px;
+    height: 30px;
+    padding-top: 6px;
+    color: gray;
+    font-weight: 500;
+}
 .layui-tab {
     text-align: center !important;
 }
