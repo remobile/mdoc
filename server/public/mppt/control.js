@@ -13,13 +13,13 @@ layui.use(['form', 'colorpicker'], function() {
                 let fontSize = parseInt(getComputedStyle(target).fontSize);
                 controls.fontSizeSlider.setValue(fontSize - 9);
                 // 行距
-                let lineHeight = getComputedStyle(target).lineHeight;
+                let lineHeight = target.style.lineHeight;
                 if (lineHeight === 'normal') {
                     lineHeight = 1.23;
                 } else {
                     lineHeight = parseInt(lineHeight);
                 }
-                controls.lineHeightSlider.setValue(lineHeight*100 - 50);
+                controls.lineHeightSlider.setValue(lineHeight * 100 - 80);
             }
         };
         // 字体大小的滑块
@@ -43,14 +43,14 @@ layui.use(['form', 'colorpicker'], function() {
         controls.lineHeightSlider = slider.render({
             elem: '#lineHeightSlider',
             value: 123,
-            min: 50,
-            max: 300,
+            min: 80,
+            max: 800,
             change: function(lineHeight){
                 if (referents.length) {
                     for (const referent of referents) {
                         const target = referent.target;
                         if (target.classList.contains('text')) {
-                            target.style.lineHeight = lineHeight/100;
+                            target.style.lineHeight = lineHeight / 100;
                         }
                     }
                 }
