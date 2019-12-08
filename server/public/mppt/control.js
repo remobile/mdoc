@@ -97,11 +97,22 @@ layui.use(['form', 'colorpicker'], function() {
                 }
             }
         }
+        function setImageStyle(callback) {
+            if (referents.length) {
+                for (const referent of referents) {
+                    const target = referent.target;
+                    if (!target.classList.contains('text')) {
+                        callback(target);
+                    }
+                }
+            }
+        }
 
         // 更新属性的值
         controls.updateValues = function (target) {
             if (!target) {
                 $('#textPropertyPanel').hide();
+                $('#imagePropertyPanel').hide();
                 $('#animatePanel').hide();
                 return;
             }
@@ -179,8 +190,42 @@ layui.use(['form', 'colorpicker'], function() {
                         });
                     },
                 });
+            } else {
+                $('#imagePropertyPanel').show();
+                $('#animatePanel').show();
+                const style = getComputedStyle(target);
+                // 宽
+                let width = parseInt(style.width);
+                controls.imageWidthSlider = slider.render({
+                    elem: '#imageWidthSlider',
+                    value: width,
+                    min: 0,
+                    max: 800,
+                    done: function(width){
+                        console.log("=======", width);
+                    },
+                    change: function(width){
+                        setImageStyle((target)=>{
+                            target.style.width = width + 'px';
+                        });
+                    },
+                });
+                // 高
+                let height = parseInt(style.height);
+                controls.imageHeightSlider = slider.render({
+                    elem: '#imageHeightSlider',
+                    value: height,
+                    min: 0,
+                    max: 1000,
+                    done: function(height){
+                        console.log("=======", height);
+                    },
+                    change: function(height){
+                        setImageStyle((target)=>{
+                            target.style.width = height + 'px';
+                        });
+                    },
+                });
             }
         };
-
-
  });
