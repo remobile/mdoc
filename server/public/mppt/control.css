@@ -1,3 +1,9 @@
+#textPropertyPanel {
+    display: none;
+}
+#animatePanel {
+    display: none;
+}
 #fontSizeSlider, #lineHeightSlider {
     padding-top: 20px;
     padding-left: 10px;

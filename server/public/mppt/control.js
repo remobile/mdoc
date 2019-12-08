@@ -100,8 +100,15 @@ layui.use(['form', 'colorpicker'], function() {
 
         // 更新属性的值
         controls.updateValues = function (target) {
+            if (!target) {
+                $('#textPropertyPanel').hide();
+                $('#animatePanel').hide();
+                return;
+            }
             const isText = target.classList.contains('text');
             if (isText) {
+                $('#textPropertyPanel').show();
+                $('#animatePanel').show();
                 const style = getComputedStyle(target);
                 // 字体大小
                 let fontSize = parseInt(style.fontSize);

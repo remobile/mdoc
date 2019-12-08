@@ -241,20 +241,17 @@ function createReferentForTarget(target, isGroup) {
     log("create referent");
 };
 function removeAll() {
+    controls.updateValues(); // 关闭属性窗口
     removeAllReferents();
-    removeColorPicker();
-    removeAnimateSelector();
-    removeTargetTextInput();
 }
 function createReferents(target) {
     if (!isAltKeyPress) {
-        removeAll();
+        removeAllReferents();
     }
     if (!target.dataset.group) {
         createReferentForTarget(target);
         controls.updateValues(target);
     } else {
-        controls.updateValues(); // 关闭属性窗口
         const list = root.querySelectorAll(`.target[data-group = "${target.dataset.group}"]`);
         for (const el of list) {
             createReferentForTarget(el, true);
