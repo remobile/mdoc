@@ -1,7 +1,4 @@
-#textPropertyPanel {
-    display: none;
-}
-#animatePanel {
+#textPropertyPanel, #imagePropertyPanel, #animatePanel {
     display: none;
 }
 #fontSizeSlider, #lineHeightSlider, #imageWidthSlider, #imageHeightSlider {
@@ -9,11 +6,11 @@
     padding-left: 10px;
     padding-right: 10px;
 }
-.layui-tab-title {
-    width: 240px;
+.layui-tab {
+    text-align: center !important;
 }
-.layui-tab-title li {
-    width: 90px;
+.layui-tab-content {
+    text-align: left !important;
 }
 .layui-tab-content {
     padding-left: 2px;
@@ -24,6 +21,12 @@
 }
 .layui-form-pane .layui-input-block {
     margin-left: 60px;
+}
+#operatePanel .layui-form-label {
+    width: 90px;
+}
+#operatePanel .layui-input-block {
+    margin-left: 90px;
 }
 .layui-btn-group {
     padding-top: 4px;

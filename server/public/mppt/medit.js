@@ -91,7 +91,7 @@ function recoverHistory() {
     }
 }
 function initialize() {
-    root = document.getElementById('container');
+    root = document.getElementById('editor');
     getHistory();
     const list = document.querySelectorAll('.target');
     for (const el of list) {
