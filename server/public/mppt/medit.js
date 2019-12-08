@@ -23,16 +23,6 @@ const OFFSET = { x: 300, y: 4 }; // 编辑页面相对于body的偏移位置
 function log(...args) {
     hasLog && console.log(...args);
 }
-function rgb2hex(color) {
-    if (!color || !/^rgb/.test(color)) {
-        return color;
-    }
-    const rgb = color.split(',');
-    const r = parseInt(rgb[0].split('(')[1]);
-    const g = parseInt(rgb[1]);
-    const b = parseInt(rgb[2].split(')')[0]);
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-}
 function getLocation(e) {
     return {
         x: (e.x || e.clientX) - OFFSET.x,
@@ -342,12 +332,12 @@ function saveMarkdown(e) {
             if (fontStyle === 'italic') {
                 style = `${style}font-style:${fontStyle};`;
             }
-            const color = rgb2hex(el.style.color);
-            if (color && color !== '#000000') {
+            const color = el.style.color;
+            if (color) {
                 style = `${style}color:${color};`;
             }
-            const bgcolor = rgb2hex(el.style.backgroundColor);
-            if (bgcolor && color !== '#FFFFFF') {
+            const bgcolor = el.style.backgroundColor;
+            if (bgcolor) {
                 style = `${style}background-color:${bgcolor};`;
             }
             if (style) {
@@ -583,6 +573,7 @@ function onDocumentKeyDown(e) {
         if (e.keyCode === 27 || e.keyCode === 13) { // esc |  enter
             if (editingTarget) {
                 editingTarget.setAttribute('contenteditable', 'false');
+                createReferents(editingTarget);
                 editingTarget = undefined;
             }
         }
