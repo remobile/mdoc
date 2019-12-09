@@ -97,7 +97,7 @@ function buildMarkdown(port, configPath, build, index, mobile) {
                 renderToStaticMarkup(<PPTLayout config={config} />)
             );
         } else {
-            const editLayout = mobile ? '../lib/MPPTEditLayout.js' : '../lib/PPTEditLayout.js';
+            const editLayout = mobile ? '../editor/MPPTEditLayout.js' : '../lib/PPTEditLayout.js';
             removeModuleAndChildrenFromCache(editLayout);
             const PPTEditLayout = require(editLayout);
             const page = config.pages[index];
