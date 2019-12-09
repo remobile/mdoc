@@ -1,4 +1,7 @@
-#textPropertyPanel, #imagePropertyPanel, #animatePanel {
+#propertyPanel, #animatePanel {
+    display: none;
+}
+#propertyPanel.for-image>.for-text {
     display: none;
 }
 #fontSizeSlider, #lineHeightSlider, #imageWidthSlider, #imageHeightSlider {

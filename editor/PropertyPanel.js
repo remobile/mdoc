@@ -2,8 +2,8 @@ const React = require('react');
 
 module.exports = () => {
     return (
-        <form id="textPropertyPanel" className="layui-form layui-form-pane" action="">
-            <div className="layui-form-item">
+        <form id="propertyPanel" className="layui-form layui-form-pane" action="">
+            <div className="layui-form-item for-text">
                 <label className="layui-form-label">字体</label>
                 <div className="layui-input-block">
                     <select lay-filter="myselect">
@@ -13,19 +13,19 @@ module.exports = () => {
                     </select>
                 </div>
             </div>
-            <div className="layui-form-item">
+            <div className="layui-form-item for-text">
                 <label className="layui-form-label">大小</label>
                 <div className="layui-input-block">
                     <div id="fontSizeSlider"></div>
                 </div>
             </div>
-            <div className="layui-form-item">
+            <div className="layui-form-item for-text">
                 <label className="layui-form-label">行距</label>
                 <div className="layui-input-block">
                     <div id="lineHeightSlider"></div>
                 </div>
             </div>
-            <div className="layui-form-item">
+            <div className="layui-form-item for-text">
                 <label className="layui-form-label">对齐</label>
                 <div className="layui-input-inline">
                     <div className="layui-btn-group">
@@ -41,7 +41,7 @@ module.exports = () => {
                     </div>
                 </div>
             </div>
-            <div className="layui-form-item">
+            <div className="layui-form-item for-text">
                 <label className="layui-form-label">常规</label>
                 <div className="layui-input-inline">
                     <div className="layui-btn-group">

@@ -101,6 +101,10 @@ function initialize() {
 function copyTarget(target) {
     target.parentNode.insertBefore(target.cloneNode(true), target);
 }
+function setClickTarget(target) {
+    clickTarget = target;
+    controls.updateValues(target);
+}
 function onReferentDoubleClick(target) {
     const isText = target.classList.contains('text');
     if (isText) {
@@ -131,6 +135,7 @@ function onReferentMouseDown(e, type) {
         }
         if (!e.target.classList.contains('self')) {
             e.target.classList.add('self');
+            setClickTarget(e.target.target);
         }
     }
 }
@@ -262,7 +267,6 @@ function createReferents(target) {
     }
     if (!target.dataset.group) {
         createReferentForTarget(target);
-        controls.updateValues(target);
     } else {
         const list = root.querySelectorAll(`.target[data-group = "${target.dataset.group}"]`);
         for (const el of list) {
@@ -287,7 +291,7 @@ function onDocumentMouseDown(e) {
     }
     if (target) {
         createReferents(target);
-        clickTarget = target;
+        setClickTarget(target);
     }
     e.stopPropagation();
 }
@@ -506,13 +510,13 @@ function createImageTarget() {
 }
 function removeTarget(target) {
     target.remove();
-    removeAllReferents();
+    removeAll();
 }
 function removeTargets(referents) {
     for (const refrent of referents) {
         refrent.target.remove();
     }
-    removeAllReferents();
+    removeAll();
 }
 function onDocumentKeyDown(e) {
     if (referents.length) {

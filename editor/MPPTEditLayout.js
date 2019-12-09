@@ -1,9 +1,7 @@
 const React = require('react');
 const MarkdownView = require('../lib/MarkdownView');
 const { support } = require('../lib/utils');
-const TextPropertyPanel = require('./TextPropertyPanel');
-const ImagePropertyPanel = require('./ImagePropertyPanel');
-const GroupPropertyPanel = require('./GroupPropertyPanel');
+const PropertyPanel = require('./PropertyPanel');
 const AnimatePanel = require('./AnimatePanel');
 
 class PPTEditLayout extends React.Component {
@@ -29,9 +27,7 @@ class PPTEditLayout extends React.Component {
                             </ul>
                             <div className="layui-tab-content">
                                 <div className="layui-tab-item layui-show">
-                                    <TextPropertyPanel />
-                                    <ImagePropertyPanel />
-                                    <GroupPropertyPanel />
+                                    <PropertyPanel />
                                 </div>
                                 <div className="layui-tab-item">
                                     <AnimatePanel />

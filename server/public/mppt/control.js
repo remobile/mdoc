@@ -111,15 +111,14 @@ layui.use(['form', 'colorpicker'], function() {
         // 更新属性的值
         controls.updateValues = function (target) {
             if (!target) {
-                $('#textPropertyPanel').hide();
-                $('#imagePropertyPanel').hide();
+                $('#propertyPanel').hide();
                 $('#animatePanel').hide();
                 return;
             }
-            const isText = target.classList.contains('text');
-            if (isText) {
-                $('#textPropertyPanel').show();
-                $('#animatePanel').show();
+            $('#propertyPanel').show();
+            $('#animatePanel').show();
+            if (target.classList.contains('text')) {
+                $('#propertyPanel').removeClass('for-image');
                 const style = getComputedStyle(target);
                 // 字体大小
                 let fontSize = parseInt(style.fontSize);
@@ -193,8 +192,7 @@ layui.use(['form', 'colorpicker'], function() {
                 // 位置大小
                 $('#textPositionSize').html(`x: ${parseInt(style.left)}&emsp;y: ${parseInt(style.top)}&emsp;w: ${parseInt(style.width)}&emsp;h: ${parseInt(style.height)}`);
             } else {
-                $('#imagePropertyPanel').show();
-                $('#animatePanel').show();
+                $('#propertyPanel').addClass('for-image');
                 const style = getComputedStyle(target);
                 // 宽
                 let width = parseInt(style.width);
