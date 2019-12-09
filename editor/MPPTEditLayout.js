@@ -39,34 +39,34 @@ class PPTEditLayout extends React.Component {
                                 <div className="layui-tab-item">
                                     <form id="operatePanel" className="layui-form layui-form-pane" action="">
                                         <div className="layui-form-item">
-                                          <label className="layui-form-label">预览</label>
-                                          <div className="layui-input-inline">
-                                              <div className="layui-btn-group">
-                                                  <button id="textResetStyle" type="button" className="layui-btn layui-btn-sm">
-                                                    <i className="layui-icon">&#xe652;</i>
-                                                  </button>
-                                              </div>
-                                          </div>
+                                            <label className="layui-form-label">预览</label>
+                                            <div className="layui-input-inline">
+                                                <div className="layui-btn-group">
+                                                    <button id="textResetStyle" type="button" className="layui-btn layui-btn-sm">
+                                                        <i className="layui-icon">&#xe652;</i>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div className="layui-form-item">
-                                          <label className="layui-form-label">新建文本</label>
-                                          <div className="layui-input-inline">
-                                              <div className="layui-btn-group">
-                                                  <button id="textResetStyle" type="button" className="layui-btn layui-btn-sm">
-                                                    <i className="layui-icon">&#xe63c;</i>
-                                                  </button>
-                                              </div>
-                                          </div>
+                                            <label className="layui-form-label">新建文本</label>
+                                            <div className="layui-input-inline">
+                                                <div className="layui-btn-group">
+                                                    <button id="textResetStyle" type="button" className="layui-btn layui-btn-sm">
+                                                        <i className="layui-icon">&#xe63c;</i>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div className="layui-form-item">
-                                          <label className="layui-form-label">新建图片</label>
-                                          <div className="layui-input-inline">
-                                              <div className="layui-btn-group">
-                                                  <button id="textResetStyle" type="button" className="layui-btn layui-btn-sm">
-                                                    <i className="layui-icon">&#xe64a;</i>
-                                                  </button>
-                                              </div>
-                                          </div>
+                                            <label className="layui-form-label">新建图片</label>
+                                            <div className="layui-input-inline">
+                                                <div className="layui-btn-group">
+                                                    <button id="textResetStyle" type="button" className="layui-btn layui-btn-sm">
+                                                        <i className="layui-icon">&#xe64a;</i>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </form>
                                 </div>
