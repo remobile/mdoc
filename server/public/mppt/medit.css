@@ -74,6 +74,9 @@
 .referent.group {
     border:1px solid gray;
 }
+.referent.group.self {
+    border:1px dashed gray;
+}
 .referent_node {
     position: absolute;
     background:#CDC9C9;

@@ -4,7 +4,6 @@ let referents = []; // 当前选中的refrent列表
 let history = []; // 历史记录
 let historyIndex = 0; // 当前历史记录的指针
 let isAltKeyPress = false; // alt是否被按住
-let isShiftKeyPress = false; // ctrl是否被按住
 let clickX = 0; // 保留上次的X轴位置
 let clickY = 0; // 保留上次的Y轴位置©
 let group = -1; // 集合的id最小值
@@ -16,6 +15,7 @@ let root;
 const controls = {}; // 用来保存controls
 let moveMode = -1;
 let doubleClickStartTime; // 双击计时
+let clickTarget; // 被选中的target
 let editingTarget; // 正在编辑的target
 
 const OFFSET = { x: 300, y: 4 }; // 编辑页面相对于body的偏移位置
@@ -116,11 +116,22 @@ function onReferentMouseDown(e, type) {
     actions = { operateType: type, node: e.target };
     e.stopPropagation();
     isAltKeyPress && type === 'move' && copyTarget(e.target.target);
-    if (Date.now() - doubleClickStartTime < 500) {
+    if (Date.now() - doubleClickStartTime < 200) {
         onReferentDoubleClick(e.target.target);
         doubleClickStartTime = undefined;
     } else {
         doubleClickStartTime = Date.now();
+    }
+    // 改变group的情况下被点中的target
+    if (e.target.classList.contains('group')) {
+        for (const referent of referents) {
+            if (referent.classList.contains('self') && referent !== e.target) {
+                referent.classList.remove('self');
+            }
+        }
+        if (!e.target.classList.contains('self')) {
+            e.target.classList.add('self');
+        }
     }
 }
 function onDocumentMouseUp() {
@@ -204,7 +215,7 @@ function onDocumentMouseMove(e) {
     if (editingTarget) {
         return true;
     }
-    if (isShiftKeyPress && actions) {
+    if (actions) {
         const operateType = actions.operateType;
         const location = getLocation(e);
         let referent;
@@ -225,14 +236,15 @@ function removeAllReferents() {
     for (const el of list) {
         root.removeChild(el);
     }
+    editingTarget = null;
     referents = [];
 }
 // 为target创建一个referent
-function createReferentForTarget(target, isGroup) {
+function createReferentForTarget(target, isGroup, isSelf) {
     const div = document.createElement("div");
     const dirs = ['n', 's', 'w', 'e', 'nw', 'ne', 'sw', 'se'];
     const style = `height:${target.offsetHeight}px;width:${target.offsetWidth}px;top:${target.offsetTop-1}px;left:${target.offsetLeft-1}px`;
-    const className = 'referent' + (isGroup ? ' group' : '');
+    const className = 'referent' + (isGroup ? ' group' : '') + (isSelf ? ' self' : '');
     div.innerHTML = `<div class="${className}" style="${style}" onmousedown="onReferentMouseDown(event, 'move')">${dirs.map(dir=>(`<div class="referent_node" data-dir="${dir}" onmousedown="onReferentMouseDown(event, '${dir}')"></div>`)).join('')}</div>`;
     const referent = div.childNodes[0];
     referent.target = target;
@@ -254,23 +266,28 @@ function createReferents(target) {
     } else {
         const list = root.querySelectorAll(`.target[data-group = "${target.dataset.group}"]`);
         for (const el of list) {
-            createReferentForTarget(el, true);
+            createReferentForTarget(el, true, target === el);
         }
     }
 };
 function onDocumentMouseDown(e) {
+    let target;
     if (editingTarget && e.target !== editingTarget) {
         editingTarget.setAttribute('contenteditable', 'false');
         if (!e.target.classList.contains('target')) {
-            createReferents(editingTarget);
+            target = editingTarget;
         } else {
-            createReferents(e.target);
+            target = e.target;
         }
         editingTarget = undefined;
     } else if (e.target.classList.contains('target')) {
         if (e.target.getAttribute("contenteditable") !== 'true') {
-            createReferents(e.target);
+            target = e.target;
         }
+    }
+    if (target) {
+        createReferents(target);
+        clickTarget = target;
     }
     e.stopPropagation();
 }
@@ -283,6 +300,9 @@ function toggleTargetGroup() {
         for (const refrent of referents) {
             refrent.target.dataset.group = group;
             refrent.classList.add('group');
+            if (refrent.target === clickTarget) {
+                refrent.classList.add('self');
+            }
         }
         log("add group");
         pushHistory('添加组合');
@@ -589,15 +609,11 @@ function onDocumentKeyDown(e) {
         createImageTarget();
     } else if (e.keyCode === 18) { // alt
         isAltKeyPress = true;
-    } else if (e.keyCode === 16) { // ctrl
-        isShiftKeyPress = true;
     }
 }
 function onDocumentKeyUp(e) {
     if (e.keyCode === 18) { // alt
         isAltKeyPress = false;
-    } else if (e.keyCode === 16) { // shift
-        isShiftKeyPress = false;
     }
 }
 window.onload = function () {
