@@ -105,50 +105,6 @@ function setClickTarget(target) {
     clickTarget = target;
     controls.updateValues(target);
 }
-function onReferentDoubleClick(target) {
-    const isText = target.classList.contains('text');
-    if (isText) {
-        removeAllReferents();
-        target.setAttribute("contenteditable", "true");
-        editingTarget = target;
-    }
-}
-function onReferentMouseDown(e, type) {
-    const location = getLocation(e);
-    clickY = location.y;
-    clickX = location.x;
-    actions = { operateType: type, node: e.target };
-    e.stopPropagation();
-    isAltKeyPress && type === 'move' && copyTarget(e.target.target);
-    if (Date.now() - doubleClickStartTime < 200) {
-        onReferentDoubleClick(e.target.target);
-        doubleClickStartTime = undefined;
-    } else {
-        doubleClickStartTime = Date.now();
-    }
-    // 改变group的情况下被点中的target
-    if (e.target.classList.contains('group')) {
-        for (const referent of referents) {
-            if (referent.classList.contains('self') && referent !== e.target) {
-                referent.classList.remove('self');
-            }
-        }
-        if (!e.target.classList.contains('self')) {
-            e.target.classList.add('self');
-            setClickTarget(e.target.target);
-        }
-    }
-}
-function onDocumentMouseUp() {
-    root.style.cursor = "auto";
-    // if (moveMode !== -1) {
-    //     pushHistory(['移动结束', '改变大小'][moveMode]);
-    //     moveMode = -1;
-    // }
-    if (actions) {
-        actions = null;
-    }
-}
 function resize(referent, operateType, location) {
     root.style.cursor = location + "_resize";
     switch (operateType) {
@@ -216,25 +172,6 @@ function moveByStep(location) {
     }
     pushHistory('移动结束');
 }
-function onDocumentMouseMove(e) {
-    if (editingTarget) {
-        return true;
-    }
-    if (actions) {
-        const operateType = actions.operateType;
-        const location = getLocation(e);
-        let referent;
-        if (operateType === 'move') {
-            referent = actions.node;
-            move(location);
-        } else {
-            referent = actions.node.parentNode;
-            resize(referent, operateType[0], location);
-            operateType[1] && resize(referent, operateType[1], location);
-        }
-    }
-    return false;
-}
 // 删除所有的referent
 function removeAllReferents() {
     const list = root.querySelectorAll('.referent');
@@ -274,6 +211,67 @@ function createReferents(target) {
         }
     }
 };
+
+function onReferentDoubleClick(target) {
+    const isText = target.classList.contains('text');
+    if (isText) {
+        removeAllReferents();
+        target.setAttribute("contenteditable", "true");
+        editingTarget = target;
+    }
+}
+function onReferentMouseDown(e, type) {
+    const location = getLocation(e);
+    clickY = location.y;
+    clickX = location.x;
+    actions = { operateType: type, node: e.target };
+    e.stopPropagation();
+    isAltKeyPress && type === 'move' && copyTarget(e.target.target);
+    if (Date.now() - doubleClickStartTime < 200) {
+        onReferentDoubleClick(e.target.target);
+        doubleClickStartTime = undefined;
+    } else {
+        doubleClickStartTime = Date.now();
+    }
+    // 改变group的情况下被点中的target
+    if (e.target.classList.contains('group')) {
+        for (const referent of referents) {
+            if (referent.classList.contains('self') && referent !== e.target) {
+                referent.classList.remove('self');
+            }
+        }
+        if (!e.target.classList.contains('self')) {
+            e.target.classList.add('self');
+            setClickTarget(e.target.target);
+        }
+    }
+}
+function onDocumentMouseUp() {
+    root.style.cursor = "auto";
+    if (actions) {
+        actions = null;
+    }
+}
+function onDocumentMouseMove(e) {
+    if (editingTarget) {
+        return true;
+    }
+    if (actions) {
+        const operateType = actions.operateType;
+        const location = getLocation(e);
+        let referent;
+        if (operateType === 'move') {
+            referent = actions.node;
+            move(location);
+        } else {
+            referent = actions.node.parentNode;
+            resize(referent, operateType[0], location);
+            operateType[1] && resize(referent, operateType[1], location);
+        }
+        controls.updatePositionSize(clickTarget);
+    }
+    return false;
+}
 function onDocumentMouseDown(e) {
     let target;
     if (editingTarget && e.target !== editingTarget) {

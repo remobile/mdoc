@@ -190,7 +190,7 @@ layui.use(['form', 'colorpicker'], function() {
                     },
                 });
                 // 位置大小
-                $('#textPositionSize').html(`x: ${parseInt(style.left)}&emsp;y: ${parseInt(style.top)}&emsp;w: ${parseInt(style.width)}&emsp;h: ${parseInt(style.height)}`);
+                controls.updatePositionSize(target, style);
             } else {
                 $('#propertyPanel').addClass('for-image');
                 const style = getComputedStyle(target);
@@ -228,8 +228,8 @@ layui.use(['form', 'colorpicker'], function() {
                 });
             }
         };
-        controls.updatePositionSize = function (target) {
-            const style = getComputedStyle(target);
+        controls.updatePositionSize = function (target, style) {
+            style = style || getComputedStyle(target);
             $('#textPositionSize').html(`x: ${parseInt(style.left)}&emsp;y: ${parseInt(style.top)}&emsp;w: ${parseInt(style.width)}&emsp;h: ${parseInt(style.height)}`);
         };
  });
