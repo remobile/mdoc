@@ -23,6 +23,13 @@ const OFFSET = { x: 300, y: 4 }; // 编辑页面相对于body的偏移位置
 function log(...args) {
     hasLog && console.log(...args);
 }
+function uuid() {
+    return Math.random().toString().substr(2, 2)
+    + Math.random().toString().substr(2, 2)
+    + Date.now().toString(36)
+    + Math.random().toString().substr(2, 2)
+    + Math.random().toString().substr(2, 2);
+}
 function getLocation(e) {
     return {
         x: (e.x || e.clientX) - OFFSET.x,
@@ -99,7 +106,11 @@ function initialize() {
     }
 }
 function copyTarget(target) {
-    target.parentNode.insertBefore(target.cloneNode(true), target);
+    const newTarget = target.cloneNode(true);
+    const oldId = target.getAttribute('id');
+    newTarget.setAttribute('id', oldId);
+    target.setAttribute('id', uuid());
+    target.parentNode.insertBefore(newTarget, target);
 }
 function setClickTarget(target) {
     clickTarget = target;
@@ -492,6 +503,7 @@ function createTextTarget() {
     target.style.top = "30px";
     target.style.width = "100px";
     target.style.height = "30px";
+    target.setAttribute('id', uuid());
     root.appendChild(target);
     createReferentForTarget(target);
 }
@@ -503,6 +515,7 @@ function createImageTarget() {
     target.style.top = "30px";
     target.style.width = "100px";
     target.style.height = "100px";
+    target.setAttribute('id', uuid());
     root.appendChild(target);
     createReferentForTarget(target);
 }
