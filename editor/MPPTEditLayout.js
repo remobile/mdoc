@@ -16,6 +16,7 @@ class PPTEditLayout extends React.Component {
                     <link rel="stylesheet" href="layui/css/layui.css" />
                     <link rel="stylesheet" href="mppt/medit.css" />
                     <link rel="stylesheet" href="mppt/control.css" />
+                    <link rel="stylesheet" href="mppt/component.css" />
                 </head>
                 <body>
                     <div id="prop">
@@ -73,12 +74,17 @@ class PPTEditLayout extends React.Component {
                     <div id="editor">
                         <MarkdownView source={page.content} page={page} container={null} />
                     </div>
+                    <div id="component">
+                        <div className="title">组件列表</div>
+                        <div id="componentContent"></div>
+                    </div>
                     <div id="history"></div>
                     <div id="info"></div>
                     <script type="text/javascript" src="layui/layui.all.js"></script>
                     <script type="text/javascript" src="mppt/medit.js"></script>
                     <script type="text/javascript" src="mppt/jscolor.js"></script>
                     <script type="text/javascript" src="mppt/control.js"></script>
+                    <script type="text/javascript" src="mppt/component.js"></script>
                 </body>
             </html>
         );

@@ -1,0 +1,20 @@
+.component-line {
+    line-height: 40px;
+    border-bottom: solid gray 1px;
+    padding-left: 10px;
+    padding-right: 10px;
+    cursor: pointer;
+}
+.component-line.select {
+    background-color: #E0EEEE;
+}
+.component-text {
+    font-size: 14px;
+    overflow: hidden;
+    color: gray;
+}
+.component-image {
+    height: 34px;
+    border: solid #E6E6E6 1px;
+    margin: 2px;
+}

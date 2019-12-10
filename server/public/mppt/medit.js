@@ -283,6 +283,10 @@ function onDocumentMouseMove(e) {
     }
     return false;
 }
+function selectTarget(target) {
+    createReferents(target);
+    setClickTarget(target);
+}
 function onDocumentMouseDown(e) {
     let target;
     if (editingTarget && e.target !== editingTarget) {
@@ -299,8 +303,7 @@ function onDocumentMouseDown(e) {
         }
     }
     if (target) {
-        createReferents(target);
-        setClickTarget(target);
+        selectTarget(target);
     }
     e.stopPropagation();
 }

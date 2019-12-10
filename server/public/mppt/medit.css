@@ -28,21 +28,26 @@
 }
 #component {
     position: absolute;
-    left: 710px;
+    left: 800px;
     top: 2px;
-    width: 200px;
+    width: 320px;
     height: 667px;
-    border: 2px solid red;
+    border: 1px solid #E6E6E6;
     padding-left: 10px;
+}
+#component .title {
+    color: red;
+}
+#componentContent {
     overflow: scroll;
 }
 #history {
     position: absolute;
-    left: 960px;
+    left: 1150px;
     top: 2px;
-    width: 200px;
+    width: 140px;
     height: 667px;
-    border: 2px solid red;
+    border: 1px solid #E6E6E6;
     padding-left: 10px;
     overflow: scroll;
 }
@@ -52,7 +57,7 @@
 }
 #info {
     position: absolute;
-    left:1190px;
+    left:1290px;
     top:1px;
     width: 300px;
     height: 667px;

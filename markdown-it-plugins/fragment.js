@@ -47,10 +47,10 @@ module.exports = function fragment_plugin(md, page) {
 
             let html = '';
             if (options.img) {
-                html = `<img class="${className}"${dataset} src="${content}" ${append} style="${style}" />`;
+                html = `<img id="${options.id}" class="${className}"${dataset} src="${content}" ${append} style="${style}" />`;
             } else {
                 html = `
-                <div class="text ${className}"${dataset} style="${style}">
+                <div id="${options.id}" class="text ${className}"${dataset} style="${style}">
                     ${content}
                 </div>
                 `;
