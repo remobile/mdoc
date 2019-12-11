@@ -1,12 +1,15 @@
-layui.define('jquery', function(exports){
+layui.define(['jquery', 'utils'], function(exports){
     const $ = layui.$;
+    const utils = layui.utils;
+    let editor;
     let history = []; // 历史记录
     let historyIndex = 0; // 当前历史记录的指针
 
     function initialize() {
-        post('/getHistory', '', (text)=>{
+        editor = layui.editor;
+        utils.post('/getHistory', '', (text)=>{
             if (!text) {
-                history.push({ name: '创建文件', html: root.innerHTML});
+                history.push({ name: '创建文件', html: editor.root.innerHTML});
                 historyIndex = 0;
             } else {
                 history = JSON.parse(text);
@@ -26,14 +29,14 @@ layui.define('jquery', function(exports){
                 }
                 history = newHistory.concat(history.slice(history.length-10));
                 historyIndex = history.length - 1;
-                post('/updateHistory', JSON.stringify(history));
+                utils.post('/updateHistory', JSON.stringify(history));
                 showHistory();
             }
         }
     }
     function setTopHistory(index) {
         historyIndex = index;
-        root.innerHTML = history[historyIndex].html;
+        editor.root.innerHTML = history[historyIndex].html;
         showHistory();
         removeAll();
     }
@@ -45,21 +48,21 @@ layui.define('jquery', function(exports){
     function pushHistory(name) {
         historyIndex++;
         history.length = historyIndex;
-        history.push({ name, html: root.innerHTML });
-        // post('/updateHistory', JSON.stringify(history));
+        history.push({ name, html: editor.root.innerHTML });
+        // utils.post('/updateHistory', JSON.stringify(history));
         showHistory();
     }
     function popHistory() {
         if (history.length > 2) {
             historyIndex--;
-            root.innerHTML = history[historyIndex].html;
+            editor.root.innerHTML = history[historyIndex].html;
             removeAll();
         }
     }
     function recoverHistory() {
         if (history.length > historyIndex + 1) {
             historyIndex++;
-            root.innerHTML = history[historyIndex].html;
+            editor.root.innerHTML = history[historyIndex].html;
             removeAll();
         }
     }

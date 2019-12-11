@@ -1,4 +1,9 @@
-layui.define('jquery', function(exports){
+layui.define(['jquery', 'utils', 'history', 'control'], function(exports){
+    const $ = layui.$;
+    const utils = layui.utils;
+    const history = layui.history;
+    const control = layui.control;
+
     let actions = null; // 当前操作的对象
     let referents = []; // 当前选中的refrent列表
     let isAltKeyPress = false; // alt是否被按住
@@ -10,7 +15,6 @@ layui.define('jquery', function(exports){
     let animateSelector = null; //动画选择器
     let targetTextInput = null; //输入框
     let root;
-    const controls = {}; // 用来保存controls
     let moveMode = -1;
     let doubleClickStartTime; // 双击计时
     let clickTarget; // 被选中的target
@@ -19,18 +23,18 @@ layui.define('jquery', function(exports){
     const OFFSET = { x: 300, y: 4 }; // 编辑页面相对于body的偏移位置
 
 
+    function initialize() {
+        root = document.getElementById('editor');
+        // history.initialize();
+        // const list = document.querySelectorAll('.target');
+        // for (const el of list) {
+        //     group = Math.max(group, +el.dataset.group||0);
+        // }
+    }
     function getLocation(e) {
         return {
             x: (e.x || e.clientX) - OFFSET.x,
             y: (e.y || e.clientY) - OFFSET.y,
-        }
-    }
-    function initialize() {
-        root = document.getElementById('editor');
-        getHistory();
-        const list = document.querySelectorAll('.target');
-        for (const el of list) {
-            group = Math.max(group, +el.dataset.group||0);
         }
     }
     function copyTarget(target) {
@@ -42,7 +46,7 @@ layui.define('jquery', function(exports){
     }
     function setClickTarget(target) {
         clickTarget = target;
-        controls.updateValues(target);
+        control.updateValues(target);
     }
     function resize(referent, operateType, location) {
         root.style.cursor = location + "_resize";
@@ -109,7 +113,7 @@ layui.define('jquery', function(exports){
             referent.target.style.top = (referent.offsetTop+1) + "px";
             referent.target.style.left = (referent.offsetLeft+1) + "px";
         }
-        pushHistory('移动结束');
+        history.pushHistory('移动结束');
     }
     // 删除所有的referent
     function removeAllReferents() {
@@ -131,10 +135,10 @@ layui.define('jquery', function(exports){
         referent.target = target;
         root.appendChild(referent);
         referents.push(referent);
-        log("create referent");
+        utils.log("create referent");
     };
     function removeAll() {
-        controls.updateValues(); // 关闭属性窗口
+        control.updateValues(); // 关闭属性窗口
         removeAllReferents();
     }
     function createReferents(target) {
@@ -207,7 +211,7 @@ layui.define('jquery', function(exports){
                 resize(referent, operateType[0], location);
                 operateType[1] && resize(referent, operateType[1], location);
             }
-            controls.updatePositionSize(clickTarget);
+            control.updatePositionSize(clickTarget);
         }
         return false;
     }
@@ -248,15 +252,15 @@ layui.define('jquery', function(exports){
                     refrent.classList.add('self');
                 }
             }
-            log("add group");
-            pushHistory('添加组合');
+            utils.log("add group");
+            history.pushHistory('添加组合');
         } else {
             for (const refrent of referents) {
                 delete refrent.target.dataset.group;
                 refrent.classList.remove('group');
             }
-            log("delete group");
-            pushHistory('解除组合');
+            utils.log("delete group");
+            history.pushHistory('解除组合');
         }
     }
     function saveMarkdown(e) {
@@ -303,7 +307,7 @@ layui.define('jquery', function(exports){
             text.push(':::');
             text.push('');
         }
-        post('/saveMarkdown', text.join('\n'));
+        utils.post('/saveMarkdown', text.join('\n'));
     }
     function copyTargetAcctribute (target) {
         copiedTarget = target;
@@ -471,8 +475,8 @@ layui.define('jquery', function(exports){
                         fontSize = 5;
                     }
                     target.style.fontSize = fontSize + 'px';
-                    log("fontSize:", fontSize);
-                    pushHistory('减小字体');
+                    utils.log("fontSize:", fontSize);
+                    history.pushHistory('减小字体');
                 } else if (e.keyCode === 187) { // +
                     let fontSize = parseInt(getComputedStyle(target).fontSize);
                     fontSize = !e.altKey ? fontSize + 1 : fontSize + 3;
@@ -480,8 +484,8 @@ layui.define('jquery', function(exports){
                         fontSize = 100;
                     }
                     target.style.fontSize = fontSize + 'px';
-                    log("fontSize:", fontSize);
-                    pushHistory('增加字体');
+                    utils.log("fontSize:", fontSize);
+                    history.pushHistory('增加字体');
                 } else if (e.altKey && e.keyCode === 66) { // b
                     let fontWeight = getComputedStyle(target).fontWeight;
                     if (fontWeight === 'bold') {
@@ -490,8 +494,8 @@ layui.define('jquery', function(exports){
                         fontWeight = 'bold';
                     }
                     target.style.fontWeight = fontWeight;
-                    log("fontWeight:", fontWeight);
-                    pushHistory('切换加粗');
+                    utils.log("fontWeight:", fontWeight);
+                    history.pushHistory('切换加粗');
                 } else if (e.altKey && e.keyCode === 73) { // i 斜体
                     let fontStyle = getComputedStyle(target).fontStyle;
                     if (fontStyle === 'italic') {
@@ -500,8 +504,8 @@ layui.define('jquery', function(exports){
                         fontStyle = 'italic';
                     }
                     target.style.fontStyle = fontStyle;
-                    log("fontStyle:", fontStyle);
-                    pushHistory('切换斜体');
+                    utils.log("fontStyle:", fontStyle);
+                    history.pushHistory('切换斜体');
                 } else if (e.altKey && e.keyCode === 82) { // alt + r 设置颜色
                     showColorPicker(target, referents[0]);
                 } else if (e.altKey && e.keyCode === 65) { // alt + a 设置动画
@@ -534,11 +538,11 @@ layui.define('jquery', function(exports){
         if (e.altKey && e.keyCode === 83) { // alt + s 保存
             saveMarkdown();
         } else if (e.altKey && e.keyCode === 72) { // alt + h 优化历史记录
-            optimizeHistory();
+            history.optimizeHistory();
         } else if (e.altKey && e.keyCode === 90) { // alt + z 回退
-            popHistory();
+            history.popHistory();
         } else if (e.altKey && e.keyCode === 89) { // alt + y 取消回退
-            recoverHistory();
+            history.recoverHistory();
         } else if (e.altKey && e.keyCode === 84) { // alt + t 添加文字元素
             createTextTarget();
         } else if (e.altKey && e.keyCode === 77) { // alt + m 添加图片元素
@@ -556,6 +560,11 @@ layui.define('jquery', function(exports){
     // 导出函数
     exports('editor', {
         initialize,
+        onDocumentMouseDown,
+        onDocumentMouseMove,
+        onDocumentMouseUp,
+        onDocumentKeyDown,
+        onDocumentKeyUp,
     });
 
     // 全局函数

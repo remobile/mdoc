@@ -1,4 +1,5 @@
-layui.use(['form', 'colorpicker'], function() {
+console.log("=======", 123);
+layui.define(['jquery', 'form', 'colorpicker'], function(exports){
         const $ = layui.$;
         const form = layui.form;
         const slider = layui.slider;
@@ -107,9 +108,8 @@ layui.use(['form', 'colorpicker'], function() {
                 }
             }
         }
-
         // 更新属性的值
-        controls.updateValues = function (target) {
+        function updateValues(target) {
             if (!target) {
                 $('#propertyPanel').hide();
                 $('#animatePanel').hide();
@@ -117,12 +117,50 @@ layui.use(['form', 'colorpicker'], function() {
             }
             $('#propertyPanel').show();
             $('#animatePanel').show();
+
+            const style = getComputedStyle(target);
+
+            // 颜色
+            colorpicker.render({
+                elem: '#textColor',
+                color: style.color,
+                format: 'rgb',
+                predefine: true,
+                colors: textColorList,
+                alpha: true,
+                done: function(color){
+                    setTextColorList(color);
+                    pushHistory('设置文字颜色');
+                },
+                change: function(color){
+                    setTextStyle((target)=>{
+                        target.style.color = color;
+                    });
+                },
+            });
+            // 背景颜色
+            colorpicker.render({
+                elem: '#textBackgroundColor',
+                color: style.backgroundColor,
+                format: 'rgb',
+                predefine: true,
+                alpha: true,
+                done: function(color){
+                    setTextBackgroundColorList(color);
+                    pushHistory('设置文字背景颜色');
+                },
+                change: function(color){
+                    setTextStyle((target)=>{
+                        target.style.backgroundColor = color;
+                    });
+                },
+            });
+            
             if (target.classList.contains('text')) {
                 $('#propertyPanel').removeClass('for-image');
-                const style = getComputedStyle(target);
                 // 字体大小
                 let fontSize = parseInt(style.fontSize);
-                controls.fontSizeSlider = slider.render({
+                slider.render({
                     elem: '#fontSizeSlider',
                     value: fontSize,
                     min: 9,
@@ -143,7 +181,7 @@ layui.use(['form', 'colorpicker'], function() {
                 } else {
                     lineHeight = parseFloat(lineHeight);
                 }
-                controls.lineHeightSlider = slider.render({
+                slider.render({
                     elem: '#lineHeightSlider',
                     value: lineHeight*100,
                     min: 80,
@@ -154,82 +192,20 @@ layui.use(['form', 'colorpicker'], function() {
                         });
                     },
                 });
-                // 颜色
-                colorpicker.render({
-                    elem: '#textColor',
-                    color: style.color,
-                    format: 'rgb',
-                    predefine: true,
-                    colors: textColorList,
-                    alpha: true,
-                    done: function(color){
-                        setTextColorList(color);
-                        pushHistory('设置文字颜色');
-                    },
-                    change: function(color){
-                        setTextStyle((target)=>{
-                            target.style.color = color;
-                        });
-                    },
-                });
-                // 背景颜色
-                colorpicker.render({
-                    elem: '#textBackgroundColor',
-                    color: style.backgroundColor,
-                    format: 'rgb',
-                    predefine: true,
-                    alpha: true,
-                    done: function(color){
-                        setTextBackgroundColorList(color);
-                        pushHistory('设置文字背景颜色');
-                    },
-                    change: function(color){
-                        setTextStyle((target)=>{
-                            target.style.backgroundColor = color;
-                        });
-                    },
-                });
                 // 位置大小
-                controls.updatePositionSize(target, style);
+                updatePositionSize(target, style);
             } else {
                 $('#propertyPanel').addClass('for-image');
-                const style = getComputedStyle(target);
-                // 宽
-                let width = parseInt(style.width);
-                controls.imageWidthSlider = slider.render({
-                    elem: '#imageWidthSlider',
-                    value: width,
-                    min: 0,
-                    max: 800,
-                    done: function(width){
-                        console.log("=======", width);
-                    },
-                    change: function(width){
-                        setImageStyle((target)=>{
-                            target.style.width = width + 'px';
-                        });
-                    },
-                });
-                // 高
-                let height = parseInt(style.height);
-                controls.imageHeightSlider = slider.render({
-                    elem: '#imageHeightSlider',
-                    value: height,
-                    min: 0,
-                    max: 1000,
-                    done: function(height){
-                        console.log("=======", height);
-                    },
-                    change: function(height){
-                        setImageStyle((target)=>{
-                            target.style.width = height + 'px';
-                        });
-                    },
-                });
+                updatePositionSize(target, style);
             }
-        };
-        controls.updatePositionSize = function (target, style) {
+        }
+        function updatePositionSize(target, style) {
             style = style || getComputedStyle(target);
             $('#textPositionSize').html(`x: ${parseInt(style.left)}&emsp;y: ${parseInt(style.top)}&emsp;w: ${parseInt(style.width)}&emsp;h: ${parseInt(style.height)}`);
-        };
+        }
+
+        exports('control', {
+            updateValues,
+            updatePositionSize,
+        });
  });
