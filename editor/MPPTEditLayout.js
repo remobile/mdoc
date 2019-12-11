@@ -15,6 +15,7 @@ class PPTEditLayout extends React.Component {
                     <meta name="viewport" content="width=device-width" />
                     <link rel="stylesheet" href="layui/css/layui.css" />
                     <link rel="stylesheet" href="mppt/medit.css" />
+                    <link rel="stylesheet" href="mppt/panel.css" />
                     <link rel="stylesheet" href="mppt/control.css" />
                     <link rel="stylesheet" href="mppt/component.css" />
                 </head>

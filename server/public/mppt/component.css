@@ -1,9 +1,14 @@
 .component-line {
     line-height: 40px;
-    border-bottom: solid gray 1px;
+    border-bottom: solid #E0EEEE 1px;
     padding-left: 10px;
     padding-right: 10px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+.component-line i {
+    margin-right: 10px;
 }
 .component-line.select {
     background-color: #E0EEEE;
