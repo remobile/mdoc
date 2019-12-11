@@ -1,4 +1,4 @@
-layui.define(function(exports){
+layui.define(function(exports) {
     const hasLog = true; // 是否有日志
 
     function log(...args) {

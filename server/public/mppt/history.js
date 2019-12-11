@@ -1,4 +1,4 @@
-layui.define(['jquery', 'utils'], function(exports){
+layui.define(['jquery', 'utils'], function(exports) {
     const $ = layui.$;
     const utils = layui.utils;
     let editor;
@@ -9,7 +9,7 @@ layui.define(['jquery', 'utils'], function(exports){
         editor = layui.editor;
         utils.post('/getHistory', '', (text)=>{
             if (!text) {
-                history.push({ name: '创建文件', html: editor.root.innerHTML});
+                history.push({ name: '创建文件', html: editor.getRootHtml()});
                 historyIndex = 0;
             } else {
                 history = JSON.parse(text);
@@ -36,7 +36,7 @@ layui.define(['jquery', 'utils'], function(exports){
     }
     function setTopHistory(index) {
         historyIndex = index;
-        editor.root.innerHTML = history[historyIndex].html;
+        editor.setRootHtml(history[historyIndex].html);
         showHistory();
         removeAll();
     }
@@ -48,21 +48,21 @@ layui.define(['jquery', 'utils'], function(exports){
     function pushHistory(name) {
         historyIndex++;
         history.length = historyIndex;
-        history.push({ name, html: editor.root.innerHTML });
+        history.push({ name, html: editor.getRootHtml() });
         // utils.post('/updateHistory', JSON.stringify(history));
         showHistory();
     }
     function popHistory() {
         if (history.length > 2) {
             historyIndex--;
-            editor.root.innerHTML = history[historyIndex].html;
+            editor.setRootHtml(history[historyIndex].html);
             removeAll();
         }
     }
     function recoverHistory() {
         if (history.length > historyIndex + 1) {
             historyIndex++;
-            editor.root.innerHTML = history[historyIndex].html;
+            editor.setRootHtml(history[historyIndex].html);
             removeAll();
         }
     }

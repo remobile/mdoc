@@ -1,21 +1,20 @@
-layui.define(['jquery', 'utils', 'history', 'control'], function(exports){
+layui.define(['jquery', 'utils', 'history', 'control'], function(exports) {
     const $ = layui.$;
     const utils = layui.utils;
     const history = layui.history;
     const control = layui.control;
 
-    let actions = null; // 当前操作的对象
+    let action = null; // 当前操作的对象
+    let lastAction = null; // 上一次操作的对象
     let referents = []; // 当前选中的refrent列表
     let isAltKeyPress = false; // alt是否被按住
     let clickX = 0; // 保留上次的X轴位置
     let clickY = 0; // 保留上次的Y轴位置©
     let group = -1; // 集合的id最小值
     let copiedTarget = null; // 复制的target
-    let colorPicker = null; // 颜色取色器
     let animateSelector = null; //动画选择器
     let targetTextInput = null; //输入框
     let root;
-    let moveMode = -1;
     let doubleClickStartTime; // 双击计时
     let clickTarget; // 被选中的target
     let editingTarget; // 正在编辑的target
@@ -25,11 +24,11 @@ layui.define(['jquery', 'utils', 'history', 'control'], function(exports){
 
     function initialize() {
         root = document.getElementById('editor');
-        // history.initialize();
-        // const list = document.querySelectorAll('.target');
-        // for (const el of list) {
-        //     group = Math.max(group, +el.dataset.group||0);
-        // }
+        history.initialize();
+        const list = document.querySelectorAll('.target');
+        for (const el of list) {
+            group = Math.max(group, +el.dataset.group||0);
+        }
     }
     function getLocation(e) {
         return {
@@ -45,14 +44,14 @@ layui.define(['jquery', 'utils', 'history', 'control'], function(exports){
         target.parentNode.insertBefore(newTarget, target);
     }
     function setClickTarget(target) {
+        lastClickTarget = clickTarget;
         clickTarget = target;
         control.updateValues(target);
     }
-    function resize(referent, operateType, location) {
+    function resize(referent, type, location) {
         root.style.cursor = location + "_resize";
-        switch (operateType) {
+        switch (type) {
             case "e": {
-                moveMode = 1;
                 const add_length = clickX - location.x;
                 clickX = location.x;
                 const length = parseInt(referent.style.width) - add_length;
@@ -61,7 +60,6 @@ layui.define(['jquery', 'utils', 'history', 'control'], function(exports){
                 break;
             }
             case "s": {
-                moveMode = 1;
                 const add_length = clickY - location.y;
                 clickY = location.y;
                 const length = parseInt(referent.style.height) - add_length;
@@ -70,7 +68,6 @@ layui.define(['jquery', 'utils', 'history', 'control'], function(exports){
                 break;
             }
             case "w": {
-                moveMode = 1;
                 const add_length = clickX - location.x;
                 clickX = location.x;
                 const length = parseInt(referent.style.width) + add_length;
@@ -81,7 +78,6 @@ layui.define(['jquery', 'utils', 'history', 'control'], function(exports){
                 break;
             }
             case "n":  {
-                moveMode = 1;
                 const add_length = clickY - location.y;
                 clickY = location.y;
                 const length = parseInt(referent.style.height) + add_length;
@@ -94,7 +90,6 @@ layui.define(['jquery', 'utils', 'history', 'control'], function(exports){
         }
     }
     function move(location) {
-        moveMode = 0;
         const deltaX = clickX - location.x;
         const deltaY = clickY - location.y;
         for (const referent of referents) {
@@ -167,7 +162,11 @@ layui.define(['jquery', 'utils', 'history', 'control'], function(exports){
         const location = getLocation(e);
         clickY = location.y;
         clickX = location.x;
-        actions = { operateType: type, node: e.target };
+        action = {
+            type: type,
+            referent: type === 'move' ? e.target : e.target.parentNode,
+            target: type === 'move' ? e.target.target : e.target.parentNode.target,
+        };
         e.stopPropagation();
         isAltKeyPress && type === 'move' && copyTarget(e.target.target);
         if (Date.now() - doubleClickStartTime < 200) {
@@ -191,25 +190,27 @@ layui.define(['jquery', 'utils', 'history', 'control'], function(exports){
     }
     function onDocumentMouseUp() {
         root.style.cursor = "auto";
-        if (actions) {
-            actions = null;
+        if (action) {
+            if (!(lastAction && lastAction.target === action.target &&  lastAction.type === action.type)) {
+                history.pushHistory(action.type === 'move' ? '移动' : '改变大小');
+            }
+            lastAction = action;
+            action = null;
         }
     }
     function onDocumentMouseMove(e) {
         if (editingTarget) {
             return true;
         }
-        if (actions) {
-            const operateType = actions.operateType;
+        if (action) {
+            const type = action.type;
             const location = getLocation(e);
-            let referent;
-            if (operateType === 'move') {
-                referent = actions.node;
+            if (type === 'move') {
                 move(location);
             } else {
-                referent = actions.node.parentNode;
-                resize(referent, operateType[0], location);
-                operateType[1] && resize(referent, operateType[1], location);
+                const referent = action.referent;
+                resize(referent, type[0], location);
+                type[1] && resize(referent, type[1], location);
             }
             control.updatePositionSize(clickTarget);
         }
@@ -318,34 +319,6 @@ layui.define(['jquery', 'utils', 'history', 'control'], function(exports){
             target.style.fontWeight = copiedTarget.style.fontWeight;
             target.style.fontSize = copiedTarget.style.fontSize;
             target.style.fontStyle = copiedTarget.style.fontStyle;
-        }
-    }
-    function showColorPicker (target, referent) {
-        if (colorPicker) {
-            removeColorPicker();
-            return;
-        }
-        colorPicker = document.createElement('INPUT');
-        colorPicker.jscolor = new jscolor(colorPicker, { closable:true, closeText:'确定' });
-        colorPicker.jscolor.fromString(getComputedStyle(target).color);
-        colorPicker.onchange = function() {
-            target.style.color = `${colorPicker.jscolor.toRGBString()}`;
-        };
-        colorPicker.jscolor.onClose = function() {
-            document.body.removeChild(colorPicker);
-            colorPicker = null;
-        };
-        colorPicker.style.position = 'absolute';
-        colorPicker.style.visibility = 'hidden';
-        colorPicker.style.left = (referent.offsetLeft +referent.offsetWidth) + "px";
-        colorPicker.style.top = (referent.offsetTop - 25) + "px";
-        document.body.appendChild(colorPicker);
-        colorPicker.jscolor.show();
-    }
-    function removeColorPicker () {
-        if (colorPicker) {
-            colorPicker.jscolor.hide();
-            colorPicker = null;
         }
     }
     function setFragmentAnimate (target, referent) {
@@ -506,8 +479,6 @@ layui.define(['jquery', 'utils', 'history', 'control'], function(exports){
                     target.style.fontStyle = fontStyle;
                     utils.log("fontStyle:", fontStyle);
                     history.pushHistory('切换斜体');
-                } else if (e.altKey && e.keyCode === 82) { // alt + r 设置颜色
-                    showColorPicker(target, referents[0]);
                 } else if (e.altKey && e.keyCode === 65) { // alt + a 设置动画
                     setFragmentAnimate(target, referents[0]);
                 } else if (e.altKey && e.keyCode === 69) { // alt + e 编辑文字/图片
@@ -565,6 +536,8 @@ layui.define(['jquery', 'utils', 'history', 'control'], function(exports){
         onDocumentMouseUp,
         onDocumentKeyDown,
         onDocumentKeyUp,
+        getRootHtml: () => root.innerHTML,
+        setRootHtml: (html) => { root.innerHTML = html },
     });
 
     // 全局函数
