@@ -1,17 +1,32 @@
-layui.use(['jquery'], function() {
-        const $ = layui.$;
+layui.define(['jquery'], function(exports) {
+    let editor;
+    const $ = layui.$;
+    function initialize() {
+        editor = layui.editor;
+        update();
+    }
+    function update() {
         const html = $.map($('.target'), target=>{
             const isText = target.classList.contains('text');
             const id = target.getAttribute('id');
-            if (isText) {
-                return `<div class="component-line" data-target-id="${id}"><i class="layui-icon layui-icon-list"></i><div class="component-text">${target.innerHTML.trim()}<div></div>`;
-            } else {
-                return `<div class="component-line" data-target-id="${id}"><i class="layui-icon layui-icon-picture-fine"></i><img  class="component-image" src="${target.getAttribute('src')}" /></div>`
-            }
+            const html = isText ?
+            `<i class="layui-icon layui-icon-list"></i><div class="component-text">${target.innerHTML.trim()}<div>`
+            :
+            `<i class="layui-icon layui-icon-picture-fine"></i><img  class="component-image" src="${target.getAttribute('src')}" />`;
+            return `<div class="component-line" onclick="window.onComponentLineClick('${id}')">${html}</div>`
         });
         $('#componentContent').html(html);
-        $('.component-line').click(function() {
-            const id = $(this).data('target-id');
-            selectTarget(document.getElementById(id));
-        });
- });
+    }
+    function onComponentLineClick(id) {
+        editor.selectTarget(document.getElementById(id));
+    }
+
+    // 导出函数
+    exports('component', {
+        initialize,
+        update,
+    });
+
+    // 全局函数
+    window.onComponentLineClick = onComponentLineClick;
+});

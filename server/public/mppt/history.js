@@ -1,7 +1,7 @@
 layui.define(['jquery', 'utils'], function(exports) {
+    let editor;
     const $ = layui.$;
     const utils = layui.utils;
-    let editor;
     let history = []; // 历史记录
     let historyIndex = 0; // 当前历史记录的指针
 

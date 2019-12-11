@@ -1,8 +1,9 @@
-layui.define(['jquery', 'utils', 'history', 'control'], function(exports) {
+layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(exports) {
     const $ = layui.$;
     const utils = layui.utils;
     const history = layui.history;
     const control = layui.control;
+    const component = layui.component;
 
     let action = null; // 当前操作的对象
     let lastAction = null; // 上一次操作的对象
@@ -25,6 +26,7 @@ layui.define(['jquery', 'utils', 'history', 'control'], function(exports) {
     function initialize() {
         root = document.getElementById('editor');
         history.initialize();
+        component.initialize();
         const list = document.querySelectorAll('.target');
         for (const el of list) {
             group = Math.max(group, +el.dataset.group||0);
@@ -536,6 +538,7 @@ layui.define(['jquery', 'utils', 'history', 'control'], function(exports) {
         onDocumentMouseUp,
         onDocumentKeyDown,
         onDocumentKeyUp,
+        selectTarget,
         getRootHtml: () => root.innerHTML,
         setRootHtml: (html) => { root.innerHTML = html },
     });
