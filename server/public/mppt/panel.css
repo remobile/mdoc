@@ -1,11 +1,12 @@
 #prop {
     position: absolute;
     left: 20px;
-    top: 2px;
+    top: 20px;
     width: 320px;
     height: 667px;
     border: 1px solid #E6E6E6;
     overflow: scroll;
+    border-radius: 10px;
 }
 #phone {
     position: absolute;
@@ -29,12 +30,13 @@
 #component {
     position: absolute;
     left: 800px;
-    top: 2px;
-    width: 320px;
+    top: 20px;
+    width: 160px;
     height: 667px;
     border: 1px solid #E6E6E6;
+    border-radius: 10px;
 }
-#component .title {
+#component .title, #history .title {
     font-size: 16px;
     text-align: center;
     padding: 10px;
@@ -48,13 +50,18 @@
 }
 #history {
     position: absolute;
-    left: 1150px;
-    top: 2px;
-    width: 140px;
+    left: 980px;
+    top: 20px;
+    width: 160px;
     height: 667px;
     border: 1px solid #E6E6E6;
-    padding-left: 10px;
+    border-radius: 10px;
     overflow: scroll;
+}
+#historyContent {
+    overflow: scroll;
+    padding-left: 6px;
+    padding-right: 6px;
 }
 .history-item {
     cursor:pointer;

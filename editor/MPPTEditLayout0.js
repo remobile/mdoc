@@ -14,11 +14,10 @@ class PPTEditLayout extends React.Component {
                     <meta charSet="utf-8" />
                     <meta name="viewport" content="width=device-width" />
                     <link rel="stylesheet" href="layui/css/layui.css" />
+                    <link rel="stylesheet" href="mppt/medit.css" />
                     <link rel="stylesheet" href="mppt/panel.css" />
-                    <link rel="stylesheet" href="mppt/editor.css" />
                     <link rel="stylesheet" href="mppt/control.css" />
                     <link rel="stylesheet" href="mppt/component.css" />
-                    <link rel="stylesheet" href="mppt/history.css" />
                 </head>
                 <body>
                     <div id="prop">
@@ -86,7 +85,10 @@ class PPTEditLayout extends React.Component {
                     </div>
                     <div id="info"></div>
                     <script type="text/javascript" src="layui/layui.all.js"></script>
-                    <script type="text/javascript" src="mppt/main.js"></script>
+                    <script type="text/javascript" src="mppt/medit.js"></script>
+                    <script type="text/javascript" src="mppt/jscolor.js"></script>
+                    <script type="text/javascript" src="mppt/control.js"></script>
+                    <script type="text/javascript" src="mppt/component.js"></script>
                 </body>
             </html>
         );
