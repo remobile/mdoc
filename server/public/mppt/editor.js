@@ -11,10 +11,8 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
     let isAltKeyPress = false; // alt是否被按住
     let clickX = 0; // 保留上次的X轴位置
     let clickY = 0; // 保留上次的Y轴位置©
-    let group = -1; // 集合的id最小值
+    let group = 0; // 集合的id最小值
     let copiedTarget = null; // 复制的target
-    let animateSelector = null; //动画选择器
-    let targetTextInput = null; //输入框
     let editingTarget; // 正在编辑的target
     let doubleClickStartTime; // 双击计时
     let root;
@@ -37,12 +35,27 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             y: (e.y || e.clientY) - OFFSET.y,
         }
     }
-    function copyTarget(target) {
-        const newTarget = target.cloneNode(true);
-        const oldId = target.getAttribute('id');
-        newTarget.setAttribute('id', oldId);
-        target.setAttribute('id', uuid());
-        target.parentNode.insertBefore(newTarget, target);
+    function copyTargets() {
+        let hasGroup = false;
+        for (const refrent of referents) {
+            const target = refrent.target;
+            const newTarget = target.cloneNode(true);
+            const oldId = target.getAttribute('id');
+            newTarget.setAttribute('id', oldId);
+            target.setAttribute('id', utils.uuid());
+            target.parentNode.insertBefore(newTarget, target);
+            if (!target.dataset.group) {
+                if (!hasGroup) {
+                    group++
+                    hasGroup = true;
+                }
+            }
+            if (hasGroup) {
+                target.dataset.group = group;
+            }
+            component.add(target);
+        }
+
     }
     function setClickTarget(target) {
         action.target = target;
@@ -128,14 +141,15 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         referents = [];
     }
     // 为target创建一个referent
-    function createReferentForTarget(target, isGroup, isSelf) {
+    function createReferentForTarget(target, isGroup, isNotSelf) {
         const div = document.createElement("div");
         const dirs = ['n', 's', 'w', 'e', 'nw', 'ne', 'sw', 'se'];
         const style = `height:${target.offsetHeight}px;width:${target.offsetWidth}px;top:${target.offsetTop-1}px;left:${target.offsetLeft-1}px`;
-        const className = 'referent' + (isGroup ? ' group' : '') + (isSelf ? ' self' : '');
+        const className = 'referent' + (isGroup ? ' group' : '') + (!isNotSelf ? ' self' : '');
         div.innerHTML = `<div class="${className}" style="${style}" onmousedown="onReferentMouseDown(event, 'refer_move')">${dirs.map(dir=>(`<div class="referent_node" data-dir="${dir}" onmousedown="onReferentMouseDown(event, 'refer_${dir}')"></div>`)).join('')}</div>`;
         const referent = div.childNodes[0];
         referent.target = target;
+        referent.active = !isNotSelf;
         target.referent = referent;
         root.appendChild(referent);
         referents.push(referent);
@@ -154,7 +168,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         } else {
             const list = root.querySelectorAll(`.target[data-group = "${target.dataset.group}"]`);
             for (const el of list) {
-                createReferentForTarget(el, true, target === el);
+                createReferentForTarget(el, true, target !== el);
             }
         }
     };
@@ -174,7 +188,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         e.stopPropagation();
         if (cmd === 'refer_move') {
             if (isAltKeyPress) {
-                copyTarget(e.target.target);
+                copyTargets();
             }
             if (Date.now() - doubleClickStartTime < 200) {
                 onReferentDoubleClick(e.target.target);
@@ -253,7 +267,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         if (referents.length < 2) {
             return;
         }
-        if (referents[0].target.dataset.group === undefined) {
+        if (!referents[0].target.dataset.group) {
             group++;
             for (const refrent of referents) {
                 refrent.target.dataset.group = group;
@@ -331,78 +345,6 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             target.style.fontStyle = copiedTarget.style.fontStyle;
         }
     }
-    function setFragmentAnimate (target, referent) {
-        if (animateSelector) {
-            removeAnimateSelector();
-            return;
-        }
-        const animates = [
-            { value: 'grow', name: 'grow' },
-            { value: 'zoom-in', name: 'zoom' },
-            { value: 'fade-out', name: 'fade-out' },
-            { value: 'fade-up', name: 'fade-up' },
-            { value: 'fade-down', name: 'fade-down' },
-            { value: 'fade-right', name: 'fade-right' },
-            { value: 'fade-left', name: 'fade-left' },
-            { value: 'semi-fade-out', name: 'semi-fade-out' },
-            { value: 'fade-in-then-out', name: 'fade-in-then-out' },
-            { value: 'fade-in-then-semi-out', name: 'fade-in-then-semi-out' },
-            { value: 'shrink', name: 'shrink' },
-            { value: 'strike', name: 'strike' },
-            { value: 'highlight-red', name: 'highlight-red' },
-            { value: 'highlight-current-red', name: 'highlight-current-red' },
-            { value: 'highlight-current-green', name: 'highlight-current-green' },
-            { value: 'highlight-green', name: 'highlight-green' },
-            { value: 'highlight-current-blue', name: 'highlight-current-blue' },
-            { value: 'highlight-blue', name: 'highlight-blue' },
-        ];
-        animateSelector = document.createElement('DIV');
-        animateSelector.style.position = 'absolute';
-        animateSelector.style.left = (referent.offsetLeft +referent.offsetWidth) + "px";
-        animateSelector.style.top = referent.offsetTop + "px";
-        document.body.appendChild(animateSelector);
-        animateSelector.innerHTML = `<select id="animate-select">${animates.map(o=>`<option value ="${o.value}" ${o.value===target.dataset.animate?'selected':''}>${o.name}</option>`)}</select>`;
-        document.getElementById('animate-select').onchange = function(e) {
-            const index = e.target.selectedIndex;
-            const value = e.target.options[index].value;
-            target.dataset.animate = value;
-            document.body.removeChild(animateSelector);
-            animateSelector = null;
-        };
-    }
-    function removeAnimateSelector () {
-        if (animateSelector) {
-            document.body.removeChild(animateSelector);
-            animateSelector = null;
-        }
-    }
-    function editTargetText (target, referent) {
-        if (targetTextInput) {
-            removeTargetTextInput();
-            return;
-        }
-        const isText = target.classList.contains('text');
-        targetTextInput = document.createElement('INPUT');
-        targetTextInput.type = 'text';
-        targetTextInput.value = isText ? target.innerText : target.src.replace(window.location.href, '');
-        targetTextInput.className = 'target_input';
-        targetTextInput.style.left = (referent.offsetLeft +referent.offsetWidth) + "px";
-        targetTextInput.style.top = referent.offsetTop + "px";
-        document.body.appendChild(targetTextInput);
-        targetTextInput.oninput = function(e) {
-            if (isText) {
-                target.innerText = e.target.value;
-            } else {
-                target.src = e.target.value;
-            }
-        };
-    }
-    function removeTargetTextInput() {
-        if (targetTextInput) {
-            document.body.removeChild(targetTextInput);
-            targetTextInput = null;
-        }
-    }
     function createTextTarget() {
         removeAll();
         const target = document.createElement('DIV');
@@ -418,6 +360,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         createReferentForTarget(target);
         action.target = target;
         control.updateValues(target);
+        component.add(target);
     }
     function createImageTarget() {
         removeAll();
@@ -434,14 +377,12 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         createReferentForTarget(target);
         action.target = target;
         control.updateValues(target);
+        component.add(target);
     }
-    function removeTarget(target) {
-        target.remove();
-        removeAll();
-    }
-    function removeTargets(referents) {
+    function removeTargets() {
         for (const refrent of referents) {
             refrent.target.remove();
+            component.remove(refrent.target);
         }
         removeAll();
     }
@@ -497,23 +438,18 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
                     target.style.fontStyle = fontStyle;
                     utils.log("fontStyle:", fontStyle);
                     history.pushHistory('切换斜体');
-                } else if (e.altKey && e.keyCode === 65) { // alt + a 设置动画
-                    setFragmentAnimate(target, referents[0]);
-                } else if (e.altKey && e.keyCode === 69) { // alt + e 编辑文字/图片
-                    editTargetText(target, referents[0]);
                 } else if (e.altKey && e.keyCode === 80) { // alt + p 复制属性
                     copyTargetAcctribute(target);
                 } else if (e.altKey && e.keyCode === 67) { // alt + c 粘贴属性
                     pasteTargetAcctribute(target);
-                } else if (e.altKey && e.keyCode === 46) { // alt + delete 删除元素
-                    removeTarget(target);
                 }
             } else {
                 if (e.altKey && e.keyCode === 85) { // alt + u 切换group状态
                     toggleTargetGroup();
-                } else if (e.altKey && e.keyCode === 46) { // alt + delete 删除元素
-                    removeTargets(referents);
                 }
+            }
+            if (e.altKey && e.keyCode === 8) { // alt + delete 删除元素
+                removeTargets();
             }
         } else {
             if (e.keyCode === 27 || e.keyCode === 13) { // esc |  enter

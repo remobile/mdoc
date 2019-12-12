@@ -102,35 +102,33 @@ layui.define(['jquery', 'form', 'colorpicker'], function(exports) {
         }
         layui.data('settings', { key: 'textBackgroundColorList', value: textBackgroundColorList });
     }
-    function setTextStyle(callback) {
+    function getReferents() {
         const referents = editor.getReferents();
-        if (referents.length) {
-            for (const referent of referents) {
-                const target = referent.target;
-                if (target.classList.contains('text')) {
-                    callback(target);
-                }
+        return referents.filter(o=>o.active);
+    }
+    function setTextStyle(callback) {
+        const referents = getReferents();
+        for (const referent of referents) {
+            const target = referent.target;
+            if (target.classList.contains('text')) {
+                callback(target);
             }
         }
     }
     function setImageStyle(callback) {
-        const referents = editor.getReferents();
-        if (referents.length) {
-            for (const referent of referents) {
-                const target = referent.target;
-                if (!target.classList.contains('text')) {
-                    callback(target);
-                }
+        const referents = getReferents();
+        for (const referent of referents) {
+            const target = referent.target;
+            if (!target.classList.contains('text')) {
+                callback(target);
             }
         }
     }
     function setAnimate(callback) {
-        const referents = editor.getReferents();
-        if (referents.length) {
-            for (const referent of referents) {
-                const target = referent.target;
-                callback(target);
-            }
+        const referents = getReferents();
+        for (const referent of referents) {
+            const target = referent.target;
+            callback(target);
         }
     }
     // 更新属性的值
