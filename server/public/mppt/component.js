@@ -105,7 +105,7 @@ layui.define(['jquery', 'layer', 'utils', 'control'], function(exports) {
         layer.close(dialog);
     }
     function removeAnimateRelyComponent() {
-        control.setAnimate();
+        control.setAnimate({ rely: '' });
     }
 
     // 导出函数
