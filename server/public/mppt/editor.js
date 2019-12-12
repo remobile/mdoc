@@ -5,8 +5,8 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
     const control = layui.control;
     const component = layui.component;
 
-    let action = null; // 当前操作的对象
-    let lastAction = null; // 上一次操作的对象
+    let action = { cmd: '' }; // 当前操作的对象
+    let lastAction = { cmd: ''  }; // 上一次操作的对象
     let referents = []; // 当前选中的refrent列表
     let isAltKeyPress = false; // alt是否被按住
     let clickX = 0; // 保留上次的X轴位置
@@ -15,13 +15,11 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
     let copiedTarget = null; // 复制的target
     let animateSelector = null; //动画选择器
     let targetTextInput = null; //输入框
-    let root;
-    let doubleClickStartTime; // 双击计时
-    let clickTarget; // 被选中的target
     let editingTarget; // 正在编辑的target
+    let doubleClickStartTime; // 双击计时
+    let root;
 
     const OFFSET = { x: 300, y: 4 }; // 编辑页面相对于body的偏移位置
-
 
     function initialize() {
         root = document.getElementById('editor');
@@ -47,19 +45,20 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         target.parentNode.insertBefore(newTarget, target);
     }
     function setClickTarget(target) {
-        lastClickTarget = clickTarget;
-        clickTarget = target;
+        action.target = target;
         control.updateValues(target);
     }
-    function resize(referent, type, location) {
+    function resize(dir, location) {
         root.style.cursor = location + "_resize";
-        switch (type) {
+        const target = action.target;
+        const referent = target.referent;
+        switch (dir) {
             case "e": {
                 const add_length = clickX - location.x;
                 clickX = location.x;
                 const length = parseInt(referent.style.width) - add_length;
                 referent.style.width = length + "px";
-                referent.target.style.width = length + "px";
+                target.style.width = length + "px";
                 break;
             }
             case "s": {
@@ -67,7 +66,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
                 clickY = location.y;
                 const length = parseInt(referent.style.height) - add_length;
                 referent.style.height = length + "px";
-                referent.target.style.height = length + "px";
+                target.style.height = length + "px";
                 break;
             }
             case "w": {
@@ -76,8 +75,8 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
                 const length = parseInt(referent.style.width) + add_length;
                 referent.style.width = length + "px";
                 referent.style.left = clickX + "px";
-                referent.target.style.width = length + "px";
-                referent.target.style.left = (clickX + 1) + "px";
+                target.style.width = length + "px";
+                target.style.left = (clickX + 1) + "px";
                 break;
             }
             case "n":  {
@@ -86,8 +85,8 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
                 const length = parseInt(referent.style.height) + add_length;
                 referent.style.height = length + "px";
                 referent.style.top = clickY + "px";
-                referent.target.style.height = length + "px";
-                referent.target.style.top = (clickY + 1) + "px";
+                target.style.height = length + "px";
+                target.style.top = (clickY + 1) + "px";
                 break;
             }
         }
@@ -111,7 +110,11 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             referent.target.style.top = (referent.offsetTop+1) + "px";
             referent.target.style.left = (referent.offsetLeft+1) + "px";
         }
-        history.pushHistory('移动结束');
+        if (!(action.target === lastAction.target && lastAction.cmd === 'key_move')) {
+            history.pushHistory('移动');
+            lastAction.target = action.target;
+            lastAction.cmd = 'key_move';
+        }
     }
     // 删除所有的referent
     function removeAllReferents() {
@@ -120,6 +123,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             root.removeChild(el);
         }
         editingTarget = null;
+        action.target = null;
         referents = [];
     }
     // 为target创建一个referent
@@ -128,9 +132,10 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         const dirs = ['n', 's', 'w', 'e', 'nw', 'ne', 'sw', 'se'];
         const style = `height:${target.offsetHeight}px;width:${target.offsetWidth}px;top:${target.offsetTop-1}px;left:${target.offsetLeft-1}px`;
         const className = 'referent' + (isGroup ? ' group' : '') + (isSelf ? ' self' : '');
-        div.innerHTML = `<div class="${className}" style="${style}" onmousedown="onReferentMouseDown(event, 'move')">${dirs.map(dir=>(`<div class="referent_node" data-dir="${dir}" onmousedown="onReferentMouseDown(event, '${dir}')"></div>`)).join('')}</div>`;
+        div.innerHTML = `<div class="${className}" style="${style}" onmousedown="onReferentMouseDown(event, 'refer_move')">${dirs.map(dir=>(`<div class="referent_node" data-dir="${dir}" onmousedown="onReferentMouseDown(event, 'refer_${dir}')"></div>`)).join('')}</div>`;
         const referent = div.childNodes[0];
         referent.target = target;
+        target.referent = referent;
         root.appendChild(referent);
         referents.push(referent);
         utils.log("create referent");
@@ -152,7 +157,6 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             }
         }
     };
-
     function onReferentDoubleClick(target) {
         const isText = target.classList.contains('text');
         if (isText) {
@@ -161,22 +165,22 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             editingTarget = target;
         }
     }
-    function onReferentMouseDown(e, type) {
+    function onReferentMouseDown(e, cmd) {
         const location = getLocation(e);
         clickY = location.y;
         clickX = location.x;
-        action = {
-            type: type,
-            referent: type === 'move' ? e.target : e.target.parentNode,
-            target: type === 'move' ? e.target.target : e.target.parentNode.target,
-        };
+        action.cmd = cmd;
         e.stopPropagation();
-        isAltKeyPress && type === 'move' && copyTarget(e.target.target);
-        if (Date.now() - doubleClickStartTime < 200) {
-            onReferentDoubleClick(e.target.target);
-            doubleClickStartTime = undefined;
-        } else {
-            doubleClickStartTime = Date.now();
+        if (cmd === 'refer_move') {
+            if (isAltKeyPress) {
+                copyTarget(e.target.target);
+            }
+            if (Date.now() - doubleClickStartTime < 200) {
+                onReferentDoubleClick(e.target.target);
+                doubleClickStartTime = undefined;
+            } else {
+                doubleClickStartTime = Date.now();
+            }
         }
         // 改变group的情况下被点中的target
         if (e.target.classList.contains('group')) {
@@ -193,29 +197,30 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
     }
     function onDocumentMouseUp() {
         root.style.cursor = "auto";
-        if (action) {
-            if (!(lastAction && lastAction.target === action.target &&  lastAction.type === action.type)) {
-                history.pushHistory(action.type === 'move' ? '移动' : '改变大小');
+        if (action.cmd.startsWith('refer_')) {
+            if (!(lastAction.target === action.target && lastAction.cmd === action.cmd)) {
+                history.pushHistory(action.cmd === 'refer_move' ? '移动' : '改变大小');
             }
-            lastAction = action;
-            action = null;
+            lastAction.target = action.target;
+            lastAction.cmd = action.cmd;
+            action.cmd = '';
         }
     }
     function onDocumentMouseMove(e) {
         if (editingTarget) {
             return true;
         }
-        if (action) {
-            const type = action.type;
+        if (action.cmd.startsWith('refer_')) {
+            let cmd = action.cmd;
             const location = getLocation(e);
-            if (type === 'move') {
+            if (cmd === 'refer_move') {
                 move(location);
             } else {
-                const referent = action.referent;
-                resize(referent, type[0], location);
-                type[1] && resize(referent, type[1], location);
+                cmd = cmd.substr(6, 2);
+                resize(cmd[0], location);
+                cmd[1] && resize(cmd[1], location);
             }
-            control.updatePositionSize(clickTarget);
+            control.updatePositionSize(action.target);
         }
         return false;
     }
@@ -252,7 +257,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             for (const refrent of referents) {
                 refrent.target.dataset.group = group;
                 refrent.classList.add('group');
-                if (refrent.target === clickTarget) {
+                if (refrent.target === action.target) {
                     refrent.classList.add('self');
                 }
             }
@@ -434,13 +439,13 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         if (referents.length) {
             if (e.keyCode === 27) { // esc
                 removeAll();
-            } else if (e.altKey && e.keyCode === 37) { // alt + left key
+            } else if ( e.keyCode === 37) { // left key
                 moveByStep({ x: -1, y: 0 });
-            } else if (e.altKey && e.keyCode === 38) { // alt + up key
+            } else if ( e.keyCode === 38) { // up key
                 moveByStep({ x: 0, y: -1 });
-            } else if (e.altKey && e.keyCode === 39) { // alt + right key
+            } else if (e.keyCode === 39) { // right key
                 moveByStep({ x: 1, y: 0 });
-            } else if (e.altKey && e.keyCode === 40) { // alt + down key
+            } else if (e.keyCode === 40) { // down key
                 moveByStep({ x: 0, y: 1 });
             } else if (referents.length === 1) {
                 const target = referents[0].target;
