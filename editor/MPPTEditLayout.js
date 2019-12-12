@@ -52,7 +52,7 @@ class PPTEditLayout extends React.Component {
                                 <button id="componentButtonImage" title="新建图片(alt+m)" type="button" className="layui-btn layui-btn-sm tip">
                                     <i className="layui-icon">&#xe64a;</i>
                                 </button>
-                                <button id="componentButtonRelate" title="添加动画依赖" type="button" className="layui-btn layui-btn-sm tip">
+                                <button id="componentButtonRely" title="添加动画依赖" type="button" className="layui-btn layui-btn-sm tip">
                                     <i className="layui-icon">&#xe6b1;</i>
                                 </button>
                                 <button id="componentButtonDelete" title="删除元素" type="button" className="layui-btn layui-btn-sm tip">

@@ -59,7 +59,7 @@ button.tip:hover::before {
 #componentButtonImage::before,#componentButtonImage::after {
     left: 30%;
 }
-#componentButtonRelate::before,#componentButtonPre::after {
+#componentButtonRely::before,#componentButtonPre::after {
     left: 50%;
 }
 #componentButtonDelete::before,#componentButtonNext::after {

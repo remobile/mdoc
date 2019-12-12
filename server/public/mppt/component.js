@@ -1,6 +1,10 @@
-layui.define(['jquery'], function(exports) {
+layui.define(['jquery', 'layer', 'utils', 'control'], function(exports) {
     let editor;
     const $ = layui.$;
+    const layer = layui.layer;
+    const control = layui.control;
+    const utils = layui.utils;
+
     function initialize() {
         editor = layui.editor;
         $('#componentButtonText').click(function(){
@@ -9,8 +13,14 @@ layui.define(['jquery'], function(exports) {
         $('#componentButtonImage').click(function(){
             editor.createImageTarget();
         });
-        $('#componentButtonRelate').click(function(){
-
+        $('#componentButtonRely').click(function(){
+            // const action = editor.getAction();
+            // if (action.target) {
+            //     utils.unshiftUnique(animateRelyList, action.target);
+            //     layer.tips('添加成功', '#componentButtonRely');
+            // } else {
+            //     layer.tips('没有选中元素', '#componentButtonRely');
+            // }
         });
         $('#componentButtonDelete').click(function(){
 
@@ -34,7 +44,7 @@ layui.define(['jquery'], function(exports) {
         return html;
     }
     function add(target) {
-        $('#componentContent').append(getComponentLine(target));
+        $('#componentContent').prepend(getComponentLine(target));
     }
     function remove(target) {
         $(`.component-line[data-id="${target.id}"]`).remove();

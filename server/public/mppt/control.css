@@ -4,7 +4,7 @@
 #propertyPanel.for-image>.for-text {
     display: none;
 }
-#fontSizeSlider, #lineHeightSlider, #imageWidthSlider, #imageHeightSlider {
+#fontSizeSlider, #lineHeightSlider, #animateLongSlider, #animateDelaySlider {
     padding-top: 20px;
     padding-left: 10px;
     padding-right: 10px;
@@ -45,4 +45,7 @@
 }
 .layui-form-item .layui-inline {
     margin-left: 10px;
+}
+.layui-form-item.no-animate {
+    display: none;
 }

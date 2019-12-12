@@ -3,7 +3,6 @@ layui.config({
     version: true,
     debug: true,
 }).use('editor', function(editor) {
-    console.log("=======", editor);
     editor.initialize();
     document.getElementById('info').innerHTML = `
     <ol>

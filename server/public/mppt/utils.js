@@ -4,6 +4,21 @@ layui.define(function(exports) {
     function log(...args) {
         hasLog && console.log(...args);
     }
+    function unshiftUnique(list, item) {
+        removeList(list, item).unshift(item);
+        return list;
+    }
+    function pushUnique(list, item) {
+        removeList(list, item).push(item);
+        return list;
+    }
+    function removeList(list, item) {
+        const index = list.indexOf(item);
+        if (index !== -1) {
+            list.splice(index, 1);
+        }
+        return list;
+    }
     function uuid() {
         return Math.random().toString().substr(2, 2)
         + Math.random().toString().substr(2, 2)
@@ -26,5 +41,8 @@ layui.define(function(exports) {
         log,
         uuid,
         post,
+        unshiftUnique,
+        pushUnique,
+        removeList,
     });
 });

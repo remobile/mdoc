@@ -17,23 +17,22 @@ module.exports = () => {
                     </select>
                 </div>
             </div>
-            <div className="layui-form-item">
+            <div className="layui-form-item no-animate">
                 <label className="layui-form-label">时长</label>
                 <div className="layui-input-block">
                     <div id="animateLongSlider"></div>
                 </div>
             </div>
-            <div className="layui-form-item">
+            <div className="layui-form-item no-animate">
                 <label className="layui-form-label">延时</label>
                 <div className="layui-input-block">
                     <div id="animateDelaySlider"></div>
                 </div>
             </div>
-            <div className="layui-form-item">
+            <div className="layui-form-item no-animate">
                 <label className="layui-form-label">依赖</label>
                 <div className="layui-input-block">
                     <select id="animateRelyComponents" lay-filter="animateRelyComponents">
-                        <option value="none">无</option>
                     </select>
                 </div>
             </div>

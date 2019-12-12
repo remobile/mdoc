@@ -6,11 +6,13 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
     const history = layui.history;
 
     let editor;
+    let component;
     let textColorList;
     let textBackgroundColorList;
 
     function initialize() {
         editor = layui.editor;
+        component = layui.component;
         const settings = layui.data('settings');
         textColorList = [...(settings.textColorList || []), '#009688', '#5FB878', '#1E9FFF', '#FF5722', '#FFB800', '#01AAED', '#999', '#c00', '#ff8c00','#ffd700','#90ee90', '#00ced1', '#1e90ff', '#c71585', 'rgb(0, 186, 189)', 'rgb(255, 120, 0)', 'rgb(250, 212, 0)', '#393D49', 'rgba(0,0,0,.5)', 'rgba(255, 69, 0, 0.68)', 'rgba(144, 240, 144, 0.5)', 'rgba(31, 147, 255, 0.73)'];
         textColorList.length > 22 && ( textColorList.length = 22 );
@@ -74,10 +76,12 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         // 动画列表选择
         $('#animateList').attr('lay-filter', 'animateList');
         form.on('select(animateList)', function(data){
-            setAnimate((target)=>{
-                console.log("=======", data.value);
-                target.dataset.animate = data.value;
-            })
+            setAnimate({ animate: data.value });
+        });
+        // 依赖列表选择
+        $('#animateRelyComponents').attr('lay-filter', 'animateRelyComponents');
+        form.on('select(animateRelyComponents)', function(data){
+            setAnimate({ rely: data.value });
         });
     }
 
@@ -125,11 +129,15 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             }
         }
     }
-    function setAnimate(callback) {
+    function setAnimate(obj) {
         const referents = getReferents();
         for (const referent of referents) {
             const target = referent.target;
-            callback(target);
+            if (obj.animate) {
+                target.dataset.animate = 'zoomIn';
+            } else {
+                delete target.dataset.animate;
+            }
         }
     }
     // 更新属性的值
@@ -142,8 +150,45 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         $('#propertyPanel').show();
         $('#animatePanel').show();
 
-        const style = getComputedStyle(target);
+        // 设置动画(格式:zoomIn:a:b:c 其中a为时长,b为延时，c为依赖id)
+        let animate = target.dataset.animate;
+        if (animate) {
+            const list = animate.split(':');
+            animate = list[0];
+            const timeLong = list[1] || 2; // 时长
+            const delay = list[2] || 0; // 延时
+            const rely = list[3]; // 依赖
+            $('.layui-form-item.no-animate').show();
+            $("#animateList").val(animate);
 
+            // 设置依赖列表
+            // $("#animateRelyComponents").html(component.getAnimateRelyOptions());
+            // $("#animateRelyComponents").val(rely);
+            form.render('select');
+            slider.render({
+                elem: '#animateLongSlider',
+                value: timeLong,
+                min: 1,
+                max: 10,
+                change: function(timeLong){
+                    setAnimate({ timeLong });
+                },
+            });
+            slider.render({
+                elem: '#animateDelaySlider',
+                value: delay,
+                min: 0,
+                max: 10,
+                change: function(delay){
+                    setAnimate({ delay })
+                },
+            });
+        } else {
+            $('.layui-form-item.no-animate').hide();
+        }
+
+        // 设置样式
+        const style = getComputedStyle(target);
         if (target.classList.contains('text')) {
             $('#propertyPanel').removeClass('for-image');
             // 字体大小
