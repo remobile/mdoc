@@ -76,7 +76,13 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         // 动画列表选择
         $('#animateList').attr('lay-filter', 'animateList');
         form.on('select(animateList)', function(data){
-            setAnimate({ animate: data.value });
+            if (data.value === 'none') {
+                $('.layui-form-item.no-animate').hide();
+                setAnimate();
+            } else {
+                $('.layui-form-item.no-animate').show();
+                setAnimate({ animate: data.value });
+            }
         });
     }
 
@@ -128,15 +134,19 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         const referents = getReferents();
         for (const referent of referents) {
             const target = referent.target;
-            let animate = target.dataset.animate;
-            const _animate = parseAnimate(animate);
-            animate = { ..._animate, ...options };
-            target.dataset.animate = `${animate.animate||''}:${animate.timeLong||''}:${animate.delay||''}:${animate.rely||''}`.replace(/:*$/, '');
-            options.rely != _animate.rely && $('#animateRely').html(component.getRelyItem(options.rely));
+            if (options) {
+                let animate = target.dataset.animate;
+                const _animate = parseAnimate(animate);
+                animate = { ..._animate, ...options };
+                target.dataset.animate = `${animate.animate||''}:${animate.timeLong||''}:${animate.delay||''}:${animate.rely||''}`.replace(/:*$/, '');
+                options.rely != _animate.rely && $('#animateRely').html(component.getRelyItem(options.rely));
+            } else {
+                delete target.dataset.animate;
+            }
         }
     }
     // 设置动画(格式:zoomIn:a:b:c 其中a为时长,b为延时，c为依赖id)
-    function parseAnimate(animate, options = {}) {
+    function parseAnimate(animate = '', options = {}) {
         const list = animate.split(':');
         animate = list[0];
         const timeLong = list[1]; // 时长
