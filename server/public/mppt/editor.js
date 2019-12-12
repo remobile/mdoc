@@ -25,8 +25,9 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
 
     function initialize() {
         root = document.getElementById('editor');
-        history.initialize();
+        control.initialize();
         component.initialize();
+        history.initialize();
         const list = document.querySelectorAll('.target');
         for (const el of list) {
             group = Math.max(group, +el.dataset.group||0);
@@ -541,6 +542,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         selectTarget,
         getRootHtml: () => root.innerHTML,
         setRootHtml: (html) => { root.innerHTML = html },
+        getReferents: () => referents,
     });
 
     // 全局函数

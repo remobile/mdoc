@@ -79,6 +79,25 @@ class PPTEditLayout extends React.Component {
                     <div id="component">
                         <div className="title">组件列表</div>
                         <div id="componentContent"></div>
+                        <div id="componentBottom">
+                            <div className="layui-btn-group">
+                                <button id="componentButtonPre" type="button" className="layui-btn layui-btn-sm">
+                                    <i className="layui-icon">&#xe603;</i>
+                                </button>
+                                <button id="componentButtonText" type="button" className="layui-btn layui-btn-sm">
+                                    <i className="layui-icon">&#xe647;</i>
+                                </button>
+                                <button id="componentButtonImage" type="button" className="layui-btn layui-btn-sm">
+                                    <i className="layui-icon">&#xe64a;</i>
+                                </button>
+                                <button id="componentButtonDelete" type="button" className="layui-btn layui-btn-sm">
+                                    <i className="layui-icon">&#xe640;</i>
+                                </button>
+                                <button id="componentButtonNext" type="button" className="layui-btn layui-btn-sm">
+                                    <i className="layui-icon">&#xe602;</i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div id="history">
                         <div className="title">历史列表</div>
