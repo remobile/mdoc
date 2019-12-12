@@ -55,6 +55,7 @@
     justify-content: space-between;
     padding-left: 10px;
     padding-right: 10px;
+    height: 40px;
 }
 #animateRely .component-line {
     border: 0px;

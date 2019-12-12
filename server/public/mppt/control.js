@@ -124,16 +124,30 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             }
         }
     }
-    function setAnimate(obj) {
+    function setAnimate(options) {
         const referents = getReferents();
         for (const referent of referents) {
             const target = referent.target;
-            if (obj.animate) {
-                target.dataset.animate = 'zoomIn';
+            if (options) {
+                target.dataset.animate = formatAnimate(target.dataset.animate, options);
+                options.rely && $('#animateRely').html(component.getRelyItem(options.rely));
             } else {
                 delete target.dataset.animate;
             }
         }
+    }
+    // 设置动画(格式:zoomIn:a:b:c 其中a为时长,b为延时，c为依赖id)
+    function parseAnimate(animate, options = {}) {
+        const list = animate.split(':');
+        animate = list[0];
+        const timeLong = list[1]; // 时长
+        const delay = list[2]; // 延时
+        let rely = list[3]; // 依赖
+        return { animate, timeLong, delay, rely, ...options };
+    }
+    function formatAnimate(animate, options) {
+        animate = parseAnimate(animate, options);
+        return `${animate.animate||''}:${animate.timeLong||''}:${animate.delay||''}:${animate.rely||''}`.replace(/:*$/, '');
     }
     // 更新属性的值
     function updateValues(target) {
@@ -145,34 +159,18 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         $('#propertyPanel').show();
         $('#animatePanel').show();
 
-        // 设置动画(格式:zoomIn:a:b:c 其中a为时长,b为延时，c为依赖id)
         let animate = target.dataset.animate;
         if (animate) {
-            const list = animate.split(':');
-            animate = list[0];
-            const timeLong = list[1] || 2; // 时长
-            const delay = list[2] || 0; // 延时
-            let rely = list[3]; // 依赖
+            animate = parseAnimate(animate, { timeLong: 2, delay: 0 });
             $('.layui-form-item.no-animate').show();
             $("#animateList").val(animate);
-
             // 设置依赖
-            if (!rely) {
-                rely = '2093k400fwux5559';
-                // rely = '9854k400fupf5038';
-                rely = document.getElementById(rely);
-                const html = component.getReplyLine(rely);
-                $('#animateRely').html(html+`
-
-                `);
-            } else {
-                $('#animateRely').html('无');
-            }
+            $('#animateRely').html(component.getRelyItem(animate.rely));
 
             form.render('select');
             slider.render({
                 elem: '#animateLongSlider',
-                value: timeLong,
+                value: animate.timeLong,
                 min: 1,
                 max: 10,
                 change: function(timeLong){
@@ -181,7 +179,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             });
             slider.render({
                 elem: '#animateDelaySlider',
-                value: delay,
+                value: animate.delay,
                 min: 0,
                 max: 10,
                 change: function(delay){
@@ -316,5 +314,6 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         initialize,
         updateValues,
         updatePositionSize,
+        setAnimate,
     });
 });
