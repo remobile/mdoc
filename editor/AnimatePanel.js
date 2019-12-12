@@ -32,8 +32,7 @@ module.exports = () => {
             <div className="layui-form-item no-animate">
                 <label className="layui-form-label">依赖</label>
                 <div className="layui-input-block">
-                    <select id="animateRelyComponents" lay-filter="animateRelyComponents">
-                    </select>
+                    <div id="animateRely"></div>
                 </div>
             </div>
         </form>

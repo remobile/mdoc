@@ -78,11 +78,6 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         form.on('select(animateList)', function(data){
             setAnimate({ animate: data.value });
         });
-        // 依赖列表选择
-        $('#animateRelyComponents').attr('lay-filter', 'animateRelyComponents');
-        form.on('select(animateRelyComponents)', function(data){
-            setAnimate({ rely: data.value });
-        });
     }
 
     function setTextColorList(color) {
@@ -157,13 +152,23 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             animate = list[0];
             const timeLong = list[1] || 2; // 时长
             const delay = list[2] || 0; // 延时
-            const rely = list[3]; // 依赖
+            let rely = list[3]; // 依赖
             $('.layui-form-item.no-animate').show();
             $("#animateList").val(animate);
 
-            // 设置依赖列表
-            // $("#animateRelyComponents").html(component.getAnimateRelyOptions());
-            // $("#animateRelyComponents").val(rely);
+            // 设置依赖
+            if (!rely) {
+                rely = '2093k400fwux5559';
+                // rely = '9854k400fupf5038';
+                rely = document.getElementById(rely);
+                const html = component.getReplyLine(rely);
+                $('#animateRely').html(html+`
+
+                `);
+            } else {
+                $('#animateRely').html('无');
+            }
+
             form.render('select');
             slider.render({
                 elem: '#animateLongSlider',

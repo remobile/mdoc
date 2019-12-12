@@ -49,3 +49,16 @@
 .layui-form-item.no-animate {
     display: none;
 }
+#animateRely {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+#animateRely .component-line {
+    border: 0px;
+}
+#animateRely .component-text {
+    width: 126px;
+}

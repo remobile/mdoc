@@ -33,15 +33,26 @@ layui.define(['jquery', 'layer', 'utils', 'control'], function(exports) {
         });
         $('#componentContent').html(html);
     }
-    function getComponentLine(target) {
-        const isText = target.classList.contains('text');
-        const id = target.getAttribute('id');
-        const html = isText ?
-        `<i class="layui-icon layui-icon-list"></i><div class="component-text">${target.innerHTML.trim()}<div>`
+    function getTargetHtml(target) {
+        return target.classList.contains('text') ?
+        `<i class="layui-icon layui-icon-list"></i><div class="component-text">${target.innerHTML.trim()+'123123123123123'}</div>`
         :
         `<i class="layui-icon layui-icon-picture-fine"></i><img  class="component-image" src="${target.getAttribute('src')}" />`;
-        return `<div class="component-line" data-id="${id}" onclick="window.onComponentLineClick('${id}')">${html}</div>`;
-        return html;
+    }
+    function getComponentLine(target) {
+        const id = target.getAttribute('id');
+        return `<div class="component-line" data-id="${id}" onclick="window.onComponentLineClick('${id}')">${getTargetHtml(target)}</div>`;
+    }
+    function getReplyLine(target) {
+        return `
+        <div style="display:flex;">
+        ${getTargetHtml(target)}
+        </div>
+        <div class="layui-btn-group">
+            <button type="button" class="layui-btn layui-btn-sm"><i class="layui-icon">&#xe642;</i></button>
+            <button type="button" class="layui-btn layui-btn-sm"><i class="layui-icon">&#xe640;</i></button>
+        </div>
+        `;
     }
     function add(target) {
         $('#componentContent').prepend(getComponentLine(target));
@@ -58,6 +69,7 @@ layui.define(['jquery', 'layer', 'utils', 'control'], function(exports) {
         initialize,
         add,
         remove,
+        getReplyLine,
     });
 
     // 全局函数
