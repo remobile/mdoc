@@ -7,10 +7,10 @@ layui.define(['jquery'], function(exports) {
 
         });
         $('#componentButtonText').click(function(){
-
+            editor.createTextTarget();
         });
         $('#componentButtonImage').click(function(){
-
+            editor.createImageTarget();
         });
         $('#componentButtonDelete').click(function(){
 

@@ -23,3 +23,48 @@
     border-radius: 4px;
     margin: 2px;
 }
+button.tip::after {
+    content:attr(title);
+    display: none;
+    position: absolute;
+    padding: 5px 10px;
+    bottom: 100%;
+    margin-bottom: 12px;
+    transform: translateX(-50%);
+    font-size: 16px;
+    background: #000;
+    color: #fff;
+    cursor: default;
+}
+button.tip::before {
+    content: " ";
+    position: absolute;
+    display: none;
+    bottom: 100%;
+    transform: translateX(-50%);
+    margin-bottom: 3px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 9px solid #000;
+}
+button.tip:hover::after,
+button.tip:hover::before {
+    display: block;
+}
+#componentButtonPre::before,#componentButtonPre::after {
+    left: 10%;
+}
+#componentButtonText::before,#componentButtonText::after {
+    left: 30%;
+}
+#componentButtonImage::before,#componentButtonImage::after {
+    left: 50%;
+}
+#componentButtonDelete::before,#componentButtonNext::after {
+    left: 70%;
+}
+#componentButtonNext::before,#componentButtonNext::after {
+    left: 90%;
+}

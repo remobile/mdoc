@@ -110,6 +110,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             referent.target.style.top = (referent.offsetTop+1) + "px";
             referent.target.style.left = (referent.offsetLeft+1) + "px";
         }
+        control.updatePositionSize(action.target);
         if (!(action.target === lastAction.target && lastAction.cmd === 'key_move')) {
             history.pushHistory('移动');
             lastAction.target = action.target;
@@ -402,28 +403,36 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         }
     }
     function createTextTarget() {
+        removeAll();
         const target = document.createElement('DIV');
         target.className = 'target text';
-        target.style.position = "absolute";
-        target.style.left = "30px";
-        target.style.top = "30px";
-        target.style.width = "100px";
-        target.style.height = "30px";
-        target.setAttribute('id', uuid());
+        target.style.position = 'absolute';
+        target.style.left = '30px';
+        target.style.top = '30px';
+        target.style.width = '120px';
+        target.style.height = '30px';
+        target.innerHTML = '双击编辑文本内容';
+        target.setAttribute('id', utils.uuid());
         root.appendChild(target);
         createReferentForTarget(target);
+        action.target = target;
+        control.updateValues(target);
     }
     function createImageTarget() {
+        removeAll();
         const target = document.createElement('IMG');
         target.className = 'target';
-        target.style.position = "absolute";
-        target.style.left = "30px";
-        target.style.top = "30px";
-        target.style.width = "100px";
-        target.style.height = "100px";
-        target.setAttribute('id', uuid());
+        target.style.position = 'absolute';
+        target.style.left = '30px';
+        target.style.top = '30px';
+        target.style.width = '100px';
+        target.style.height = '100px';
+        target.setAttribute('src', 'mppt/default.svg');
+        target.setAttribute('id', utils.uuid());
         root.appendChild(target);
         createReferentForTarget(target);
+        action.target = target;
+        control.updateValues(target);
     }
     function removeTarget(target) {
         target.remove();
@@ -545,6 +554,8 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         onDocumentKeyDown,
         onDocumentKeyUp,
         selectTarget,
+        createImageTarget,
+        createTextTarget,
         getRootHtml: () => root.innerHTML,
         setRootHtml: (html) => { root.innerHTML = html },
         getReferents: () => referents,
