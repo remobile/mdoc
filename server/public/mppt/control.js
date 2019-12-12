@@ -1,8 +1,9 @@
-layui.define(['jquery', 'form', 'colorpicker'], function(exports) {
+layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
     const $ = layui.$;
     const form = layui.form;
     const slider = layui.slider;
     const colorpicker = layui.colorpicker;
+    const history = layui.history;
 
     let editor;
     let textColorList;
@@ -152,13 +153,11 @@ layui.define(['jquery', 'form', 'colorpicker'], function(exports) {
                 value: fontSize,
                 min: 9,
                 max: 180,
-                done: function(fontSize){
-                    console.log("=======", fontSize);
-                },
                 change: function(fontSize){
                     setTextStyle((target)=>{
                         target.style.fontSize = fontSize + 'px';
                     });
+                    history.pushHistory('设置字体大小');
                 },
             });
             // 行距
@@ -177,6 +176,7 @@ layui.define(['jquery', 'form', 'colorpicker'], function(exports) {
                     setTextStyle((target)=>{
                         target.style.lineHeight = lineHeight / 100;
                     });
+                    history.pushHistory('设置文本行距');
                 },
             });
             // 颜色
@@ -189,7 +189,7 @@ layui.define(['jquery', 'form', 'colorpicker'], function(exports) {
                 alpha: true,
                 done: function(color){
                     setTextColorList(color);
-                    pushHistory('设置文字颜色');
+                    history.pushHistory('设置文字颜色');
                 },
                 change: function(color){
                     setTextStyle((target)=>{
@@ -206,7 +206,7 @@ layui.define(['jquery', 'form', 'colorpicker'], function(exports) {
                 alpha: true,
                 done: function(color){
                     setTextBackgroundColorList(color);
-                    pushHistory('设置文字背景颜色');
+                    history.pushHistory('设置文字背景颜色');
                 },
                 change: function(color){
                     setTextStyle((target)=>{
@@ -228,7 +228,7 @@ layui.define(['jquery', 'form', 'colorpicker'], function(exports) {
                 alpha: true,
                 done: function(color){
                     setTextColorList(color);
-                    pushHistory('设置文字颜色');
+                    history.pushHistory('设置文字颜色');
                 },
                 change: function(color){
                     setTextStyle((target)=>{
@@ -245,7 +245,7 @@ layui.define(['jquery', 'form', 'colorpicker'], function(exports) {
                 alpha: true,
                 done: function(color){
                     setTextBackgroundColorList(color);
-                    pushHistory('设置文字背景颜色');
+                    history.pushHistory('设置文字背景颜色');
                 },
                 change: function(color){
                     setTextStyle((target)=>{

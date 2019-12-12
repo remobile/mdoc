@@ -6,7 +6,6 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
     const component = layui.component;
 
     let action = { cmd: '' }; // 当前操作的对象
-    let lastAction = { cmd: ''  }; // 上一次操作的对象
     let referents = []; // 当前选中的refrent列表
     let isAltKeyPress = false; // alt是否被按住
     let clickX = 0; // 保留上次的X轴位置
@@ -124,11 +123,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             referent.target.style.left = (referent.offsetLeft+1) + "px";
         }
         control.updatePositionSize(action.target);
-        if (!(action.target === lastAction.target && lastAction.cmd === 'key_move')) {
-            history.pushHistory('移动');
-            lastAction.target = action.target;
-            lastAction.cmd = 'key_move';
-        }
+        history.pushHistory('移动');
     }
     // 删除所有的referent
     function removeAllReferents() {
@@ -156,7 +151,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         const dirs = ['n', 's', 'w', 'e', 'nw', 'ne', 'sw', 'se'];
         const style = `height:${target.offsetHeight}px;width:${target.offsetWidth}px;top:${target.offsetTop-1}px;left:${target.offsetLeft-1}px`;
         const className = 'referent' + (group ? ' group' : '') + (isSelf ? ' self' : '');
-        div.innerHTML = `<div data-group="${group||''}" class="${className}" style="${style}" onmousedown="onReferentMouseDown(event, 'refer_move')">${dirs.map(dir=>(`<div class="referent_node" data-dir="${dir}" onmousedown="onReferentMouseDown(event, 'refer_${dir}')"></div>`)).join('')}</div>`;
+        div.innerHTML = `<div data-group="${group||''}" class="${className}" style="${style}" onmousedown="onReferentMouseDown(event, 'move')">${dirs.map(dir=>(`<div class="referent_node" data-dir="${dir}" onmousedown="onReferentMouseDown(event, '${dir}')"></div>`)).join('')}</div>`;
         const referent = div.childNodes[0];
         referent.target = target;
         referent.active = (!group || isSelf);
@@ -195,8 +190,9 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         clickY = location.y;
         clickX = location.x;
         action.cmd = cmd;
+        action.from = 'referent';
         e.stopPropagation();
-        if (cmd === 'refer_move') {
+        if (cmd === 'move') {
             if (isAltKeyPress) {
                 copyTargets();
             }
@@ -224,26 +220,21 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
     }
     function onDocumentMouseUp() {
         root.style.cursor = "auto";
-        if (action.cmd.startsWith('refer_')) {
-            if (!(lastAction.target === action.target && lastAction.cmd === action.cmd)) {
-                history.pushHistory(action.cmd === 'refer_move' ? '移动' : '改变大小');
-            }
-            lastAction.target = action.target;
-            lastAction.cmd = action.cmd;
-            action.cmd = '';
+        if (action.from === 'referent') {
+            history.pushHistory(action.cmd === 'move' ? '移动' : '改变大小');
+            action.from = undefined;
         }
     }
     function onDocumentMouseMove(e) {
         if (editingTarget) {
             return true;
         }
-        if (action.cmd.startsWith('refer_')) {
+        if (action.from === 'referent') {
             let cmd = action.cmd;
             const location = getLocation(e);
-            if (cmd === 'refer_move') {
+            if (cmd === 'move') {
                 move(location);
             } else {
-                cmd = cmd.substr(6, 2);
                 resize(cmd[0], location);
                 cmd[1] && resize(cmd[1], location);
             }
@@ -438,7 +429,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
                     }
                     target.style.fontSize = fontSize + 'px';
                     utils.log("fontSize:", fontSize);
-                    history.pushHistory('减小字体');
+                    history.pushHistory('设置字体大小');
                 } else if (e.keyCode === 187) { // +
                     let fontSize = parseInt(getComputedStyle(target).fontSize);
                     fontSize = !e.altKey ? fontSize + 1 : fontSize + 3;
@@ -447,7 +438,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
                     }
                     target.style.fontSize = fontSize + 'px';
                     utils.log("fontSize:", fontSize);
-                    history.pushHistory('增加字体');
+                    history.pushHistory('设置字体大小');
                 } else if (e.altKey && e.keyCode === 66) { // b
                     let fontWeight = getComputedStyle(target).fontWeight;
                     if (fontWeight === 'bold') {
@@ -526,6 +517,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         getRootHtml: () => root.innerHTML,
         setRootHtml: (html) => { root.innerHTML = html },
         getReferents: () => referents,
+        getAction: () => action,
     });
 
     // 全局函数

@@ -4,6 +4,7 @@ layui.define(['jquery', 'utils'], function(exports) {
     const utils = layui.utils;
     let history = []; // 历史记录
     let historyIndex = 0; // 当前历史记录的指针
+    let lastAction = {}; // 上一次操作的对象
 
     function initialize() {
         editor = layui.editor;
@@ -46,11 +47,17 @@ layui.define(['jquery', 'utils'], function(exports) {
         )).join('');
     }
     function pushHistory(name) {
-        historyIndex++;
-        history.length = historyIndex;
-        history.push({ name, html: editor.getRootHtml() });
-        // utils.post('/updateHistory', JSON.stringify(history));
-        showHistory();
+        const action = editor.getAction();
+        if (!(lastAction.target === action.target && lastAction.name === name)) {
+            lastAction.target = action.target;
+            lastAction.name = name;
+
+            historyIndex++;
+            history.length = historyIndex;
+            history.push({ name, html: editor.getRootHtml() });
+            // utils.post('/updateHistory', JSON.stringify(history));
+            showHistory();
+        }
     }
     function popHistory() {
         if (history.length > 2) {
