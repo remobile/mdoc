@@ -141,15 +141,15 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         referents = [];
     }
     // 为target创建一个referent
-    function createReferentForTarget(target, isGroup, isNotSelf) {
+    function createReferentForTarget(target, isGroup, isSelf) {
         const div = document.createElement("div");
         const dirs = ['n', 's', 'w', 'e', 'nw', 'ne', 'sw', 'se'];
         const style = `height:${target.offsetHeight}px;width:${target.offsetWidth}px;top:${target.offsetTop-1}px;left:${target.offsetLeft-1}px`;
-        const className = 'referent' + (isGroup ? ' group' : '') + (!isNotSelf ? ' self' : '');
+        const className = 'referent' + (isGroup ? ' group' : '') + (isSelf ? ' self' : '');
         div.innerHTML = `<div class="${className}" style="${style}" onmousedown="onReferentMouseDown(event, 'refer_move')">${dirs.map(dir=>(`<div class="referent_node" data-dir="${dir}" onmousedown="onReferentMouseDown(event, 'refer_${dir}')"></div>`)).join('')}</div>`;
         const referent = div.childNodes[0];
         referent.target = target;
-        referent.active = !isNotSelf;
+        referent.active = (!isGroup || isSelf);
         target.referent = referent;
         root.appendChild(referent);
         referents.push(referent);
@@ -168,7 +168,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         } else {
             const list = root.querySelectorAll(`.target[data-group = "${target.dataset.group}"]`);
             for (const el of list) {
-                createReferentForTarget(el, true, target !== el);
+                createReferentForTarget(el, true, target === el);
             }
         }
     };
