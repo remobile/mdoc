@@ -70,6 +70,14 @@ layui.define(['jquery', 'form', 'colorpicker'], function(exports) {
             });
             pushHistory('清除样式');
         });
+        // 动画列表选择
+        $('#animateList').attr('lay-filter', 'animateList');
+        form.on('select(animateList)', function(data){
+            setAnimate((target)=>{
+                console.log("=======", data.value);
+                target.dataset.animate = data.value;
+            })
+        });
     }
 
     function setTextColorList(color) {
@@ -113,6 +121,15 @@ layui.define(['jquery', 'form', 'colorpicker'], function(exports) {
                 if (!target.classList.contains('text')) {
                     callback(target);
                 }
+            }
+        }
+    }
+    function setAnimate(callback) {
+        const referents = editor.getReferents();
+        if (referents.length) {
+            for (const referent of referents) {
+                const target = referent.target;
+                callback(target);
             }
         }
     }

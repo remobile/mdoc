@@ -53,18 +53,18 @@ button.tip:hover::after,
 button.tip:hover::before {
     display: block;
 }
-#componentButtonPre::before,#componentButtonPre::after {
+#componentButtonText::before,#componentButtonText::after {
     left: 10%;
 }
-#componentButtonText::before,#componentButtonText::after {
+#componentButtonImage::before,#componentButtonImage::after {
     left: 30%;
 }
-#componentButtonImage::before,#componentButtonImage::after {
+#componentButtonRelate::before,#componentButtonPre::after {
     left: 50%;
 }
 #componentButtonDelete::before,#componentButtonNext::after {
     left: 70%;
 }
-#componentButtonNext::before,#componentButtonNext::after {
+#componentButtonPlay::before,#componentButtonNext::after {
     left: 90%;
 }

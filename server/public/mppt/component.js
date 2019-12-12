@@ -3,19 +3,19 @@ layui.define(['jquery'], function(exports) {
     const $ = layui.$;
     function initialize() {
         editor = layui.editor;
-        $('#componentButtonPre').click(function(){
-
-        });
         $('#componentButtonText').click(function(){
             editor.createTextTarget();
         });
         $('#componentButtonImage').click(function(){
             editor.createImageTarget();
         });
+        $('#componentButtonRelate').click(function(){
+
+        });
         $('#componentButtonDelete').click(function(){
 
         });
-        $('#componentButtonNext').click(function(){
+        $('#componentButtonPlay').click(function(){
 
         });
         update();

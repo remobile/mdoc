@@ -277,6 +277,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         const text = [];
         const list = root.querySelectorAll('.target');
         for (const el of list) {
+            const id = el.id;
             const x = el.offsetLeft;
             const y = el.offsetTop;
             const w = el.offsetWidth;
@@ -312,8 +313,8 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             const group = el.dataset.group !== undefined ? ` group=${el.dataset.group}` : '';
             const animate = el.dataset.animate !== undefined ? ` animate=${el.dataset.animate}` : '';
 
-            text.push(`::: fm${type} x=${x} y=${y} w=${w} h=${h}${style}${group}${animate}`);
-            (el.src || el.innerText) && text.push(isText ? el.innerText : el.src);
+            text.push(`::: fm${type} x=${x} y=${y} w=${w} h=${h}${style}${group}${animate} id=${id}`);
+            (el.src || el.innerText) && text.push(isText ? el.innerText : el.src.replace(window.location.href, ''));
             text.push(':::');
             text.push('');
         }

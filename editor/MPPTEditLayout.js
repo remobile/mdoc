@@ -26,7 +26,6 @@ class PPTEditLayout extends React.Component {
                             <ul className="layui-tab-title">
                                 <li className="layui-this">属性</li>
                                 <li>动画</li>
-                                <li>操作</li>
                             </ul>
                             <div className="layui-tab-content">
                                 <div className="layui-tab-item layui-show">
@@ -34,40 +33,6 @@ class PPTEditLayout extends React.Component {
                                 </div>
                                 <div className="layui-tab-item">
                                     <AnimatePanel />
-                                </div>
-                                <div className="layui-tab-item">
-                                    <form id="operatePanel" className="layui-form layui-form-pane" action="">
-                                        <div className="layui-form-item">
-                                            <label className="layui-form-label">预览</label>
-                                            <div className="layui-input-inline">
-                                                <div className="layui-btn-group">
-                                                    <button id="textResetStyle" type="button" className="layui-btn layui-btn-sm">
-                                                        <i className="layui-icon">&#xe652;</i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="layui-form-item">
-                                            <label className="layui-form-label">新建文本</label>
-                                            <div className="layui-input-inline">
-                                                <div className="layui-btn-group">
-                                                    <button id="textResetStyle" type="button" className="layui-btn layui-btn-sm">
-                                                        <i className="layui-icon">&#xe63c;</i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="layui-form-item">
-                                            <label className="layui-form-label">新建图片</label>
-                                            <div className="layui-input-inline">
-                                                <div className="layui-btn-group">
-                                                    <button id="textResetStyle" type="button" className="layui-btn layui-btn-sm">
-                                                        <i className="layui-icon">&#xe64a;</i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -81,20 +46,20 @@ class PPTEditLayout extends React.Component {
                         <div id="componentContent"></div>
                         <div id="componentBottom">
                             <div className="layui-btn-group">
-                                <button id="componentButtonPre" title="fang" type="button" className="layui-btn layui-btn-sm tip">
-                                    <i className="layui-icon">&#xe603;</i>
+                                <button id="componentButtonText" title="新建文本(alt+t)" type="button" className="layui-btn layui-btn-sm tip">
+                                    <i className="layui-icon">&#xe63c;</i>
                                 </button>
-                                <button id="componentButtonText" title="fang" type="button" className="layui-btn layui-btn-sm tip">
-                                    <i className="layui-icon">&#xe647;</i>
-                                </button>
-                                <button id="componentButtonImage" title="fang" type="button" className="layui-btn layui-btn-sm tip">
+                                <button id="componentButtonImage" title="新建图片(alt+m)" type="button" className="layui-btn layui-btn-sm tip">
                                     <i className="layui-icon">&#xe64a;</i>
                                 </button>
-                                <button id="componentButtonDelete" title="fang" type="button" className="layui-btn layui-btn-sm tip">
+                                <button id="componentButtonRelate" title="添加动画依赖" type="button" className="layui-btn layui-btn-sm tip">
+                                    <i className="layui-icon">&#xe6b1;</i>
+                                </button>
+                                <button id="componentButtonDelete" title="删除元素" type="button" className="layui-btn layui-btn-sm tip">
                                     <i className="layui-icon">&#xe640;</i>
                                 </button>
-                                <button id="componentButtonNext" title="fang" type="button" className="layui-btn layui-btn-sm tip">
-                                    <i className="layui-icon">&#xe602;</i>
+                                <button id="componentButtonPlay" title="预览" type="button" className="layui-btn layui-btn-sm tip">
+                                    <i className="layui-icon">&#xe652;</i>
                                 </button>
                             </div>
                         </div>

@@ -6,7 +6,7 @@ module.exports = () => {
           <div className="layui-form-item">
             <label className="layui-form-label">动画</label>
             <div className="layui-input-block">
-                <select lay-filter="myselect">
+                <select id="animateList" lay-filter="animateList">
                     <option value="none">无</option>
                     <option value="zoomIn">中心放大</option>
                     <option value="fadeIn">淡入</option>
@@ -20,13 +20,13 @@ module.exports = () => {
           <div className="layui-form-item">
             <label className="layui-form-label">时长</label>
             <div className="layui-input-block">
-              <div id="fontSizeSlider"></div>
+              <div id="animateLongSlider"></div>
             </div>
           </div>
           <div className="layui-form-item">
             <label className="layui-form-label">延时</label>
             <div className="layui-input-block">
-              <div id="fontSizeSlider"></div>
+              <div id="animateDelaySlider"></div>
             </div>
           </div>
           <div className="layui-form-item">
