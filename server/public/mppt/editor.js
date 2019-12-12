@@ -156,7 +156,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         const dirs = ['n', 's', 'w', 'e', 'nw', 'ne', 'sw', 'se'];
         const style = `height:${target.offsetHeight}px;width:${target.offsetWidth}px;top:${target.offsetTop-1}px;left:${target.offsetLeft-1}px`;
         const className = 'referent' + (group ? ' group' : '') + (isSelf ? ' self' : '');
-        div.innerHTML = `<div data-group="${group}" class="${className}" style="${style}" onmousedown="onReferentMouseDown(event, 'refer_move')">${dirs.map(dir=>(`<div class="referent_node" data-dir="${dir}" onmousedown="onReferentMouseDown(event, 'refer_${dir}')"></div>`)).join('')}</div>`;
+        div.innerHTML = `<div data-group="${group||''}" class="${className}" style="${style}" onmousedown="onReferentMouseDown(event, 'refer_move')">${dirs.map(dir=>(`<div class="referent_node" data-dir="${dir}" onmousedown="onReferentMouseDown(event, 'refer_${dir}')"></div>`)).join('')}</div>`;
         const referent = div.childNodes[0];
         referent.target = target;
         referent.active = (!group || isSelf);
@@ -279,7 +279,31 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         if (referents.length < 2) {
             return;
         }
-        if (!referents[0].target.dataset.group) {
+        // 判断所有的是否是同一个组，如果不是，则解散后再组合
+        if (_.every(referents, o=>o.dataset.group === referents[0].dataset.group)){
+            if (referents[0].dataset.group) {
+                for (const refrent of referents) {
+                    delete refrent.target.dataset.group;
+                    delete refrent.dataset.group;
+                    refrent.classList.remove('group');
+                    refrent.classList.remove('self');
+                }
+                utils.log("delete group");
+                history.pushHistory('解除组合');
+            } else {
+                group++;
+                for (const refrent of referents) {
+                    refrent.target.dataset.group = group;
+                    refrent.classList.add('group');
+                    refrent.dataset.group = group;
+                    if (refrent.target === action.target) {
+                        refrent.classList.add('self');
+                    }
+                }
+                utils.log("add group");
+                history.pushHistory('添加组合');
+            }
+        } else {
             group++;
             for (const refrent of referents) {
                 refrent.target.dataset.group = group;
@@ -287,18 +311,10 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
                 refrent.dataset.group = group;
                 if (refrent.target === action.target) {
                     refrent.classList.add('self');
+                } else {
+                    refrent.classList.remove('self');
                 }
             }
-            utils.log("add group");
-            history.pushHistory('添加组合');
-        } else {
-            for (const refrent of referents) {
-                delete refrent.target.dataset.group;
-                delete refrent.dataset.group;
-                refrent.classList.remove('group');
-            }
-            utils.log("delete group");
-            history.pushHistory('解除组合');
         }
     }
     function saveMarkdown(e) {

@@ -70,6 +70,7 @@ class PPTEditLayout extends React.Component {
                     </div>
                     <div id="info"></div>
                     <script type="text/javascript" src="layui/layui.all.js"></script>
+                    <script type="text/javascript" src="lodash/lodash.js"></script>
                     <script type="text/javascript" src="mppt/main.js"></script>
                 </body>
             </html>
