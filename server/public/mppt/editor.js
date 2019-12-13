@@ -408,6 +408,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         removeAll();
     }
     function onDocumentKeyDown(e) {
+        console.log("=======", e.keyCode);
         if (referents.length) {
             if (e.keyCode === 27) { // esc
                 removeAll();
@@ -419,48 +420,22 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
                 moveByStep({ x: 1, y: 0 });
             } else if (e.keyCode === 40) { // down key
                 moveByStep({ x: 0, y: 1 });
+            } else if (e.keyCode === 189 || e.keyCode === 187) { // - | +
+                control.setTextStyle((target)=>{
+                    let fontSize = parseInt(getComputedStyle(target).fontSize);
+                    const step = e.keyCode === 189 ? 1 : -1;
+                    const multiple = e.altKey ? 3 : 1;
+                    fontSize =  fontSize + step * multiple;
+                    fontSize < 5 && (fontSize = 5);
+                    fontSize > 100 && (fontSize = 100);
+                    target.style.fontSize = fontSize + 'px';
+                    history.pushHistory('设置字体大小');
+                });
             } else if (referents.length === 1) {
                 const target = referents[0].target;
-                if (e.keyCode === 189) { // -
-                    let fontSize = parseInt(getComputedStyle(target).fontSize);
-                    fontSize = !e.altKey ? fontSize - 1 : fontSize - 3;
-                    if (fontSize < 5) {
-                        fontSize = 5;
-                    }
-                    target.style.fontSize = fontSize + 'px';
-                    utils.log("fontSize:", fontSize);
-                    history.pushHistory('设置字体大小');
-                } else if (e.keyCode === 187) { // +
-                    let fontSize = parseInt(getComputedStyle(target).fontSize);
-                    fontSize = !e.altKey ? fontSize + 1 : fontSize + 3;
-                    if (fontSize > 100) {
-                        fontSize = 100;
-                    }
-                    target.style.fontSize = fontSize + 'px';
-                    utils.log("fontSize:", fontSize);
-                    history.pushHistory('设置字体大小');
-                } else if (e.altKey && e.keyCode === 66) { // b
-                    let fontWeight = getComputedStyle(target).fontWeight;
-                    if (fontWeight === 'bold') {
-                        fontWeight = 'normal';
-                    } else {
-                        fontWeight = 'bold';
-                    }
-                    target.style.fontWeight = fontWeight;
-                    utils.log("fontWeight:", fontWeight);
-                    history.pushHistory('切换加粗');
-                } else if (e.altKey && e.keyCode === 73) { // i 斜体
-                    let fontStyle = getComputedStyle(target).fontStyle;
-                    if (fontStyle === 'italic') {
-                        fontStyle = 'normal';
-                    } else {
-                        fontStyle = 'italic';
-                    }
-                    target.style.fontStyle = fontStyle;
-                    utils.log("fontStyle:", fontStyle);
-                    history.pushHistory('切换斜体');
-                } else if (e.altKey && e.keyCode === 80) { // alt + p 复制属性
+                if (e.altKey && e.keyCode === 80) { // alt + p 复制属性
                     copyTargetAcctribute(target);
+                    utils.toast('复制属性成功');
                 } else if (e.altKey && e.keyCode === 67) { // alt + c 粘贴属性
                     pasteTargetAcctribute(target);
                 }
@@ -485,6 +460,8 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             saveMarkdown();
         } else if (e.altKey && e.keyCode === 72) { // alt + h 优化历史记录
             history.optimizeHistory();
+        } else if (e.altKey && e.keyCode === 72) { // alt + ? 查看帮助
+            history.showHelp();
         } else if (e.altKey && e.keyCode === 90) { // alt + z 回退
             history.popHistory();
         } else if (e.altKey && e.keyCode === 89) { // alt + y 取消回退
@@ -511,9 +488,11 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         onDocumentMouseUp,
         onDocumentKeyDown,
         onDocumentKeyUp,
+        removeAll,
         selectTarget,
         createImageTarget,
         createTextTarget,
+        removeTargets,
         getRootHtml: () => root.innerHTML,
         setRootHtml: (html) => { root.innerHTML = html },
         getReferents: () => referents,

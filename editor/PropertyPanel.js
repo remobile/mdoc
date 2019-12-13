@@ -51,7 +51,7 @@ module.exports = () => {
                         <button id="textUnderLine" type="button" className="layui-btn layui-btn-sm">
                             <i className="layui-icon">&#xe646;</i>
                         </button>
-                        <button id="textItalics" type="button" className="layui-btn layui-btn-sm">
+                        <button id="textItalic" type="button" className="layui-btn layui-btn-sm">
                             <i className="layui-icon">&#xe644;</i>
                         </button>
                     </div>

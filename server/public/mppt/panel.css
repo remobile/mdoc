@@ -1,7 +1,7 @@
-#prop {
+#leftPanel {
     position: absolute;
     left: 20px;
-    top: 20px;
+    top: 75px;
     width: 320px;
     height: 667px;
     border: 1px solid #E6E6E6;
@@ -27,21 +27,25 @@
     height: 667px;
     border: 1px solid #000;
 }
-#component {
+#rightPanel {
     position: absolute;
     left: 800px;
-    top: 20px;
-    width: 201px;
+    top: 75px;
+    width: 250px;
     height: 667px;
+    padding-bottom: 36px;
     border: 1px solid #E6E6E6;
     border-radius: 10px;
 }
-#component .title, #history .title {
-    font-size: 16px;
-    text-align: center;
-    padding: 10px;
-    color: #33A497;
-    background-color: #F4F4F4;
+#rightBottomPanel {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    background-color: #E6E6E6;
+    border-radius: 4px;
+}
+#rightBottomPanel .layui-btn-group {
+    padding-left: 6px;
 }
 #componentContent {
     overflow: scroll;
@@ -56,37 +60,48 @@
 #componentBottom .layui-btn-group {
     padding-left: 1px;
 }
-#history {
-    position: absolute;
-    left: 1040px;
-    top: 20px;
-    width: 220px;
-    height: 667px;
-    border: 1px solid #E6E6E6;
-    border-radius: 10px;
-    overflow: scroll;
-}
 #historyContent {
     overflow: scroll;
     padding-left: 6px;
     padding-right: 6px;
 }
-.history-item {
-    cursor:pointer;
+#historyContent .history-item {
+    cursor: pointer;
     margin-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 10px;
+    border-bottom: solid #E0EEEE 1px;
 }
-#info {
-    position: absolute;
-    left:1290px;
-    top:1px;
-    width: 300px;
-    height: 667px;
-    border: 1px solid red;
-    padding-right: 4px;
-    overflow: scroll;
+#componentButtonText::before,#componentButtonText::after {
+    left: 10%;
 }
-#info li {
-    margin-top: 10px;
-    font-size: 14px;
-    font-weight: 400;
+#componentButtonImage::before,#componentButtonImage::after {
+    left: 30%;
+}
+#componentButtonDelete::before,#componentButtonNext::after {
+    left: 70%;
+}
+#componentButtonPlay::before,#componentButtonNext::after {
+    left: 90%;
+}
+#componentButtonHistory::before,#componentButtonNext::after {
+    left: 90%;
+}
+#componentButtonHelp::before,#componentButtonPre::after {
+    left: 50%;
+}
+#help {
+    padding: 10px;
+    font-size: 18px;
+    line-height: 25px;
+    color: grey;
+}
+#help .title {
+    color: #159688;
+}
+#help :not(.title) {
+    margin-left: 20px;
+}
+#help span {
+    color: #FF7256;
 }

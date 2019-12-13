@@ -3,6 +3,7 @@ const MarkdownView = require('../lib/MarkdownView');
 const { support } = require('../lib/utils');
 const PropertyPanel = require('./PropertyPanel');
 const AnimatePanel = require('./AnimatePanel');
+const RightBottomPanel = require('./RightBottomPanel');
 
 class PPTEditLayout extends React.Component {
     render() {
@@ -22,7 +23,7 @@ class PPTEditLayout extends React.Component {
                     <link rel="stylesheet" href="mppt/history.css" />
                 </head>
                 <body>
-                    <div id="prop">
+                    <div id="leftPanel">
                         <div className="layui-tab layui-tab-brief">
                             <ul className="layui-tab-title">
                                 <li className="layui-this">属性</li>
@@ -42,34 +43,23 @@ class PPTEditLayout extends React.Component {
                     <div id="editor">
                         <MarkdownView source={page.content} page={page} container={null} />
                     </div>
-                    <div id="component">
-                        <div className="title">组件列表</div>
-                        <div id="componentContent"></div>
-                        <div id="componentBottom">
-                            <div className="layui-btn-group">
-                                <button id="componentButtonText" title="新建文本(alt+t)" type="button" className="layui-btn layui-btn-sm tip">
-                                    <i className="layui-icon">&#xe63c;</i>
-                                </button>
-                                <button id="componentButtonImage" title="新建图片(alt+m)" type="button" className="layui-btn layui-btn-sm tip">
-                                    <i className="layui-icon">&#xe64a;</i>
-                                </button>
-                                <button id="componentButtonRely" title="添加动画依赖" type="button" className="layui-btn layui-btn-sm tip">
-                                    <i className="layui-icon">&#xe6b1;</i>
-                                </button>
-                                <button id="componentButtonDelete" title="删除元素" type="button" className="layui-btn layui-btn-sm tip">
-                                    <i className="layui-icon">&#xe640;</i>
-                                </button>
-                                <button id="componentButtonPlay" title="预览" type="button" className="layui-btn layui-btn-sm tip">
-                                    <i className="layui-icon">&#xe652;</i>
-                                </button>
+                    <div id="rightPanel">
+                        <div className="layui-tab layui-tab-brief">
+                            <ul className="layui-tab-title">
+                                <li className="layui-this">组件</li>
+                                <li>历史</li>
+                            </ul>
+                            <div className="layui-tab-content">
+                                <div className="layui-tab-item layui-show">
+                                    <div id="componentContent"></div>
+                                </div>
+                                <div className="layui-tab-item">
+                                    <div id="historyContent"></div>
+                                </div>
                             </div>
                         </div>
+                        <RightBottomPanel />
                     </div>
-                    <div id="history">
-                        <div className="title">历史列表</div>
-                        <div id="historyContent"></div>
-                    </div>
-                    <div id="info"></div>
                     <script type="text/javascript" src="layui/layui.all.js"></script>
                     <script type="text/javascript" src="js/lodash.js"></script>
                     <script type="text/javascript" src="mppt/main.js"></script>

@@ -41,31 +41,13 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             });
         });
         $('#textBold').click(()=>{
-            setTextStyle((target)=>{
-                if (target.style.fontWeight !== 'normal' || !target.style.fontWeight) {
-                    target.style.fontWeight = 'normal';
-                } else {
-                    target.style.fontWeight = 'bold';
-                }
-            });
+            toggleTextStyle('bold');
         });
         $('#textUnderLine').click(()=>{
-            setTextStyle((target)=>{
-                if (target.style.textDecoration !== 'none' || !target.style.textDecoration) {
-                    target.style.textDecoration = 'none';
-                } else {
-                    target.style.textDecoration = 'underline';
-                }
-            });
+            toggleTextStyle('underline');
         });
-        $('#textItalics').click(()=>{
-            setTextStyle((target)=>{
-                if (target.style.fontStyle !== 'normal' || !target.style.fontStyle) {
-                    target.style.fontStyle = 'normal';
-                } else {
-                    target.style.fontStyle = 'italic';
-                }
-            });
+        $('#textItalic').click(()=>{
+            toggleTextStyle('italic');
         });
         $('#textResetStyle').click(()=>{
             setTextStyle((target)=>{
@@ -91,7 +73,36 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             }
         });
     }
-
+    function toggleTextStyle(type) {
+        if (type === 'italic') {
+            const success = setTextStyle((target)=>{
+                if (target.style.fontStyle !== 'normal' || !target.style.fontStyle) {
+                    target.style.fontStyle = 'normal';
+                } else {
+                    target.style.fontStyle = 'italic';
+                }
+            });
+            success && history.pushHistory('切换字体斜体');
+        } else if (type === 'bold') {
+            const success = setTextStyle((target)=>{
+                if (target.style.fontWeight !== 'normal' || !target.style.fontWeight) {
+                    target.style.fontWeight = 'normal';
+                } else {
+                    target.style.fontWeight = 'bold';
+                }
+            });
+            success && history.pushHistory('切换字体加粗');
+        } else if (type === 'underline') {
+            const success = setTextStyle((target)=>{
+                if (target.style.textDecoration !== 'none' || !target.style.textDecoration) {
+                    target.style.textDecoration = 'none';
+                } else {
+                    target.style.textDecoration = 'underline';
+                }
+            });
+            success && history.pushHistory('切换字体下划线');
+        }
+    }
     function setTextColorList(color) {
         const index = textColorList.indexOf(color);
         if (index !== -1) {
@@ -148,6 +159,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
                 callback(target);
             }
         }
+        return !!referents.length;
     }
     function setImageStyle(callback) {
         const referents = getReferents();
@@ -157,6 +169,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
                 callback(target);
             }
         }
+        return !!referents.length;
     }
     function showAnimate(target, animate) {
         const animates = [ animate.animate ];
@@ -181,6 +194,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             } else {
                 delete target.dataset.animate;
             }
+            history.pushHistory('设置动画');
         }
     }
     // 设置动画(格式:zoomIn:a:b:c 其中a为时长,b为延时，c为依赖id)
@@ -359,6 +373,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         initialize,
         updateValues,
         updatePositionSize,
+        setTextStyle,
         setAnimate,
     });
 });

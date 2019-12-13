@@ -39,7 +39,7 @@ layui.define(['jquery', 'utils'], function(exports) {
         historyIndex = index;
         editor.setRootHtml(history[historyIndex].html);
         showHistory();
-        removeAll();
+        editor.removeAll();
     }
     function showHistory() {
         document.getElementById('historyContent').innerHTML = history.map((o, k)=>(
@@ -63,14 +63,14 @@ layui.define(['jquery', 'utils'], function(exports) {
         if (history.length > 2) {
             historyIndex--;
             editor.setRootHtml(history[historyIndex].html);
-            removeAll();
+            editor.removeAll();
         }
     }
     function recoverHistory() {
         if (history.length > historyIndex + 1) {
             historyIndex++;
             editor.setRootHtml(history[historyIndex].html);
-            removeAll();
+            editor.removeAll();
         }
     }
 
@@ -80,6 +80,7 @@ layui.define(['jquery', 'utils'], function(exports) {
         pushHistory,
         popHistory,
         recoverHistory,
+        optimizeHistory,
     });
 
     // 全局函数

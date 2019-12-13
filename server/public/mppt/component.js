@@ -1,8 +1,9 @@
-layui.define(['jquery', 'layer', 'utils', 'control'], function(exports) {
+layui.define(['jquery', 'layer', 'utils', 'control', 'history'], function(exports) {
     let editor;
     const $ = layui.$;
     const layer = layui.layer;
     const control = layui.control;
+    const history = layui.history;
     const utils = layui.utils;
     const animateRelyList = [];
     let dialog;
@@ -15,20 +16,17 @@ layui.define(['jquery', 'layer', 'utils', 'control'], function(exports) {
         $('#componentButtonImage').click(function(){
             editor.createImageTarget();
         });
-        $('#componentButtonRely').click(function(){
-
-        });
         $('#componentButtonDelete').click(function(){
-            // const action = editor.getAction();
-            // if (action.target) {
-            //
-            //     layer.tips('添加成功', '#componentButtonRely');
-            // } else {
-            //     layer.tips('没有选中元素', '#componentButtonRely');
-            // }
+            editor.removeTargets();
+        });
+        $('#componentButtonHistory').click(function(){
+            history.optimizeHistory();
         });
         $('#componentButtonPlay').click(function(){
-
+            control.playCurrentPage();
+        });
+        $('#componentButtonHelp').click(function(){
+            showHelp();
         });
         const html = $.map($('.target'), target=>{
             animateRelyList.push(target);
@@ -47,7 +45,7 @@ layui.define(['jquery', 'layer', 'utils', 'control'], function(exports) {
         return `<div class="component-line" data-id="${id}" onclick="window.onComponentLineClick('${id}')">${getTargetHtml(target)}</div>`;
     }
     function add(target) {
-        utils.unshift(animateRelyList, target);
+        animateRelyList.unshift(target);
         $('#componentContent').prepend(getComponentLine(target));
     }
     function remove(target) {
@@ -106,6 +104,32 @@ layui.define(['jquery', 'layer', 'utils', 'control'], function(exports) {
     }
     function removeAnimateRelyComponent() {
         control.setAnimate({ rely: '' });
+    }
+    function showHelp() {
+        layer.open({
+            type: 1,
+            title: '帮助',
+            offset: ['100px', '500px'], //位置
+            area: ['440px', '600px'], //宽高
+            content: `
+            <div id="help">
+                <div class="title">基础用法：</div>
+                <div><span>选择元素:</span> 鼠标点击选择元素，按住alt，可以选择多个元素，按esc取消选择</div>
+                <div><span>移动元素:</span> 选中元素用鼠标拖动位置，改变大小，使用上下左右键微调</div>
+                <div><span>复制元素:</span> 按住alt，用鼠标拖动选中的元素进行复制</div>
+                <div><span>字体大小:</span> +或-微调字体大小，按住alt快速微调</div>
+                <div class="title">快捷键：</div>
+                <div><span>alt+g:</span> 合并组和拆开组</div>
+                <div><span>alt+t:</span> 添加文字元素</div>
+                <div><span>alt+i:</span> 添加图片元素</div>
+                <div><span>alt+c:</span> 复制元素属性</div>
+                <div><span>alt+v:</span> 粘贴元素属性</div>
+                <div><span>alt+z:</span> 回滚历史操作</div>
+                <div><span>alt+y:</span> 取消回滚历史</div>
+                <div><span>alt+h:</span> 优化历史记录</div>
+                <div><span>alt+s:</span> 保存文件至md</div>
+            </div>`,
+        });
     }
 
     // 导出函数

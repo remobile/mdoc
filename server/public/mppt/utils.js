@@ -1,8 +1,12 @@
-layui.define(function(exports) {
+layui.define(['layer'], function(exports) {
     const hasLog = true; // 是否有日志
 
+    const layer = layui.layer;
     function log(...args) {
         hasLog && console.log(...args);
+    }
+    function toast(text) {
+        layer.msg(text, { offset: 't', anim: 1 });
     }
     function unshiftUnique(list, item) {
         removeList(list, item).unshift(item);
@@ -39,6 +43,7 @@ layui.define(function(exports) {
     // 导出函数
     exports('utils', {
         log,
+        toast,
         uuid,
         post,
         unshiftUnique,

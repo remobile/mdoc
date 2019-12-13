@@ -54,18 +54,3 @@ button.tip:hover::after,
 button.tip:hover::before {
     display: block;
 }
-#componentButtonText::before,#componentButtonText::after {
-    left: 10%;
-}
-#componentButtonImage::before,#componentButtonImage::after {
-    left: 30%;
-}
-#componentButtonRely::before,#componentButtonPre::after {
-    left: 50%;
-}
-#componentButtonDelete::before,#componentButtonNext::after {
-    left: 70%;
-}
-#componentButtonPlay::before,#componentButtonNext::after {
-    left: 90%;
-}
