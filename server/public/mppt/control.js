@@ -171,25 +171,48 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         }
         return !!referents.length;
     }
-    function showAnimate(target, animate, noloop) {
+    function showItemAnimate(target, animate) {
         const name = animate.name;
+        target.classList.add('animated', name);
+        function handleAnimationEnd() {
+            target.classList.remove('animated', name);
+            target.removeEventListener('animationend', handleAnimationEnd);
+        }
+        target.addEventListener('animationend', handleAnimationEnd);
+    }
+    function showAnimate(parent, target, animate, force) {
+        const name = animate.name;
+        const rely = animate.rely;
         const timeLong = animate.timeLong;
         const delay = animate.delay;
         const loop = animate.loop;
 
-        target.classList.add('animated', name);
-        timeLong && (target.style.animationDuration = `${timeLong*1000}ms`);
-        delay && (target.style.animationDelay = `${delay*1000}ms`);
-        !noloop && loop && (target.style.animationIterationCount = loop==-1 ? 'infinite' : loop);
-
-        function handleAnimationEnd() {
-            target.classList.remove('animated', name);
-            delete target.style.animationDuration;
-            delete target.style.animationDelay;
-            delete target.style.animationIterationCount;
-            target.removeEventListener('animationend', handleAnimationEnd);
+        if (name) {
+            if (force || !rely) {
+                target.classList.add('animated', name);
+                timeLong && (target.style.animationDuration = `${timeLong*1000}ms`);
+                !!parent && delay && (target.style.animationDelay = `${delay*1000}ms`);
+                !!parent && loop && (target.style.animationIterationCount = loop==-1 ? 'infinite' : loop);
+                function handleAnimationEnd() {
+                    target.classList.remove('animated', name);
+                    delete target.style.animationDuration;
+                    delete target.style.animationDelay;
+                    delete target.style.animationIterationCount;
+                    target.removeEventListener('animationend', handleAnimationEnd);
+                    // 如果有依赖该节点的，执行依赖该节点的动画
+                    const id = target.id;
+                    parent.children().each(function(){
+                        animate = parseAnimate(this.dataset.animate);
+                        if (animate.name) {
+                            if (animate.rely === id) {
+                                showAnimate(parent, this, animate, true);
+                            }
+                        }
+                    });
+                }
+                target.addEventListener('animationend', handleAnimationEnd);
+            }
         }
-        target.addEventListener('animationend', handleAnimationEnd);
     }
     function setAnimate(options) {
         const referents = getReferents();
@@ -200,7 +223,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
                 const _animate = parseAnimate(animate);
                 animate = { ..._animate, ...options };
                 target.dataset.animate = `${animate.name||''}:${animate.rely||''}:${animate.timeLong||''}:${animate.delay||''}:${animate.loop||''}`.replace(/:*$/, '');
-                showAnimate(target, animate, true);
+                showItemAnimate(target, animate);
                 options.rely != _animate.rely && $('#animateRely').html(component.getRelyItem(options.rely));
             } else {
                 delete target.dataset.animate;
@@ -394,7 +417,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         const root = $('#editor>span');
         root.children().each(function(){
             const animate = parseAnimate(this.dataset.animate);
-            showAnimate(this, animate);
+            showAnimate(root, this, animate);
         });
     }
 
