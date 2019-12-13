@@ -10,16 +10,16 @@ module.exports = () => {
                 <button id="componentButtonImage" title="新建图片(alt+m)" type="button" className="layui-btn layui-btn-sm tip">
                     <i className="layui-icon">&#xe64a;</i>
                 </button>
-                <button id="componentButtonDelete" title="删除元素" type="button" className="layui-btn layui-btn-sm tip">
+                <button id="componentButtonDelete" title="删除元素(alt+del)" type="button" className="layui-btn layui-btn-sm tip">
                     <i className="layui-icon">&#xe640;</i>
                 </button>
-                <button id="componentButtonHistory" title="优化历史列表" type="button" className="layui-btn layui-btn-sm tip">
+                <button id="componentButtonHistory" title="优化历史列表(alt+h)" type="button" className="layui-btn layui-btn-sm tip">
                     <i className="layui-icon">&#xe656;</i>
                 </button>
-                <button id="componentButtonPlay" title="预览本页" type="button" className="layui-btn layui-btn-sm tip">
+                <button id="componentButtonPlay" title="预览本页(alt+p)" type="button" className="layui-btn layui-btn-sm tip">
                     <i className="layui-icon">&#xe652;</i>
                 </button>
-                <button id="componentButtonHelp" title="查看帮助" type="button" className="layui-btn layui-btn-sm tip">
+                <button id="componentButtonHelp" title="查看帮助(alt+?)" type="button" className="layui-btn layui-btn-sm tip">
                     <i className="layui-icon">&#xe607;</i>
                 </button>
             </div>

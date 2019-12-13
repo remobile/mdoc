@@ -6,7 +6,8 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'history'], function(export
     const history = layui.history;
     const utils = layui.utils;
     const animateRelyList = [];
-    let dialog;
+    let relyDialog;
+    let helpDialog;
 
     function initialize() {
         editor = layui.editor;
@@ -88,7 +89,7 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'history'], function(export
             const html = animateRelyList.filter(target=>target.id!==action.target.id).map(target=>{
                 return getRelyLine(target);
             }).join('');
-            dialog = layer.open({
+            relyDialog = layer.open({
                 type: 1,
                 title: '选择动画依赖组件',
                 offset: ['290px', '30px'], //位置
@@ -100,13 +101,18 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'history'], function(export
     function setAnimateRelyComponent(id) {
         control.setAnimate({ rely: id });
         utils.unshiftUnique(animateRelyList, document.getElementById(id));
-        layer.close(dialog);
+        layer.close(relyDialog);
     }
     function removeAnimateRelyComponent() {
         control.setAnimate({ rely: '' });
     }
     function showHelp() {
-        layer.open({
+        if (helpDialog) {
+            layer.close(helpDialog);
+            helpDialog = null;
+            return;
+        }
+        helpDialog = layer.open({
             type: 1,
             title: '帮助',
             offset: ['100px', '500px'], //位置
@@ -138,6 +144,7 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'history'], function(export
         add,
         remove,
         getRelyItem,
+        showHelp,
     });
 
     // 全局函数

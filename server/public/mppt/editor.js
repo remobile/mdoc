@@ -354,6 +354,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             text.push('');
         }
         utils.post('/saveMarkdown', text.join('\n'));
+        utils.toast('保存成功');
     }
     function copyTargetAcctribute (target) {
         copiedTarget = target;
@@ -408,7 +409,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         removeAll();
     }
     function onDocumentKeyDown(e) {
-        console.log("=======", e.keyCode);
+        utils.log("[onDocumentKeyDown]:", e.keyCode);
         if (referents.length) {
             if (e.keyCode === 27) { // esc
                 removeAll();
@@ -433,14 +434,14 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
                 });
             } else if (referents.length === 1) {
                 const target = referents[0].target;
-                if (e.altKey && e.keyCode === 80) { // alt + p 复制属性
+                if (e.altKey && e.keyCode === 86) { // alt + v 复制属性
                     copyTargetAcctribute(target);
                     utils.toast('复制属性成功');
                 } else if (e.altKey && e.keyCode === 67) { // alt + c 粘贴属性
                     pasteTargetAcctribute(target);
                 }
             } else {
-                if (e.altKey && e.keyCode === 85) { // alt + u 切换group状态
+                if (e.altKey && e.keyCode === 71) { // alt + g 切换group状态
                     toggleTargetGroup();
                 }
             }
@@ -460,8 +461,8 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             saveMarkdown();
         } else if (e.altKey && e.keyCode === 72) { // alt + h 优化历史记录
             history.optimizeHistory();
-        } else if (e.altKey && e.keyCode === 72) { // alt + ? 查看帮助
-            history.showHelp();
+        } else if (e.altKey && e.keyCode === 191) { // alt + ? 查看帮助
+            component.showHelp();
         } else if (e.altKey && e.keyCode === 90) { // alt + z 回退
             history.popHistory();
         } else if (e.altKey && e.keyCode === 89) { // alt + y 取消回退
@@ -470,6 +471,8 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             createTextTarget();
         } else if (e.altKey && e.keyCode === 77) { // alt + m 添加图片元素
             createImageTarget();
+        } else if (e.altKey && e.keyCode === 80) { // alt + p 预览本页
+            control.playCurrentPage();
         } else if (e.keyCode === 18) { // alt
             isAltKeyPress = true;
         }

@@ -72,24 +72,6 @@
     padding-left: 10px;
     border-bottom: solid #E0EEEE 1px;
 }
-#componentButtonText::before,#componentButtonText::after {
-    left: 10%;
-}
-#componentButtonImage::before,#componentButtonImage::after {
-    left: 30%;
-}
-#componentButtonDelete::before,#componentButtonNext::after {
-    left: 70%;
-}
-#componentButtonPlay::before,#componentButtonNext::after {
-    left: 90%;
-}
-#componentButtonHistory::before,#componentButtonNext::after {
-    left: 90%;
-}
-#componentButtonHelp::before,#componentButtonPre::after {
-    left: 50%;
-}
 #help {
     padding: 10px;
     font-size: 18px;
@@ -104,4 +86,22 @@
 }
 #help span {
     color: #FF7256;
+}
+#componentButtonText::before,#componentButtonText::after {
+    left: 10%;
+}
+#componentButtonImage::before,#componentButtonImage::after {
+    left: 25%;
+}
+#componentButtonDelete::before,#componentButtonNext::after {
+    left: 42%;
+}
+#componentButtonHistory::before,#componentButtonNext::after {
+    left: 58%;
+}
+#componentButtonPlay::before,#componentButtonNext::after {
+    left: 73%;
+}
+#componentButtonHelp::before,#componentButtonPre::after {
+    left: 90%;
 }

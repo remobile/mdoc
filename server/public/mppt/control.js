@@ -368,6 +368,14 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         style = style || getComputedStyle(target);
         $('#textPositionSize').html(`x: ${parseInt(style.left)}&emsp;y: ${parseInt(style.top)}&emsp;w: ${parseInt(style.width)}&emsp;h: ${parseInt(style.height)}`);
     }
+    function playCurrentPage() {
+        editor.removeAll();
+        const root = $('#editor>span');
+        root.children().each(function(){
+            const animate = parseAnimate(this.dataset.animate);
+            showAnimate(this, animate);
+        });
+    }
 
     exports('control', {
         initialize,
@@ -375,5 +383,6 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         updatePositionSize,
         setTextStyle,
         setAnimate,
+        playCurrentPage,
     });
 });
