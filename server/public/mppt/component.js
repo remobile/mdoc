@@ -87,7 +87,7 @@ layui.define(['jquery', 'layer', 'utils', 'control'], function(exports) {
     function showAnimateRelyComponent() {
         const action = editor.getAction();
         if (action.target) {
-            const html = animateRelyList.map(target=>{
+            const html = animateRelyList.filter(target=>target.id!==action.target.id).map(target=>{
                 return getRelyLine(target);
             }).join('');
             dialog = layer.open({

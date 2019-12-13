@@ -9,6 +9,8 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
     let component;
     let textColorList;
     let textBackgroundColorList;
+    let imageColorList;
+    let imageBackgroundColorList;
 
     function initialize() {
         editor = layui.editor;
@@ -18,6 +20,10 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         textColorList.length > 22 && ( textColorList.length = 22 );
         textBackgroundColorList = [...(settings.textBackgroundColorList || []), '#009688', '#5FB878', '#1E9FFF', '#FF5722', '#FFB800', '#01AAED', '#999', '#c00', '#ff8c00','#ffd700','#90ee90', '#00ced1', '#1e90ff', '#c71585', 'rgb(0, 186, 189)', 'rgb(255, 120, 0)', 'rgb(250, 212, 0)', '#393D49', 'rgba(0,0,0,.5)', 'rgba(255, 69, 0, 0.68)', 'rgba(144, 240, 144, 0.5)', 'rgba(31, 147, 255, 0.73)'];
         textBackgroundColorList.length > 22 && ( textBackgroundColorList.length = 22 );
+        imageColorList = [...(settings.imageColorList || []), '#009688', '#5FB878', '#1E9FFF', '#FF5722', '#FFB800', '#01AAED', '#999', '#c00', '#ff8c00','#ffd700','#90ee90', '#00ced1', '#1e90ff', '#c71585', 'rgb(0, 186, 189)', 'rgb(255, 120, 0)', 'rgb(250, 212, 0)', '#393D49', 'rgba(0,0,0,.5)', 'rgba(255, 69, 0, 0.68)', 'rgba(144, 240, 144, 0.5)', 'rgba(31, 147, 255, 0.73)'];
+        imageColorList.length > 22 && ( imageColorList.length = 22 );
+        imageBackgroundColorList = [...(settings.imageBackgroundColorList || []), '#009688', '#5FB878', '#1E9FFF', '#FF5722', '#FFB800', '#01AAED', '#999', '#c00', '#ff8c00','#ffd700','#90ee90', '#00ced1', '#1e90ff', '#c71585', 'rgb(0, 186, 189)', 'rgb(255, 120, 0)', 'rgb(250, 212, 0)', '#393D49', 'rgba(0,0,0,.5)', 'rgba(255, 69, 0, 0.68)', 'rgba(144, 240, 144, 0.5)', 'rgba(31, 147, 255, 0.73)'];
+        imageBackgroundColorList.length > 22 && ( imageBackgroundColorList.length = 22 );
 
         $('#textAlignLeft').click(()=>{
             setTextStyle((target)=>{
@@ -97,6 +103,17 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         }
         layui.data('settings', { key: 'textColorList', value: textColorList });
     }
+    function setImageColorList(color) {
+        const index = imageColorList.indexOf(color);
+        if (index !== -1) {
+            imageColorList.splice(index, 1);
+        }
+        imageColorList.unshift(color);
+        if (imageColorList.length > 22) {
+            imageColorList.length = 22;
+        }
+        layui.data('settings', { key: 'imageColorList', value: imageColorList });
+    }
     function setTextBackgroundColorList(color) {
         const index = textBackgroundColorList.indexOf(color);
         if (index !== -1) {
@@ -107,6 +124,17 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             textBackgroundColorList.length = 22;
         }
         layui.data('settings', { key: 'textBackgroundColorList', value: textBackgroundColorList });
+    }
+    function setImageBackgroundColorList(color) {
+        const index = imageBackgroundColorList.indexOf(color);
+        if (index !== -1) {
+            imageBackgroundColorList.splice(index, 1);
+        }
+        imageBackgroundColorList.unshift(color);
+        if (imageBackgroundColorList.length > 22) {
+            imageBackgroundColorList.length = 22;
+        }
+        layui.data('settings', { key: 'imageBackgroundColorList', value: imageBackgroundColorList });
     }
     function getReferents() {
         const referents = editor.getReferents();
@@ -234,7 +262,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             });
             // 颜色
             colorpicker.render({
-                elem: '#textColor',
+                elem: '#colorSlider',
                 color: style.color,
                 format: 'rgb',
                 predefine: true,
@@ -242,29 +270,30 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
                 alpha: true,
                 done: function(color){
                     setTextColorList(color);
-                    history.pushHistory('设置文字颜色');
                 },
                 change: function(color){
                     setTextStyle((target)=>{
                         target.style.color = color;
                     });
+                    history.pushHistory('设置文字颜色');
                 },
             });
             // 背景颜色
             colorpicker.render({
-                elem: '#textBackgroundColor',
+                elem: '#backgroundColorSlider',
                 color: style.backgroundColor,
                 format: 'rgb',
                 predefine: true,
+                colors: textBackgroundColorList,
                 alpha: true,
                 done: function(color){
                     setTextBackgroundColorList(color);
-                    history.pushHistory('设置文字背景颜色');
                 },
                 change: function(color){
                     setTextStyle((target)=>{
                         target.style.backgroundColor = color;
                     });
+                    history.pushHistory('设置文字背景颜色');
                 },
             });
             // 位置大小
@@ -273,36 +302,37 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             $('#propertyPanel').addClass('for-image');
             // 颜色
             colorpicker.render({
-                elem: '#textColor',
+                elem: '#colorSlider',
                 color: style.color,
                 format: 'rgb',
                 predefine: true,
-                colors: textColorList,
+                colors: imageColorList,
                 alpha: true,
                 done: function(color){
-                    setTextColorList(color);
-                    history.pushHistory('设置文字颜色');
+                    setImageColorList(color);
                 },
                 change: function(color){
-                    setTextStyle((target)=>{
+                    setImageStyle((target)=>{
                         target.style.color = color;
                     });
+                    history.pushHistory('设置图片颜色');
                 },
             });
             // 背景颜色
             colorpicker.render({
-                elem: '#textBackgroundColor',
+                elem: '#backgroundColorSlider',
                 color: style.backgroundColor,
                 format: 'rgb',
                 predefine: true,
+                colors: imageBackgroundColorList,
                 alpha: true,
                 done: function(color){
-                    setTextBackgroundColorList(color);
-                    history.pushHistory('设置文字背景颜色');
+                    setImageBackgroundColorList(color);
                 },
                 change: function(color){
-                    setTextStyle((target)=>{
+                    setImageStyle((target)=>{
                         target.style.backgroundColor = color;
+                        history.pushHistory('设置图片背景颜色');
                     });
                 },
             });

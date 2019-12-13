@@ -62,7 +62,7 @@ module.exports = () => {
                 <div className="layui-input-inline">
                     <div>
                         <input type="hidden" name="color" value="" id="textColorPicker" />
-                        <div id="textColor"></div>
+                        <div id="colorSlider"></div>
                     </div>
                 </div>
             </div>
@@ -71,7 +71,7 @@ module.exports = () => {
                 <div className="layui-input-inline">
                     <div>
                         <input type="hidden" name="color" value="" id="textBackgroundColorPicker" />
-                        <div id="textBackgroundColor"></div>
+                        <div id="backgroundColorSlider"></div>
                     </div>
                 </div>
             </div>
