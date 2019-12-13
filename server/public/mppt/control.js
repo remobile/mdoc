@@ -69,7 +69,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
                 setAnimate();
             } else {
                 $('.layui-form-item.no-animate').show();
-                setAnimate({ animate: data.value });
+                setAnimate({ name: data.value });
             }
         });
     }
@@ -171,11 +171,22 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         }
         return !!referents.length;
     }
-    function showAnimate(target, animate) {
-        const animates = [ animate.animate ];
-        target.classList.add('animated', ...animates);
+    function showAnimate(target, animate, noloop) {
+        const name = animate.name;
+        const timeLong = animate.timeLong;
+        const delay = animate.delay;
+        const loop = animate.loop;
+
+        target.classList.add('animated', name);
+        timeLong && (target.style.animationDuration = `${timeLong*1000}ms`);
+        delay && (target.style.animationDelay = `${delay*1000}ms`);
+        !noloop && loop && (target.style.animationIterationCount = loop==-1 ? 'infinite' : loop);
+
         function handleAnimationEnd() {
-            target.classList.remove('animated', ...animates);
+            target.classList.remove('animated', name);
+            delete target.style.animationDuration;
+            delete target.style.animationDelay;
+            delete target.style.animationIterationCount;
             target.removeEventListener('animationend', handleAnimationEnd);
         }
         target.addEventListener('animationend', handleAnimationEnd);
@@ -188,8 +199,8 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
                 let animate = target.dataset.animate;
                 const _animate = parseAnimate(animate);
                 animate = { ..._animate, ...options };
-                target.dataset.animate = `${animate.animate||''}:${animate.timeLong||''}:${animate.delay||''}:${animate.rely||''}`.replace(/:*$/, '');
-                showAnimate(target, animate);
+                target.dataset.animate = `${animate.name||''}:${animate.rely||''}:${animate.timeLong||''}:${animate.delay||''}:${animate.loop||''}`.replace(/:*$/, '');
+                showAnimate(target, animate, true);
                 options.rely != _animate.rely && $('#animateRely').html(component.getRelyItem(options.rely));
             } else {
                 delete target.dataset.animate;
@@ -197,14 +208,15 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             history.pushHistory('设置动画');
         }
     }
-    // 设置动画(格式:zoomIn:a:b:c 其中a为时长,b为延时，c为依赖id)
-    function parseAnimate(animate = '', options = {}) {
+    // 设置动画(格式:zoomIn:a:b:c:d 其中a:依赖id,b:时长,c:延时,d:loop)
+    function parseAnimate(animate = '') {
         const list = animate.split(':');
-        animate = list[0];
-        const timeLong = list[1]||options.timeLong; // 时长
-        const delay = list[2]||options.delay; // 延时
-        let rely = list[3]||options.rely; // 依赖
-        return { animate, timeLong, delay, rely };
+        const name = list[0];
+        const rely = list[1]; // 依赖
+        const timeLong = list[2]; // 时长
+        const delay = list[3]; // 延时
+        const loop = list[4]; // loop
+        return { name, rely, timeLong, delay, loop };
     }
     // 更新属性的值
     function updateValues(target) {
@@ -218,17 +230,26 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
 
         let animate = target.dataset.animate;
         if (animate) {
-            animate = parseAnimate(animate, { timeLong: 2, delay: 0 });
+            animate = parseAnimate(animate);
             $('.layui-form-item.no-animate').show();
-            $("#animateList").val(animate.animate);
+            $("#animateList").val(animate.name);
             // 设置依赖
             $('#animateRely').html(component.getRelyItem(animate.rely));
 
             form.render('select');
             slider.render({
+                elem: '#animateLoopSlider',
+                value: animate.loop,
+                min: -1,
+                max: 10,
+                change: function(loop){
+                    setAnimate({ loop });
+                },
+            });
+            slider.render({
                 elem: '#animateLongSlider',
                 value: animate.timeLong,
-                min: 1,
+                min: 0,
                 max: 10,
                 change: function(timeLong){
                     setAnimate({ timeLong });

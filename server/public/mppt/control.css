@@ -4,7 +4,7 @@
 #propertyPanel.for-image>.for-text {
     display: none;
 }
-#fontSizeSlider, #lineHeightSlider, #animateLongSlider, #animateDelaySlider {
+#fontSizeSlider, #lineHeightSlider, #animateLoopSlider, #animateLongSlider, #animateDelaySlider {
     padding-top: 20px;
     padding-left: 10px;
     padding-right: 10px;

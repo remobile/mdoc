@@ -18,6 +18,12 @@ module.exports = () => {
                 </div>
             </div>
             <div className="layui-form-item no-animate">
+                <label className="layui-form-label">循环</label>
+                <div className="layui-input-block">
+                    <div id="animateLoopSlider"></div>
+                </div>
+            </div>
+            <div className="layui-form-item no-animate">
                 <label className="layui-form-label">时长</label>
                 <div className="layui-input-block">
                     <div id="animateLongSlider"></div>
