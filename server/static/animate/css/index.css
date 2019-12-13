@@ -1,0 +1,93 @@
+*{
+    padding:0;
+    margin:0;
+}
+.fragment {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.page:nth-child(2){
+    background:green;
+}
+.page:nth-child(3){
+    background:gold;
+}
+.page:nth-child(4){
+    background:black;
+}
+.page h1{
+    position:absolute;
+    top:45%;
+    left:0;
+    width:100%;
+    font-size:40px;
+    color:#fff;
+    text-align:center;
+}
+.page > * {
+    /* visibility: hidden; */
+}
+.hide {
+    display: none;
+}
+#audio_button {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    z-index: 200;
+    width: 30px;
+    height: 30px;
+    background-image: url(normalmusic.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+@keyframes rotating {
+    from {
+        transform: rotate(0deg)
+    }
+    to {
+        transform: rotate(360deg)
+    }
+}
+.rotate {
+    animation: rotating 1.2s linear infinite;
+}
+@keyframes arrow-float {
+    0%, 30% {
+        opacity: 0;
+        transform: translate(0, 10px)
+    }
+    60% {
+        opacity: 1;
+        transform: translate(0, 0)
+    }
+    100% {
+        opacity: 0;
+        transform: translate(0, -8px)
+    }
+}
+.arrow-wrap {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    z-index: 150;
+    margin-left: -7px;
+    animation: arrow-float 1.5s infinite ease-in-out;
+}
+.arrow1 {
+    transform: rotate(-135deg);
+    left: 1px;
+}
+.arrow2 {
+    left: -4.5px;
+    transform: rotate(-45deg);
+}
+.arrow1, .arrow2 {
+    background-color: #fff;
+    width: 14px;
+    height: 5px;
+    border-radius: 2px;
+    position: absolute;
+    top: 5px;
+}

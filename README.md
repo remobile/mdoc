@@ -379,7 +379,7 @@ npm run mdoc -- -f conf/chart.js
 module.exports = {
     name: 'chart', //名称
     path: 'md/chart.md', // 路径，跟目录为工程config的documentPath，该文件只能为.md和.js类型
-    supports: ['jquery', 'chart'], //支持的功能,有 [main, code, jquery, _, tree, math, flow, sequence, chart] 其中main为main.css, _ 为 underscore
+    supports: ['jquery', 'chart'], //支持的功能,有 [main, code, jquery, _, tree, math, flow, sequence, chart] 其中main为main.css, _ 为 lodash
     dist: '1.html', //目标文件，可以为目录，如果为目录，文件名称为 chart.html
 };
 ```
