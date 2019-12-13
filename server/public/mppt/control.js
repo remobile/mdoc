@@ -158,6 +158,15 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             }
         }
     }
+    function showAnimate(target, animate) {
+        const animates = [ animate.animate ];
+        target.classList.add('animated', ...animates);
+        function handleAnimationEnd() {
+            target.classList.remove('animated', ...animates);
+            target.removeEventListener('animationend', handleAnimationEnd);
+        }
+        target.addEventListener('animationend', handleAnimationEnd);
+    }
     function setAnimate(options) {
         const referents = getReferents();
         for (const referent of referents) {
@@ -167,6 +176,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
                 const _animate = parseAnimate(animate);
                 animate = { ..._animate, ...options };
                 target.dataset.animate = `${animate.animate||''}:${animate.timeLong||''}:${animate.delay||''}:${animate.rely||''}`.replace(/:*$/, '');
+                showAnimate(target, animate);
                 options.rely != _animate.rely && $('#animateRely').html(component.getRelyItem(options.rely));
             } else {
                 delete target.dataset.animate;
@@ -177,10 +187,10 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
     function parseAnimate(animate = '', options = {}) {
         const list = animate.split(':');
         animate = list[0];
-        const timeLong = list[1]; // 时长
-        const delay = list[2]; // 延时
-        let rely = list[3]; // 依赖
-        return { animate, timeLong, delay, rely, ...options };
+        const timeLong = list[1]||options.timeLong; // 时长
+        const delay = list[2]||options.delay; // 延时
+        let rely = list[3]||options.rely; // 依赖
+        return { animate, timeLong, delay, rely };
     }
     // 更新属性的值
     function updateValues(target) {

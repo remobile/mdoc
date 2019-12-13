@@ -14,6 +14,7 @@ class PPTEditLayout extends React.Component {
                     <meta charSet="utf-8" />
                     <meta name="viewport" content="width=device-width" />
                     <link rel="stylesheet" href="layui/css/layui.css" />
+                    <link rel="stylesheet" href="animate/css/animate.css" />
                     <link rel="stylesheet" href="mppt/panel.css" />
                     <link rel="stylesheet" href="mppt/editor.css" />
                     <link rel="stylesheet" href="mppt/control.css" />
@@ -70,7 +71,7 @@ class PPTEditLayout extends React.Component {
                     </div>
                     <div id="info"></div>
                     <script type="text/javascript" src="layui/layui.all.js"></script>
-                    <script type="text/javascript" src="lodash/lodash.js"></script>
+                    <script type="text/javascript" src="js/lodash.js"></script>
                     <script type="text/javascript" src="mppt/main.js"></script>
                 </body>
             </html>
