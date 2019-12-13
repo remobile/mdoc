@@ -1,3 +1,4 @@
+// https://github.com/mc-zone/Zepto.pageSlider
 ;(function( $, window ){
     if( typeof $ == "undefined" ){
         throw new Error("Zepto not found!");
@@ -268,76 +269,79 @@
         translate,
         applyCss;
 
-        translate = ( this.config.horizontal ?
-            "translate3d(" + amount + "%, 0, 0)" :
-            "translate3d(0, " + amount + "%, 0)" );
-            applyCss = {
-                "-webkit-transform":translate,
-                "transform":translate
-            };
-            doAnimation(function(){
-                that.$ctnInner.css(applyCss);
-            });
+        translate = (
+            this.config.horizontal ?
+            "translate3d(" + amount + "%, 0, 0)"
+            :
+            "translate3d(0, " + amount + "%, 0)"
+        );
+        applyCss = {
+            "-webkit-transform":translate,
+            "transform":translate
         };
+        doAnimation(function(){
+            that.$ctnInner.css(applyCss);
+        });
+    };
 
-        //自动播放
-        PageSlider.prototype.autoPlay = function(){
-            var that = this;
-            if( !this.config.auto ) return false;
+    //自动播放
+    PageSlider.prototype.autoPlay = function(){
+        var that = this;
+        if( !this.config.auto ) return false;
 
-            window.clearTimeout( this.autoTimeId );
-            this.autoTimeId = window.setTimeout(function(){
-                that.moveNext( true );
-                that.autoPlay();
-            },this.config.autoSpeed);
+        window.clearTimeout( this.autoTimeId );
+        this.autoTimeId = window.setTimeout(function(){
+            that.moveNext( true );
+            that.autoPlay();
+        },this.config.autoSpeed);
 
-        };
+    };
 
-        var defaults = {
-            pageSelector: ".page",
-            height:     null,   //默认为window高。可传入百分比（按父级百分比）,或px
-            width:      null,   //默认为window宽。可传入百分比（按父级百分比）,或px
-            horizontal: false,  //默认为竖直排布scroll，可以水平
-            autoSpeed:  5000,   //自动播放速度
-            auto:       false,  //是否自动播放
-            loop:       true,     //是否循环播放
-            percentThreshold: 10, //拉动超过百分比时翻页
-            easing:     'ease-out',   //缓动函数 加在transition里
-            easingTime: 400,      //缓动延迟
-            pageCss:    {},         //page额外的css(不接受height,width,会被覆盖)
-            prevBtn:    null,
-            nextBtn:    null,
-            beforeMove: emptyFunction,
-            afterMove:  emptyFunction
-        };
+    var defaults = {
+        pageSelector: ".page",
+        height:     null,   //默认为window高。可传入百分比（按父级百分比）,或px
+        width:      null,   //默认为window宽。可传入百分比（按父级百分比）,或px
+        horizontal: false,  //默认为竖直排布scroll，可以水平
+        autoSpeed:  5000,   //自动播放速度
+        auto:       false,  //是否自动播放
+        loop:       true,     //是否循环播放
+        percentThreshold: 10, //拉动超过百分比时翻页
+        easing:     'ease-out',   //缓动函数 加在transition里
+        easingTime: 400,      //缓动延迟
+        pageCss:    {},         //page额外的css(不接受height,width,会被覆盖)
+        prevBtn:    null,
+        nextBtn:    null,
+        beforeMove: emptyFunction,
+        afterMove:  emptyFunction
+    };
 
-        //fn extend
-        $.fn.pageSlider = function( parameters ){
-            var config = $.extend( true, {}, defaults, parameters );
+    //fn extend
+    $.fn.pageSlider = function( parameters ){
+        var config = $.extend( true, {}, defaults, parameters );
 
-            return this.each(function( idx, el ){
-                //实例化PageSlider
-                var $el = $(el);
-                var instance = new PageSlider( $el, config );
-                instance.init();
-                config.onLoaded && config.onLoaded(instance.$pages, instance.curPage);
+        return this.each(function( idx, el ){
+            //实例化PageSlider
+            var $el = $(el);
+            var instance = new PageSlider( $el, config );
+            instance.init();
+            config.onLoaded && config.onLoaded(instance.$pages, instance.curPage);
 
-                //auto play
-                if( instance.config.auto ){
-                    instance.autoPlay();
+            //auto play
+            if( instance.config.auto ){
+                instance.autoPlay();
+            }
+
+            //control button
+            [ "prevBtn", "nextBtn" ].forEach(function(btn,idx){
+                var $btn = instance.config[ btn ];
+                if( $btn && $btn.length>0 ){
+                    var oper = 'move' + btn.replace('Btn', '').replace(/./, function(m){ return m[0].toUpperCase(); });
+                    $btn.on("touchend",function(){
+                        instance[oper]();
+                    });
                 }
-
-                //control button
-                [ "prevBtn", "nextBtn" ].forEach(function(btn,idx){
-                    var $btn = instance.config[ btn ];
-                    if( $btn && $btn.length>0 ){
-                        var oper = 'move' + btn.replace('Btn', '').replace(/./, function(m){ return m[0].toUpperCase(); });
-                        $btn.on("touchend",function(){
-                            instance[oper]();
-                        });
-                    }
-                });
             });
-        };
+        });
+    };
 
-    }( window.Zepto, window ));
+}( window.Zepto, window ));
