@@ -21,10 +21,11 @@ layui.define(['jquery', 'utils'], function(exports) {
     }
     function optimizeHistory() {
         const length = history.length;
-        if (length > 20) {
-            const ret = confirm(`是否优化历史记录，优化了之后不能再恢复，是否修复?`);
-            let newHistory = [];
-            if (ret) {
+        if (length > 0) {
+            const dialog = layer.confirm('优化历史记录了之后不能再恢复，是否继续?', {
+                btn: ['继续','放弃']
+            }, function(){
+                let newHistory = [];
                 for (let i = 0; i < length - 10; i += 10) {
                     newHistory.push(history[i]);
                 }
@@ -32,7 +33,9 @@ layui.define(['jquery', 'utils'], function(exports) {
                 historyIndex = history.length - 1;
                 utils.post('/updateHistory', JSON.stringify(history));
                 showHistory();
-            }
+                layer.close(dialog);
+                utils.toast('优化成功');
+            });
         }
     }
     function setTopHistory(index) {
