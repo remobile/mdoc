@@ -13,14 +13,13 @@ function showAnimate(parent, target, animate, force) {
     const timeLong = animate.timeLong;
     const delay = animate.delay;
     const loop = animate.loop;
-
-console.log("=======", animate);
     if (name) {
         if (force || !rely) {
             target.classList.add('animated', name);
             timeLong && (target.style.animationDuration = `${timeLong*1000}ms`);
             !!parent && delay && (target.style.animationDelay = `${delay*1000}ms`);
             !!parent && loop && (target.style.animationIterationCount = loop==-1 ? 'infinite' : loop);
+            target.style.visibility = 'visible';
             function handleAnimationEnd() {
                 target.classList.remove('animated', name);
                 delete target.style.animationDuration;
@@ -42,6 +41,9 @@ console.log("=======", animate);
         }
     }
 }
+function setArrowColor(page, arrows) {
+    arrows.css({ backgroundColor: page.dataset.arrowColor||'#FFF' });
+}
 function initPage($){
     // 音乐开关
     const audio = document.getElementById('audio');
@@ -57,29 +59,39 @@ function initPage($){
             this.classList.add('rotate');
         }
     });
+    // 箭头
+    const arrows = $('.arrow-wrap>div');
     $("#container").pageSlider({
         pageSelector:".page",
         loop:false,
-        afterMove: function(pages, el1, el2, index) {
+        afterMove: function(pages, prePage, curPage, index) {
             // 不显示最后一张的箭头
             if (index + 1 === pages.length) {
                 $('.arrow-wrap').addClass('hide');
             } else {
                 $('.arrow-wrap').removeClass('hide');
             }
-            el1 = $(el1.children()[0].childNodes[0]);
-            el1.children().each(function(){
+            setArrowColor(curPage[0], arrows);
+            let el = $(prePage.children()[0].childNodes[0]);
+            el.children().each(function(){
                 this.dataset.animate && (this.style.visibility = 'hidden');
             });
-            el2 = $(el2.children()[0].childNodes[0]);
-            el2.children().each(function(){
-                showAnimate(el2, this, parseAnimate(this.dataset.animate));
+            el = $(curPage.children()[0].childNodes[0]);
+            el.children().each(function(){
+                showAnimate(el, this, parseAnimate(this.dataset.animate));
             });
         },
         onLoaded: function(pages, curPage) {
-            let el = $(pages[curPage].childNodes[0].childNodes[0]);
-            el.children().each(function(){
-                showAnimate(el, this, parseAnimate(this.dataset.animate));
+            setArrowColor(pages[curPage], arrows);
+            pages.forEach(function(page, index){
+                const el = $(page.childNodes[0].childNodes[0]);
+                el.children().each(function(){
+                    if (curPage === index) {
+                        showAnimate(el, this, parseAnimate(this.dataset.animate));
+                    } else {
+                        this.dataset.animate && (this.style.visibility = 'hidden');
+                    }
+                });
             });
         },
     });

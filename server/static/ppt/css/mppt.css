@@ -7,9 +7,6 @@ html, body {
     top: 0;
     left: 0;
 }
-.page > * {
-    visibility: hidden;
-}
 .hide {
     display: none;
 }
@@ -57,15 +54,15 @@ html, body {
     margin-left: -7px;
     animation: arrow-float 1.5s infinite ease-in-out;
 }
-.arrow1 {
+.arrow-wrap>.arrow1 {
     transform: rotate(-135deg);
     left: 1px;
 }
-.arrow2 {
+.arrow-wrap>.arrow2 {
     left: -4.5px;
     transform: rotate(-45deg);
 }
-.arrow1, .arrow2 {
+.arrow-wrap>.arrow1, .arrow-wrap>.arrow2 {
     background-color: #fff;
     width: 14px;
     height: 5px;
