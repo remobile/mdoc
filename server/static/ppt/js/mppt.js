@@ -1,28 +1,44 @@
-function showAnimate(parent, node, animate, force) {
-    if (animate) {
-        let animates = animate.split(' ');
-        if (force || !animates.find(o => 'after-' === o.substr(0, 6))) {
-            node.classList.add('animated', ...animates);
-            node.style.visibility = 'visible';
+function parseAnimate(animate = '') {
+    const list = animate.split(':');
+    const name = list[0];
+    const rely = list[1]; // 依赖
+    const timeLong = list[2]; // 时长
+    const delay = list[3]; // 延时
+    const loop = list[4]; // loop
+    return { name, rely, timeLong, delay, loop };
+}
+function showAnimate(parent, target, animate, force) {
+    const name = animate.name;
+    const rely = animate.rely;
+    const timeLong = animate.timeLong;
+    const delay = animate.delay;
+    const loop = animate.loop;
+
+console.log("=======", animate);
+    if (name) {
+        if (force || !rely) {
+            target.classList.add('animated', name);
+            timeLong && (target.style.animationDuration = `${timeLong*1000}ms`);
+            !!parent && delay && (target.style.animationDelay = `${delay*1000}ms`);
+            !!parent && loop && (target.style.animationIterationCount = loop==-1 ? 'infinite' : loop);
             function handleAnimationEnd() {
-                node.classList.remove('animated', ...animates);
-                node.removeEventListener('animationend', handleAnimationEnd);
+                target.classList.remove('animated', name);
+                delete target.style.animationDuration;
+                delete target.style.animationDelay;
+                delete target.style.animationIterationCount;
+                target.removeEventListener('animationend', handleAnimationEnd);
                 // 如果有依赖该节点的，执行依赖该节点的动画
-                const index = $(node).data('index');
-                if (index !== undefined) {
-                    let after = 'after-'+index;
-                    parent.children().each(function(){
-                        let animate = $(this).data('animate');
-                        if (animate) {
-                            animates = animate.split(' ');
-                            if (animates.find(o => o===after)) {
-                                showAnimate(parent, this, animate, true);
-                            }
+                const id = target.id;
+                parent.children().each(function(){
+                    animate = parseAnimate(this.dataset.animate);
+                    if (animate.name) {
+                        if (animate.rely === id) {
+                            showAnimate(parent, this, animate, true);
                         }
-                    });
-                }
+                    }
+                });
             }
-            node.addEventListener('animationend', handleAnimationEnd);
+            target.addEventListener('animationend', handleAnimationEnd);
         }
     }
 }
@@ -51,17 +67,19 @@ function initPage($){
             } else {
                 $('.arrow-wrap').removeClass('hide');
             }
+            el1 = $(el1.children()[0].childNodes[0]);
             el1.children().each(function(){
-                $(this).data('animate') && (this.style.visibility = 'hidden');
+                this.dataset.animate && (this.style.visibility = 'hidden');
             });
+            el2 = $(el2.children()[0].childNodes[0]);
             el2.children().each(function(){
-                showAnimate(el2, this, $(this).data('animate'));
+                showAnimate(el2, this, parseAnimate(this.dataset.animate));
             });
         },
         onLoaded: function(pages, curPage) {
-            let el = $(pages[curPage]);
+            let el = $(pages[curPage].childNodes[0].childNodes[0]);
             el.children().each(function(){
-                showAnimate(el, this, $(this).data('animate'));
+                showAnimate(el, this, parseAnimate(this.dataset.animate));
             });
         },
     });

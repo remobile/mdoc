@@ -1,4 +1,4 @@
-*{
+html, body {
     padding:0;
     margin:0;
 }
@@ -7,26 +7,8 @@
     top: 0;
     left: 0;
 }
-.page:nth-child(2){
-    background:green;
-}
-.page:nth-child(3){
-    background:gold;
-}
-.page:nth-child(4){
-    background:black;
-}
-.page h1{
-    position:absolute;
-    top:45%;
-    left:0;
-    width:100%;
-    font-size:40px;
-    color:#fff;
-    text-align:center;
-}
 .page > * {
-    /* visibility: hidden; */
+    visibility: hidden;
 }
 .hide {
     display: none;

@@ -32,21 +32,21 @@ module.exports = function fragment_plugin(md, page) {
             style = `${style}${(options.x < 0) ? `right:${-options.x}px;` : `left:${options.x}px;`}`;
             style = `${style}${(options.y < 0) ? `bottom:${-options.y}px;` : `top:${options.y}px;`}`;
             options.style && (style = `${style}${options.style}`);
-            const className = `${options.className||''} ${page.edit ? 'target' : ''}`;
+            const className = `${options.className||''}${page.edit ? ' target' : ''} ${options.img ? '' : ' text'}`.trim();
             let dataset = '';
             if (options.group) {
                 dataset = ` data-group=${options.group}`;
             }
-            if (page.edit && options.animate) {
+            if (options.animate) {
                 dataset = `${dataset} data-animate=${options.animate}`;
             }
 
             let html = '';
             if (options.img) {
-                html = `<img id="${options.id}" class="${className}"${dataset} src="${content}" ${append} style="${style}" />`;
+                html = `<img id="${options.id}" class="${className}" ${dataset} src="${content}" ${append} style="${style}" />`;
             } else {
                 html = `
-                <div id="${options.id}" class="text ${className}"${dataset} style="${style}">
+                <div id="${options.id}" class="${className}" ${dataset} style="${style}">
                     ${content}
                 </div>
                 `;
