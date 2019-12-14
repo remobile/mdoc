@@ -323,30 +323,30 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             if (isText) {
                 const fontSize = el.style.fontSize;
                 if (fontSize) {
-                    style = `${style}font-size:${fontSize};`;
+                    style = `${style}s=${parseFloat(fontSize)} `;
                 }
                 const fontWeight = el.style.fontWeight;
-                if (fontWeight) {
-                    style = `${style}font-weight:${fontWeight};`;
+                if (fontWeight === 'bold') {
+                    style = `${style}b `;
                 }
                 const fontStyle = el.style.fontStyle;
                 if (fontStyle === 'italic') {
-                    style = `${style}font-style:${fontStyle};`;
+                    style = `${style}i `;
                 }
                 const color = el.style.color;
                 if (color) {
-                    style = `${style}color:${color};`;
+                    style = `${style}c=${utils.rgbaToHex(color)} `;
                 }
                 const bgcolor = el.style.backgroundColor;
                 if (bgcolor) {
-                    style = `${style}background-color:${bgcolor};`;
+                    style = `${style}bc=${utils.rgbaToHex(bgcolor)} `;
                 }
                 if (style) {
-                    style = ` style=${style.replace(/\s/g, '')}`;
+                    style = ` ${style.trim()}`;
                 }
             }
-            const group = el.dataset.group !== undefined ? ` group=${el.dataset.group}` : '';
-            const animate = el.dataset.animate !== undefined ? ` animate=${el.dataset.animate}` : '';
+            const group = el.dataset.group !== undefined ? ` g=${el.dataset.group}` : '';
+            const animate = el.dataset.animate !== undefined ? ` a=${el.dataset.animate}` : '';
 
             text.push(`::: fm${type} x=${x} y=${y} w=${w} h=${h}${style}${group}${animate} id=${id}`);
             (el.src || el.innerText) && text.push(isText ? el.innerText : el.src.replace(window.location.href, ''));

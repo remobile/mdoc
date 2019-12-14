@@ -2,7 +2,7 @@
 const React = require('react');
 const renderToStaticMarkup = require('react-dom/server').renderToStaticMarkup;
 const container = require('./container');
-const { parseParams } = require('../lib/utils');
+const { parseParams, hexToRgba } = require('../lib/utils');
 
 module.exports = function fragment_plugin(md, page) {
     const MarkdownView = page.MarkdownView;
@@ -15,31 +15,27 @@ module.exports = function fragment_plugin(md, page) {
             const content = tokens[idx].markup;
             let style = 'position: absolute;';
             let append = '';
-            if (options.w !== undefined)  {
-                if (!options.img) {
-                    style = `${style}width:${options.w}px;`;
-                } else {
-                    append = `${append}width="${options.w}px" `;
-                }
-            }
-            if (options.h !== undefined)  {
-                if (!options.img) {
-                    style = `${style}height:${options.h}px;`;
-                } else {
-                    append = `${append}height="${options.h}px" `;
-                }
+            if (options.img) {
+                options.w && (append = `${append}width="${options.w}px" `);
+                options.h && (append = `${append}height="${options.h}px" `);
+            } else {
+                options.w && (style = `${style}width:${options.w}px;`);
+                options.h && (style = `${style}height:${options.h}px;`);
             }
             style = `${style}${(options.x < 0) ? `right:${-options.x}px;` : `left:${options.x}px;`}`;
             style = `${style}${(options.y < 0) ? `bottom:${-options.y}px;` : `top:${options.y}px;`}`;
+
+            options.s && (style = `${style}font-size:${options.s}px;`);
+            options.b && (style = `${style}font-weight:bold;`);
+            options.i && (style = `${style}font-style:italic;`);
+            options.c && (style = `${style}color:${hexToRgba(options.c)};`);
+            options.bc && (style = `${style}background-color:${hexToRgba(options.bc)};`);
+
             options.style && (style = `${style}${options.style}`);
             const className = `${options.className||''}${page.edit ? ' target' : ''} ${options.img ? '' : ' text'}`.trim();
             let dataset = '';
-            if (options.group) {
-                dataset = ` data-group=${options.group}`;
-            }
-            if (options.animate) {
-                dataset = `${dataset} data-animate=${options.animate}`;
-            }
+            options.g && (dataset = ` data-group=${options.g}`);
+            options.a && (dataset = `${dataset} data-animate=${options.a}`);
 
             let html = '';
             if (options.img) {
