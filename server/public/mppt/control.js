@@ -183,14 +183,14 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
     function showAnimate(parent, target, animate, force) {
         const name = animate.name;
         const rely = animate.rely;
-        const timeLong = animate.timeLong;
+        const duration = animate.duration;
         const delay = animate.delay;
         const loop = animate.loop;
 
         if (name) {
             if (force || !rely) {
                 target.classList.add('animated', name);
-                timeLong && (target.style.animationDuration = `${timeLong*1000}ms`);
+                duration && (target.style.animationDuration = `${duration*1000}ms`);
                 !!parent && delay && (target.style.animationDelay = `${delay*1000}ms`);
                 !!parent && loop && (target.style.animationIterationCount = loop==-1 ? 'infinite' : loop);
                 function handleAnimationEnd() {
@@ -222,7 +222,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
                 let animate = target.dataset.animate;
                 const _animate = parseAnimate(animate);
                 animate = { ..._animate, ...options };
-                target.dataset.animate = `${animate.name||''}:${animate.rely||''}:${animate.timeLong||''}:${animate.delay||''}:${animate.loop||''}`.replace(/:*$/, '');
+                target.dataset.animate = `${animate.name||''}:${animate.rely||''}:${animate.duration||''}:${animate.delay||''}:${animate.loop||''}`.replace(/:*$/, '');
                 showItemAnimate(target, animate);
                 options.rely != _animate.rely && $('#animateRely').html(component.getRelyItem(options.rely));
             } else {
@@ -236,10 +236,10 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         const list = animate.split(':');
         const name = list[0];
         const rely = list[1]; // 依赖
-        const timeLong = list[2]; // 时长
+        const duration = list[2]; // 时长
         const delay = list[3]; // 延时
         const loop = list[4]; // loop
-        return { name, rely, timeLong, delay, loop };
+        return { name, rely, duration, delay, loop };
     }
     // 更新属性的值
     function updateValues(target) {
@@ -271,11 +271,11 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             });
             slider.render({
                 elem: '#animateLongSlider',
-                value: animate.timeLong,
+                value: animate.duration,
                 min: 0,
                 max: 10,
-                change: function(timeLong){
-                    setAnimate({ timeLong });
+                change: function(duration){
+                    setAnimate({ duration });
                 },
             });
             slider.render({
