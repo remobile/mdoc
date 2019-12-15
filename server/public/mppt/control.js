@@ -1,12 +1,12 @@
-layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
+layui.define(['jquery', 'form', 'colorpicker', 'animate', 'history'], function(exports) {
     const $ = layui.$;
     const form = layui.form;
     const slider = layui.slider;
     const colorpicker = layui.colorpicker;
     const history = layui.history;
+    const animate = layui.animate;
 
     let editor;
-    let component;
     let textColorList;
     let textBackgroundColorList;
     let imageColorList;
@@ -14,7 +14,6 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
 
     function initialize() {
         editor = layui.editor;
-        component = layui.component;
         const settings = layui.data('settings');
         textColorList = [...(settings.textColorList || []), '#009688', '#5FB878', '#1E9FFF', '#FF5722', '#FFB800', '#01AAED', '#999', '#c00', '#ff8c00','#ffd700','#90ee90', '#00ced1', '#1e90ff', '#c71585', 'rgb(0, 186, 189)', 'rgb(255, 120, 0)', 'rgb(250, 212, 0)', '#393D49', 'rgba(0,0,0,.5)', 'rgba(255, 69, 0, 0.68)', 'rgba(144, 240, 144, 0.5)', 'rgba(31, 147, 255, 0.73)'];
         textColorList.length > 22 && ( textColorList.length = 22 );
@@ -61,17 +60,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             });
             pushHistory('清除样式');
         });
-        // 动画列表选择
-        $('#animateList').attr('lay-filter', 'animateList');
-        form.on('select(animateList)', function(data){
-            if (data.value === 'none') {
-                $('.layui-form-item.no-animate').hide();
-                setAnimate();
-            } else {
-                $('.layui-form-item.no-animate').show();
-                setAnimate({ name: data.value });
-            }
-        });
+        animate.initialize();
     }
     function toggleTextStyle(type) {
         if (type === 'italic') {
@@ -147,12 +136,8 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         }
         layui.data('settings', { key: 'imageBackgroundColorList', value: imageBackgroundColorList });
     }
-    function getReferents() {
-        const referents = editor.getReferents();
-        return referents.filter(o=>o.active);
-    }
     function setTextStyle(callback) {
-        const referents = getReferents();
+        const referents = editor.getReferents();
         for (const referent of referents) {
             const target = referent.target;
             if (target.classList.contains('text')) {
@@ -162,7 +147,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         return !!referents.length;
     }
     function setImageStyle(callback) {
-        const referents = getReferents();
+        const referents = editor.getReferents();
         for (const referent of referents) {
             const target = referent.target;
             if (!target.classList.contains('text')) {
@@ -170,76 +155,6 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             }
         }
         return !!referents.length;
-    }
-    function showItemAnimate(target, animate) {
-        const name = animate.name;
-        target.classList.add('animated', name);
-        function handleAnimationEnd() {
-            target.classList.remove('animated', name);
-            target.removeEventListener('animationend', handleAnimationEnd);
-        }
-        target.addEventListener('animationend', handleAnimationEnd);
-    }
-    function showAnimate(parent, target, animate, force) {
-        const name = animate.name;
-        const rely = animate.rely;
-        const duration = animate.duration;
-        const delay = animate.delay;
-        const loop = animate.loop;
-
-        if (name) {
-            if (force || !rely) {
-                target.classList.add('animated', name);
-                duration && (target.style.animationDuration = `${duration*1000}ms`);
-                !!parent && delay && (target.style.animationDelay = `${delay*1000}ms`);
-                !!parent && loop && (target.style.animationIterationCount = loop==-1 ? 'infinite' : loop);
-                function handleAnimationEnd() {
-                    target.classList.remove('animated', name);
-                    delete target.style.animationDuration;
-                    delete target.style.animationDelay;
-                    delete target.style.animationIterationCount;
-                    target.removeEventListener('animationend', handleAnimationEnd);
-                    // 如果有依赖该节点的，执行依赖该节点的动画
-                    const id = target.id;
-                    parent.children().each(function(){
-                        animate = parseAnimate(this.dataset.animate);
-                        if (animate.name) {
-                            if (animate.rely === id) {
-                                showAnimate(parent, this, animate, true);
-                            }
-                        }
-                    });
-                }
-                target.addEventListener('animationend', handleAnimationEnd);
-            }
-        }
-    }
-    function setAnimate(options) {
-        const referents = getReferents();
-        for (const referent of referents) {
-            const target = referent.target;
-            if (options) {
-                let animate = target.dataset.animate;
-                const _animate = parseAnimate(animate);
-                animate = { ..._animate, ...options };
-                target.dataset.animate = `${animate.name||''}:${animate.rely||''}:${animate.duration||''}:${animate.delay||''}:${animate.loop||''}`.replace(/:*$/, '');
-                showItemAnimate(target, animate);
-                options.rely != _animate.rely && $('#animateRely').html(component.getRelyItem(options.rely));
-            } else {
-                delete target.dataset.animate;
-            }
-            history.pushHistory('设置动画');
-        }
-    }
-    // 设置动画(格式:zoomIn:a:b:c:d 其中a:依赖id,b:时长,c:延时,d:loop)
-    function parseAnimate(animate = '') {
-        const list = animate.split(':');
-        const name = list[0];
-        const rely = list[1]; // 依赖
-        const duration = list[2]; // 时长
-        const delay = list[3]; // 延时
-        const loop = list[4]; // loop
-        return { name, rely, duration, delay, loop };
     }
     // 更新属性的值
     function updateValues(target) {
@@ -250,46 +165,6 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         }
         $('#propertyPanel').show();
         $('#animatePanel').show();
-
-        let animate = target.dataset.animate;
-        if (animate) {
-            animate = parseAnimate(animate);
-            $('.layui-form-item.no-animate').show();
-            $("#animateList").val(animate.name);
-            // 设置依赖
-            $('#animateRely').html(component.getRelyItem(animate.rely));
-
-            form.render('select');
-            slider.render({
-                elem: '#animateLoopSlider',
-                value: animate.loop,
-                min: -1,
-                max: 10,
-                change: function(loop){
-                    setAnimate({ loop });
-                },
-            });
-            slider.render({
-                elem: '#animateLongSlider',
-                value: animate.duration,
-                min: 0,
-                max: 10,
-                change: function(duration){
-                    setAnimate({ duration });
-                },
-            });
-            slider.render({
-                elem: '#animateDelaySlider',
-                value: animate.delay,
-                min: 0,
-                max: 10,
-                change: function(delay){
-                    setAnimate({ delay })
-                },
-            });
-        } else {
-            $('.layui-form-item.no-animate').hide();
-        }
 
         // 设置样式
         const style = getComputedStyle(target);
@@ -407,18 +282,12 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
             // 位置大小
             updatePositionSize(target, style);
         }
+
+        animate.updateValues(target);
     }
     function updatePositionSize(target, style) {
         style = style || getComputedStyle(target);
         $('#textPositionSize').html(`x: ${parseInt(style.left)}&emsp;y: ${parseInt(style.top)}&emsp;w: ${parseInt(style.width)}&emsp;h: ${parseInt(style.height)}`);
-    }
-    function playCurrentPage() {
-        editor.removeAll();
-        const root = $('#editor>span');
-        root.children().each(function(){
-            const animate = parseAnimate(this.dataset.animate);
-            showAnimate(root, this, animate);
-        });
     }
 
     exports('control', {
@@ -426,7 +295,5 @@ layui.define(['jquery', 'form', 'colorpicker', 'history'], function(exports) {
         updateValues,
         updatePositionSize,
         setTextStyle,
-        setAnimate,
-        playCurrentPage,
     });
 });

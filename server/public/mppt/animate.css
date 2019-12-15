@@ -1,0 +1,30 @@
+#addAnimateButton {
+    width: 94%;
+    margin-left: 3%;
+}
+#animatePanelContainer form {
+    border-bottom: 1px solid gray;
+}
+#animateRely {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 40px;
+}
+#animateRely .component-line {
+    border: 0px;
+}
+#animateRely .component-text {
+    width: 126px;
+}
+.line {
+    height: 1px;
+    background-color: #E6E6E6;
+    width: 100%;
+    margin-bottom: 20px;
+}
+.no-animate, .no-animate-ext {
+    display: none;
+}

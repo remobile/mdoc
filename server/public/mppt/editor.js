@@ -3,6 +3,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
     const utils = layui.utils;
     const history = layui.history;
     const control = layui.control;
+    const animate = layui.animate;
     const component = layui.component;
 
     let action = { cmd: '' }; // 当前操作的对象
@@ -346,9 +347,9 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
                 }
             }
             const group = el.dataset.group !== undefined ? ` g=${el.dataset.group}` : '';
-            const animate = el.dataset.animate !== undefined ? ` a=${el.dataset.animate}` : '';
+            const _animate = el.dataset.animate !== undefined ? ` a=${el.dataset.animate}` : '';
 
-            text.push(`::: fm${type} x=${x} y=${y} w=${w} h=${h}${style}${group}${animate} id=${id}`);
+            text.push(`::: fm${type} x=${x} y=${y} w=${w} h=${h}${style}${group}${_animate} id=${id}`);
             (el.src || el.innerText) && text.push(isText ? el.innerText : el.src.replace(window.location.href, ''));
             text.push(':::');
             text.push('');
@@ -472,7 +473,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         } else if (e.altKey && e.keyCode === 77) { // alt + m 添加图片元素
             createImageTarget();
         } else if (e.altKey && e.keyCode === 80) { // alt + p 预览本页
-            control.playCurrentPage();
+            animate.playCurrentPage();
         } else if (e.keyCode === 18) { // alt
             isAltKeyPress = true;
         }
@@ -498,7 +499,8 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         removeTargets,
         getRootHtml: () => root.innerHTML,
         setRootHtml: (html) => { root.innerHTML = html },
-        getReferents: () => referents,
+        getAllReferents: () => referents,
+        getReferents: () => referents.filter(o=>o.active),
         getAction: () => action,
     });
 

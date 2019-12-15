@@ -16,13 +16,13 @@ module.exports = () => {
             <div className="layui-form-item for-text">
                 <label className="layui-form-label">大小</label>
                 <div className="layui-input-block">
-                    <div id="fontSizeSlider"></div>
+                    <div id="fontSizeSlider" class="slider-container"></div>
                 </div>
             </div>
             <div className="layui-form-item for-text">
                 <label className="layui-form-label">行距</label>
                 <div className="layui-input-block">
-                    <div id="lineHeightSlider"></div>
+                    <div id="lineHeightSlider" class="slider-container"></div>
                 </div>
             </div>
             <div className="layui-form-item for-text">

@@ -4,11 +4,6 @@
 #propertyPanel.for-image>.for-text {
     display: none;
 }
-#fontSizeSlider, #lineHeightSlider, #animateLoopSlider, #animateLongSlider, #animateDelaySlider {
-    padding-top: 20px;
-    padding-left: 10px;
-    padding-right: 10px;
-}
 #textPositionSize {
     font-size: 16px;
     width: 240px;
@@ -16,6 +11,11 @@
     padding-top: 6px;
     color: gray;
     font-weight: 500;
+}
+.slider-container {
+    padding-top: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 .layui-tab {
     text-align: center !important;
@@ -45,21 +45,4 @@
 }
 .layui-form-item .layui-inline {
     margin-left: 10px;
-}
-.layui-form-item.no-animate {
-    display: none;
-}
-#animateRely {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-left: 10px;
-    padding-right: 10px;
-    height: 40px;
-}
-#animateRely .component-line {
-    border: 0px;
-}
-#animateRely .component-text {
-    width: 126px;
 }

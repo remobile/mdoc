@@ -19,6 +19,7 @@ class PPTEditLayout extends React.Component {
                     <link rel="stylesheet" href="mppt/panel.css" />
                     <link rel="stylesheet" href="mppt/editor.css" />
                     <link rel="stylesheet" href="mppt/control.css" />
+                    <link rel="stylesheet" href="mppt/animate.css" />
                     <link rel="stylesheet" href="mppt/component.css" />
                     <link rel="stylesheet" href="mppt/history.css" />
                 </head>

@@ -1,8 +1,9 @@
-layui.define(['jquery', 'layer', 'utils', 'control', 'history'], function(exports) {
+layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], function(exports) {
     let editor;
     const $ = layui.$;
     const layer = layui.layer;
     const control = layui.control;
+    const animate = layui.animate;
     const history = layui.history;
     const utils = layui.utils;
     const animateRelyList = [];
@@ -24,7 +25,7 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'history'], function(export
             history.optimizeHistory();
         });
         $('#componentButtonPlay').click(function(){
-            control.playCurrentPage();
+            animate.playCurrentPage();
         });
         $('#componentButtonHelp').click(function(){
             showHelp();
@@ -99,12 +100,12 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'history'], function(export
         }
     }
     function setAnimateRelyComponent(id) {
-        control.setAnimate({ rely: id });
+        animate.setAnimate({ rely: id });
         utils.unshiftUnique(animateRelyList, document.getElementById(id));
         layer.close(relyDialog);
     }
     function removeAnimateRelyComponent() {
-        control.setAnimate({ rely: '' });
+        animate.setAnimate({ rely: '' });
     }
     function showHelp() {
         if (helpDialog) {
