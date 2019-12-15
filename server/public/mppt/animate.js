@@ -1,8 +1,9 @@
-layui.define(['jquery', 'form', 'history'], function(exports) {
+layui.define(['jquery', 'form', 'utils', 'history'], function(exports) {
     const $ = layui.$;
     const form = layui.form;
     const slider = layui.slider;
     const history = layui.history;
+    const utils = layui.utils;
     const animate_list = [
         { value: 'none', name: '无' },
         { value: 'zoomIn', name: '中心放大' },
@@ -37,7 +38,7 @@ layui.define(['jquery', 'form', 'history'], function(exports) {
             <div class="layui-form-item no-animate">
                 <label class="layui-form-label">循环</label>
                 <div class="layui-input-block">
-                    <div id="animateLoopSlider${index}" class="slider-container"></div>
+                    <div id="animateTimesSlider${index}" class="slider-container"></div>
                 </div>
             </div>
             <div class="layui-form-item no-animate">
@@ -101,12 +102,12 @@ layui.define(['jquery', 'form', 'history'], function(exports) {
                     }
                 });
                 slider.render({
-                    elem: `#animateLoopSlider${i}`,
-                    value: animate.loop,
-                    min: -1,
+                    elem: `#animateTimesSlider${i}`,
+                    value: animate.times,
+                    min: 0,
                     max: 10,
-                    change: function(loop){
-                        setAnimate({ loop }, i);
+                    change: function(times){
+                        setAnimate({ times }, i);
                     },
                 });
                 slider.render({
@@ -134,13 +135,19 @@ layui.define(['jquery', 'form', 'history'], function(exports) {
         form.render('select');
     }
     // 动画规则，只能连续动画，不能重叠动画
-    // 设置动画(格式:zoomIn:a:b:c:d 其中a:时长,b:延时,c:loop,d:依赖id) 多个动画用;隔开，只有首歌动态才能设置依赖
+    // 设置动画(格式:zoomIn:a:b:c:d 其中a:时长,b:延时,c:次数,d:依赖id) 多个动画用;隔开，只有首歌动态才能设置依赖
     function parseAnimate(animate = '') {
         const animates = animate.split(';');
         const list = [];
         for (animate of animates) {
             const items = animate.split(':');
-            list.push({ name: items[0], duration: items[1], delay: items[2], loop: items[3], rely: items[4] });
+            list.push({
+                name: items[0]||undefined,
+                duration: items[1]||utils.options.ANIMATE_DURATION,
+                delay: items[2]||utils.options.ANIMATE_DELAY,
+                times: items[3]||utils.options.ANIMATE_TIMES,
+                rely: items[4]||undefined
+            });
         }
         return list;
     }
@@ -148,7 +155,10 @@ layui.define(['jquery', 'form', 'history'], function(exports) {
         const list = [];
         for (animate of animates) {
             if (animate.name) {
-                list.push(`${animate.name||''}:${animate.duration||''}:${animate.delay||''}:${animate.loop||''}:${animate.rely||''}`.replace(/:*$/, ''));
+                const duration = !animate.duration || animate.duration==utils.options.ANIMATE_DURATION ? '' : animate.duration;
+                const delay = !animate.delay || animate.delay==utils.options.ANIMATE_DELAY ? '' : animate.delay;
+                const times = !animate.times || animate.times==utils.options.ANIMATE_TIMES ? '' : animate.times;
+                list.push(`${animate.name||''}:${duration}:${delay}:${times}:${animate.rely||''}`.replace(/:*$/, ''));
             }
         }
         return list.join(';');
@@ -203,14 +213,14 @@ layui.define(['jquery', 'form', 'history'], function(exports) {
         const rely = animate.rely;
         const duration = animate.duration;
         const delay = animate.delay;
-        const loop = animate.loop;
+        const times = animate.times;
 
         if (name) {
             if (force || !rely) {
                 target.classList.add('animated', name);
                 duration && (target.style.animationDuration = `${duration*1000}ms`);
                 !!parent && delay && (target.style.animationDelay = `${delay*1000}ms`);
-                !!parent && loop && (target.style.animationIterationCount = loop==-1 ? 'infinite' : loop);
+                !!parent && times && (target.style.animationIterationCount = times ? times : 'infinite');
                 function handleAnimationEnd() {
                     target.classList.remove('animated', name);
                     delete target.style.animationDuration;
@@ -242,7 +252,6 @@ layui.define(['jquery', 'form', 'history'], function(exports) {
         const root = $('#editor>span');
         root.children().each(function(){
             const animates = parseAnimate(this.dataset.animate);
-            console.log("=======", animates);
             showAnimate(root, this, animates, 0);
         });
     }

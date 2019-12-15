@@ -1,6 +1,12 @@
 layui.define(['layer'], function(exports) {
     const hasLog = true; // 是否有日志
 
+    const options = {
+        ANIMATE_DELAY: 0, //默认的动画延时
+        ANIMATE_DURATION: 2, //默认的动画时长
+        ANIMATE_TIMES: 1, //默认的动画播放次数
+    };
+
     const layer = layui.layer;
     function log(...args) {
         hasLog && console.log(...args);
@@ -52,6 +58,7 @@ layui.define(['layer'], function(exports) {
     }
     // 导出函数
     exports('utils', {
+        options,
         log,
         toast,
         uuid,
