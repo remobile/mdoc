@@ -200,7 +200,7 @@ function buildMarkdown(port, configPath, build, index, mobile) {
         }
     });
     server.on('error', function (err) {
-        buildMarkdown(port+1, configPath, build, index);
+        buildMarkdown(port+1, configPath, build, index, mobile);
     });
 }
 

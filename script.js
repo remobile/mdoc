@@ -18,7 +18,6 @@ program
 .option('-f, --file <config file>', 'start server single file with config')
 .option('-t, --ppt <config file>', 'start server single file with ppt')
 .option('-i, --index <ppt index file>', 'edit ppt file')
-.option('-i, --index <ppt index file>', 'edit ppt file')
 .option('-m, --mobile', 'is mppt file')
 .option('-p, --port [4000]', 'port of server', 4000)
 .option('-o, --open', 'if open browser')
