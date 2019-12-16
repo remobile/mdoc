@@ -61,6 +61,7 @@ class PPTEditLayout extends React.Component {
                         </div>
                         <RightBottomPanel />
                     </div>
+                    <script type="text/javascript" src="other/sortable.js"></script>
                     <script type="text/javascript" src="layui/layui.all.js"></script>
                     <script type="text/javascript" src="js/lodash.js"></script>
                     <script type="text/javascript" src="mppt/main.js"></script>

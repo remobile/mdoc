@@ -54,3 +54,6 @@ button.tip:hover::after,
 button.tip:hover::before {
     display: block;
 }
+.blue-background-class {
+    background-color: #F0FFFF;
+}

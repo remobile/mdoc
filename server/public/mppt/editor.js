@@ -241,12 +241,8 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
                 cmd[1] && resize(cmd[1], location);
             }
             control.updatePositionSize(action.target);
+            return false;
         }
-        return false;
-    }
-    function selectTarget(target) {
-        createReferents(target);
-        setClickTarget(target);
     }
     function onDocumentMouseDown(e) {
         let target;
@@ -267,6 +263,10 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             selectTarget(target);
         }
         e.stopPropagation();
+    }
+    function selectTarget(target) {
+        createReferents(target);
+        setClickTarget(target);
     }
     function toggleTargetGroup() {
         if (referents.length < 2) {
@@ -310,9 +310,22 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             }
         }
     }
-    function saveMarkdown(e) {
+    function saveMarkdown(ids) {
         const text = [];
-        const list = root.querySelectorAll('.target');
+
+        let list = root.querySelectorAll('.target');
+        if (ids) {
+            const _list = [];
+            for (const id of ids) {
+                for (const o of list) {
+                    if (o.id === id) {
+                        _list.push(o);
+                        break;
+                    }
+                }
+            }
+            list = _list;
+        }
         for (const el of list) {
             const id = el.id;
             const x = el.offsetLeft;
@@ -356,7 +369,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             text.push('');
         }
         utils.post('/saveMarkdown', text.join('\n'));
-        utils.toast('保存成功');
+        !ids && utils.toast('保存成功');
     }
     function copyTargetAcctribute (target) {
         copiedTarget = target;
@@ -497,6 +510,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         selectTarget,
         createImageTarget,
         createTextTarget,
+        saveMarkdown,
         removeTargets,
         getRootHtml: () => root.innerHTML,
         setRootHtml: (html) => { root.innerHTML = html },

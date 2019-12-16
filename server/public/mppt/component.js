@@ -35,6 +35,17 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
             return getComponentLine(target);
         });
         $('#componentContent').html(html);
+        Sortable.create(document.getElementById('componentContent'), {
+            animation: 150,
+            ghostClass: 'blue-background-class',
+            onUpdate: function() {
+                 changeTargetOrder();
+            },
+        });
+    }
+    function changeTargetOrder() {
+        const ids = $.map($('#componentContent').children(), o=>o.dataset.id);
+        editor.saveMarkdown(ids);
     }
     function getTargetHtml(target) {
         return target.classList.contains('text') ?
