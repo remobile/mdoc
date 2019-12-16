@@ -47,14 +47,21 @@ layui.define(['layer'], function(exports) {
         xhr.send(data);
     }
     //rgba(31,147,255,0.73)
+    //rgb(31,147,255)
     function rgbaToHex(rgba) {
-        const list = rgba.replace(/\s*/g, '').match(/rgba\((\d+),(\d+),(\d+),(.*)\)/);
-        return `#${(+list[1]).toString(16)}${(+list[2]).toString(16)}${(+list[3]).toString(16)}${(list[4]*100).toString(16)}`.toUpperCase();
+        var list = rgba.replace(/\s*/g, '').match(/rgba?\((\d+),(\d+),(\d+),?(.*)?\)/);
+        if (list) {
+            return `#${(+list[1]).toString(16).padStart(2, '0')}${(+list[2]).toString(16).padStart(2, '0')}${(+list[3]).toString(16).padStart(2, '0')}${((list[4]||1)*100).toString(16).padStart(2, '0')}`.toUpperCase();
+        }
+        return '';
     }
     //#1F93FF49
     function hexToRgba(hex) {
-        const list = hex.match(/#(..)(..)(..)(..)/);
-        return `rgba(${parseInt(list[1], 16)},${parseInt(list[2], 16)},${parseInt(list[3], 16)},${parseInt(list[4], 16)/100})`;
+        const list = hex.match(/#(..)(..)(..)(..)?/);
+        if (list) {
+            return `rgba(${parseInt(list[1], 16)},${parseInt(list[2], 16)},${parseInt(list[3], 16)},${parseInt(list[4]||'64', 16)/100})`;
+        }
+        return '';
     }
     // 导出函数
     exports('utils', {

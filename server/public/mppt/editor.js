@@ -15,12 +15,13 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
     let copiedTarget = null; // 复制的target
     let editingTarget; // 正在编辑的target
     let doubleClickStartTime; // 双击计时
+    let offset; // 编辑页面相对于body的偏移位置
     let root;
 
-    const OFFSET = { x: 300, y: 4 }; // 编辑页面相对于body的偏移位置
 
     function initialize() {
         root = document.getElementById('editor');
+        offset = { x: root.offsetLeft + 3, y: root.offsetTop + 3 };
         control.initialize();
         component.initialize();
         history.initialize();
@@ -31,8 +32,8 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
     }
     function getLocation(e) {
         return {
-            x: (e.x || e.clientX) - OFFSET.x,
-            y: (e.y || e.clientY) - OFFSET.y,
+            x: (e.x || e.clientX) - offset.x,
+            y: (e.y || e.clientY) - offset.y,
         }
     }
     function copyTargets() {
