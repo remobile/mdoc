@@ -472,7 +472,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         } else if (e.altKey && e.keyCode === 72) { // alt + h 优化历史记录
             history.optimizeHistory();
         } else if (e.altKey && e.keyCode === 191) { // alt + ? 查看帮助
-            component.showHelp();
+            history.showHelp();
         } else if (e.altKey && e.keyCode === 90) { // alt + z 回退
             history.popHistory();
         } else if (e.altKey && e.keyCode === 89) { // alt + y 取消回退
