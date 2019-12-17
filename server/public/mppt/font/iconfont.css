@@ -19,23 +19,22 @@
   content: "\e617";
 }
 
-.icon-lock:before {
-  content: "\e616";
-}
-
-.icon-back1:before {
+.icon-forward:before {
   content: "\e504";
 }
 
-.icon-Password-No-display:before {
-  content: "\e6e2";
+.icon-lock:before {
+  content: "\e616";
 }
 
 .icon-unlock:before {
   content: "\e63e";
 }
 
-.icon-display:before {
-  content: "\e61f";
+.icon-noview:before {
+  content: "\e6e2";
 }
 
+.icon-view:before {
+  content: "\e61f";
+}

@@ -19,7 +19,7 @@ module.exports = () => {
                         <i className="iconfont icon-lock"></i>
                     </button>
                     <button id="componentButtonToggleShow" title="切换模板可见(alt+d)" type="button" className="layui-btn tip">
-                        <i className="iconfont icon-display"></i>
+                        <i className="iconfont icon-view"></i>
                     </button>
                 </div>
             </div>

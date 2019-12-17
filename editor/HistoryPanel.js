@@ -6,7 +6,7 @@ module.exports = () => {
             <div className="bottom-buttons">
                 <div className="layui-btn-group">
                     <button id="historyButtonBack" title="回滚历史(alt+z)" type="button" className="layui-btn tip">
-                        <i className="iconfont icon-back1"></i>
+                        <i className="iconfont icon-forward"></i>
                     </button>
                     <button id="historyButtonForward" title="恢复历史(alt+y)" type="button" className="layui-btn tip">
                         <i className="iconfont icon-back"></i>
