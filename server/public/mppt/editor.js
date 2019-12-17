@@ -21,8 +21,10 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
 
     function initialize() {
         root = document.getElementById('editor');
-        $('#editor .target').each((i, target)=>{
-            target.style.zIndex = i;
+        const targets = $('#editor .target');
+        const count = targets.length;
+        targets.each((i, target)=>{
+            target.style.zIndex = count-i-1;
             group = Math.max(group, +target.dataset.group||0);
         });
         offset = { x: root.offsetLeft + 3, y: root.offsetTop + 3 };
@@ -311,22 +313,10 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             }
         }
     }
-    function saveMarkdown(ids) {
+    function saveMarkdown() {
         const text = [];
+        const list = _.sortBy($('#editor .target'), o=>-(o.style.zIndex||0));
 
-        let list = root.querySelectorAll('.target');
-        if (ids) {
-            const _list = [];
-            for (const id of ids) {
-                for (const o of list) {
-                    if (o.id === id) {
-                        _list.push(o);
-                        break;
-                    }
-                }
-            }
-            list = _list;
-        }
         for (const el of list) {
             const id = el.id;
             const x = el.offsetLeft;
@@ -370,7 +360,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             text.push('');
         }
         utils.post('/saveMarkdown', text.join('\n'));
-        !ids && utils.toast('保存成功');
+        utils.toast('保存成功');
     }
     function copyTargetAcctribute (target) {
         copiedTarget = target;
@@ -518,12 +508,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         saveMarkdown,
         removeTargets,
         getRootHtml: () => root.innerHTML,
-        setRootHtml: (html) => {
-             root.innerHTML = html;
-             $('#editor .target').each((i, target)=>{
-                 target.style.zIndex = i;
-             });
-         },
+        setRootHtml: (html) => { root.innerHTML = html; },
         getAllReferents: () => referents,
         getReferents: () => referents.filter(o=>o.active),
         getAction: () => action,
