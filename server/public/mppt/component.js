@@ -6,7 +6,7 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
     const animate = layui.animate;
     const history = layui.history;
     const utils = layui.utils;
-    const animateRelyList = [];
+    let animateRelyList = [];
     let relyDialog;
     let helpDialog;
 
@@ -30,22 +30,29 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
         $('#componentButtonHelp').click(function(){
             showHelp();
         });
-        const html = $.map($('.target'), target=>{
-            animateRelyList.push(target);
-            return getComponentLine(target);
-        });
-        $('#componentContent').html(html);
+        update();
         Sortable.create(document.getElementById('componentContent'), {
             animation: 150,
             ghostClass: 'blue-background-class',
             onUpdate: function() {
-                 changeTargetOrder();
+                updateTargetOrder();
+                history.pushHistory('改变组件顺序');
             },
         });
     }
-    function changeTargetOrder() {
+    function update() {
+        animateRelyList = [];
+        const html = _.sortBy($('#editor .target'), o=>-(o.style.zIndex||0)).map(target=>{
+            animateRelyList.push(target);
+            return getComponentLine(target);
+        });
+        $('#componentContent').html(html);
+    }
+    function updateTargetOrder() {
         const ids = $.map($('#componentContent').children(), o=>o.dataset.id);
-        editor.saveMarkdown(ids);
+        $('#editor .target').each((i, target)=>{
+            target.style.zIndex = ids.length - ids.indexOf(target.id) - 1;
+        });
     }
     function getTargetHtml(target) {
         return target.classList.contains('text') ?
@@ -55,15 +62,7 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
     }
     function getComponentLine(target) {
         const id = target.getAttribute('id');
-        return `<div class="component-line" data-id="${id}" onclick="window.onComponentLineClick('${id}')">${getTargetHtml(target)}</div>`;
-    }
-    function add(target) {
-        animateRelyList.unshift(target);
-        $('#componentContent').prepend(getComponentLine(target));
-    }
-    function remove(target) {
-        utils.removeList(animateRelyList, target);
-        $(`.component-line[data-id="${target.id}"]`).remove();
+        return `<div class="component-line" data-id="${id}" onmousedown="window.onComponentLineClick('${id}')">${getTargetHtml(target)}</div>`;
     }
     function selectComponentLine(id) {
         $('.component-line.select').removeClass('select');
@@ -157,8 +156,7 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
     // 导出函数
     exports('component', {
         initialize,
-        add,
-        remove,
+        update,
         getRelyItem,
         selectComponentLine,
         showHelp,

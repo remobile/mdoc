@@ -21,14 +21,14 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
 
     function initialize() {
         root = document.getElementById('editor');
+        $('#editor .target').each((i, target)=>{
+            target.style.zIndex = i;
+            group = Math.max(group, +target.dataset.group||0);
+        });
         offset = { x: root.offsetLeft + 3, y: root.offsetTop + 3 };
         control.initialize();
         component.initialize();
         history.initialize();
-        const list = document.querySelectorAll('.target');
-        for (const el of list) {
-            group = Math.max(group, +el.dataset.group||0);
-        }
     }
     function getLocation(e) {
         return {
@@ -54,7 +54,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             if (hasGroup) {
                 target.dataset.group = group;
             }
-            component.add(target);
+            component.update();
         }
 
     }
@@ -385,6 +385,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
     }
     function createTextTarget() {
         removeAll();
+        const zIndex = +((_.maxBy($('#editor .target'), o=>o.style.zIndex)||{}).style.zIndex||0)+1;
         const target = document.createElement('DIV');
         target.className = 'target text';
         target.style.position = 'absolute';
@@ -392,16 +393,18 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         target.style.top = '30px';
         target.style.width = '120px';
         target.style.height = '30px';
+        target.style.zIndex = zIndex;
         target.innerHTML = '双击编辑文本内容';
         target.setAttribute('id', utils.uuid());
         root.appendChild(target);
         createReferentForTarget(target);
         action.target = target;
         control.updateValues(target);
-        component.add(target);
+        component.update();
     }
     function createImageTarget() {
         removeAll();
+        const zIndex = +((_.maxBy($('#editor .target'), o=>o.style.zIndex)||{}).style.zIndex||0)+1;
         const target = document.createElement('IMG');
         target.className = 'target';
         target.style.position = 'absolute';
@@ -409,18 +412,19 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         target.style.top = '30px';
         target.style.width = '100px';
         target.style.height = '100px';
+        target.style.zIndex = zIndex;
         target.setAttribute('src', 'mppt/default.svg');
         target.setAttribute('id', utils.uuid());
         root.appendChild(target);
         createReferentForTarget(target);
         action.target = target;
         control.updateValues(target);
-        component.add(target);
+        component.update();
     }
     function removeTargets() {
         for (const refrent of referents) {
             refrent.target.remove();
-            component.remove(refrent.target);
+            component.update();
         }
         removeAll();
     }
@@ -514,7 +518,12 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         saveMarkdown,
         removeTargets,
         getRootHtml: () => root.innerHTML,
-        setRootHtml: (html) => { root.innerHTML = html },
+        setRootHtml: (html) => {
+             root.innerHTML = html;
+             $('#editor .target').each((i, target)=>{
+                 target.style.zIndex = i;
+             });
+         },
         getAllReferents: () => referents,
         getReferents: () => referents.filter(o=>o.active),
         getAction: () => action,

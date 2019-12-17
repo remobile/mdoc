@@ -1,5 +1,6 @@
 layui.define(['jquery', 'utils'], function(exports) {
     let editor;
+    let component;
     const $ = layui.$;
     const utils = layui.utils;
     let history = []; // 历史记录
@@ -8,6 +9,7 @@ layui.define(['jquery', 'utils'], function(exports) {
 
     function initialize() {
         editor = layui.editor;
+        component = layui.component;
         utils.post('/getHistory', '', (text)=>{
             if (!text) {
                 history.push({ name: '创建文件', html: editor.getRootHtml()});
@@ -42,6 +44,7 @@ layui.define(['jquery', 'utils'], function(exports) {
         historyIndex = index;
         editor.setRootHtml(history[historyIndex].html);
         showHistory();
+        component.update();
         editor.removeAll();
     }
     function showHistory() {
