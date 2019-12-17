@@ -3,7 +3,8 @@ const MarkdownView = require('../lib/MarkdownView');
 const { support } = require('../lib/utils');
 const PropertyPanel = require('./PropertyPanel');
 const AnimatePanel = require('./AnimatePanel');
-const RightBottomPanel = require('./RightBottomPanel');
+const ComponentPanel = require('./ComponentPanel');
+const HistoryPanel = require('./HistoryPanel');
 
 class PPTEditLayout extends React.Component {
     render() {
@@ -44,22 +45,26 @@ class PPTEditLayout extends React.Component {
                     <div id="editor" style={{backgroundColor: page.backgroundColor||page.config.backgroundColor, backgroundImage: `url(${page.backgroundImage||page.config.backgroundImage})` }}>
                         <MarkdownView source={page.content} page={page} container={null} />
                     </div>
-                    <div id="rightPanel">
+                    <div id="componentPanel">
                         <div className="layui-tab layui-tab-brief">
                             <ul className="layui-tab-title">
                                 <li className="layui-this">组件</li>
-                                <li>历史</li>
                             </ul>
                             <div className="layui-tab-content">
-                                <div className="layui-tab-item layui-show">
-                                    <div id="componentContent"></div>
-                                </div>
-                                <div className="layui-tab-item">
-                                    <div id="historyContent"></div>
-                                </div>
+                                <ComponentPanel />
                             </div>
                         </div>
-                        <RightBottomPanel />
+                    </div>
+
+                    <div id="historyPanel">
+                        <div className="layui-tab layui-tab-brief">
+                            <ul className="layui-tab-title">
+                                <li className="layui-this">历史</li>
+                            </ul>
+                            <div className="layui-tab-content">
+                                <HistoryPanel />
+                            </div>
+                        </div>
                     </div>
                     <script type="text/javascript" src="other/sortable.js"></script>
                     <script type="text/javascript" src="layui/layui.all.js"></script>

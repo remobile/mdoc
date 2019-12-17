@@ -3,6 +3,7 @@ layui.config({
     version: true,
     debug: true,
 }).use('editor', function(editor) {
+    layui.link('mppt/font/iconfont.css');
     editor.initialize();
     document.onmousedown = editor.onDocumentMouseDown;
     document.onmousemove = editor.onDocumentMouseMove;

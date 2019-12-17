@@ -1,3 +1,9 @@
+#componentContent {
+    overflow: scroll;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-bottom: 100px;
+}
 .component-line {
     line-height: 40px;
     border-bottom: solid #E0EEEE 1px;
@@ -23,6 +29,38 @@
     border: solid #D4D4D4 1px;
     border-radius: 4px;
     margin: 2px;
+}
+#componentButtonText::before,#componentButtonText::after {
+    left: 10%;
+}
+#componentButtonImage::before,#componentButtonImage::after {
+    left: 25%;
+}
+#componentButtonDelete::before,#componentButtonNext::after {
+    left: 42%;
+}
+#componentButtonHistory::before,#componentButtonNext::after {
+    left: 58%;
+}
+#componentButtonPlay::before,#componentButtonNext::after {
+    left: 73%;
+}
+#componentButtonHelp::before,#componentButtonPre::after {
+    left: 90%;
+}
+.bottom-buttons {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    background-color: #E6E6E6;
+    border-radius: 4px;
+    padding-bottom: 4px;
+}
+.bottom-buttons .layui-btn-group {
+    padding-left: 6px;
+}
+.bottom-buttons .layui-btn {
+    padding: 0 14px;
 }
 button.tip::after {
     content:attr(title);
@@ -56,4 +94,20 @@ button.tip:hover::before {
 }
 .blue-background-class {
     background-color: #F0FFFF;
+}
+
+#help {
+    padding: 10px;
+    font-size: 18px;
+    line-height: 25px;
+    color: grey;
+}
+#help .title {
+    color: #159688;
+}
+#help :not(.title) {
+    margin-left: 20px;
+}
+#help span {
+    color: #FF7256;
 }

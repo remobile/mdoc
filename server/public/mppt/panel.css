@@ -30,7 +30,7 @@
     background-repeat: no-repeat;
     background-size: 100% 100%;
 }
-#rightPanel {
+#componentPanel {
     position: absolute;
     left: 800px;
     top: 75px;
@@ -40,59 +40,13 @@
     border: 1px solid #E6E6E6;
     border-radius: 10px;
 }
-#rightBottomPanel {
+#historyPanel {
     position: absolute;
-    bottom: 0px;
-    width: 100%;
-    background-color: #E6E6E6;
-    border-radius: 4px;
-}
-#rightBottomPanel .layui-btn-group {
-    padding-left: 6px;
-}
-#componentContent {
-    overflow: scroll;
-    padding-left: 6px;
-    padding-right: 6px;
-    padding-bottom: 100px;
-}
-#componentBottom {
-    position: absolute;
-    bottom: 0;
-}
-#componentBottom .layui-btn-group {
-    padding-left: 1px;
-}
-#help {
-    padding: 10px;
-    font-size: 18px;
-    line-height: 25px;
-    color: grey;
-}
-#help .title {
-    color: #159688;
-}
-#help :not(.title) {
-    margin-left: 20px;
-}
-#help span {
-    color: #FF7256;
-}
-#componentButtonText::before,#componentButtonText::after {
-    left: 10%;
-}
-#componentButtonImage::before,#componentButtonImage::after {
-    left: 25%;
-}
-#componentButtonDelete::before,#componentButtonNext::after {
-    left: 42%;
-}
-#componentButtonHistory::before,#componentButtonNext::after {
-    left: 58%;
-}
-#componentButtonPlay::before,#componentButtonNext::after {
-    left: 73%;
-}
-#componentButtonHelp::before,#componentButtonPre::after {
-    left: 90%;
+    left: 1070px;
+    top: 75px;
+    width: 250px;
+    height: 667px;
+    padding-bottom: 36px;
+    border: 1px solid #E6E6E6;
+    border-radius: 10px;
 }
