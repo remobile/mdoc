@@ -80,7 +80,7 @@ layui.define(['jquery', 'utils'], function(exports) {
         editor.setRootHtml(history[historyIndex].html);
         showHistory();
         component.update();
-        editor.removeAll();
+        editor.clearAll();
     }
     function popHistory() {
         if (historyIndex > 0) {

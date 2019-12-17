@@ -29,6 +29,7 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
         update();
         Sortable.create(document.getElementById('componentContent'), {
             animation: 150,
+            handle: '.handle',
             ghostClass: 'blue-background-class',
             onUpdate: function() {
                 updateTargetOrder();
@@ -58,14 +59,29 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
     }
     function getComponentLine(target) {
         const id = target.id;
-        return `<div class="component-line" data-id="${id}" onmousedown="window.onComponentLineClick('${id}')"><i onmousedown="window.onToggleView(event, '${id}')" class="iconfont icon-noview"></i>${getTargetHtml(target)}</div>`;
+        const lock = target.dataset.lock;
+        const template = target.dataset.template;
+        const className = `component-line${lock||template ? ' lock' : ''}${template ? ' template' : ''}`;
+        return `
+        <div class="${className}" data-id="${id}" onmousedown="window.onComponentLineClick('${id}', ${lock}, ${template})">
+            <i onmousedown="window.onToggleView(event, '${id}')" class="iconfont icon-noview"></i>
+            <i class="layui-icon layui-icon-align-center${lock||template ? '' : ' handle'}"></i>
+            ${getTargetHtml(target)}
+            ${lock||template ? `<i class="iconfont icon-lock"></i>` : ''}
+        </div>
+        `;
     }
     function selectComponentLine(id) {
         $('.component-line.select').removeClass('select');
         id && $('.component-line[data-id="'+id+'"]').addClass('select');
     }
-    function onComponentLineClick(id) {
-        editor.selectTarget(document.getElementById(id));
+    function onComponentLineClick(id, lock, template) {
+        if (!lock && !template) {
+            editor.selectTarget(document.getElementById(id));
+        } else {
+            editor.clearAll();
+            selectComponentLine(id);
+        }
     }
     function onToggleView(event, id) {
         const target = document.getElementById(id);
@@ -78,7 +94,38 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
             event.target.classList.remove('icon-view');
             event.target.classList.add('icon-noview');
         }
-        editor.removeAll();
+        editor.clearAll();
+        event.stopPropagation();
+    }
+    function onToggleLock(event, id) {
+        const target = document.getElementById(id);
+        const lock = target.dataset.lock;
+        const template = target.dataset.template;
+        if (!template) {
+            if (lock) {
+                delete target.dataset.lock;
+                event.target.classList.remove('icon-back');
+                event.target.classList.add('icon-lock');
+            } else {
+                target.dataset.lock = 1;
+                event.target.classList.remove('icon-lock');
+                event.target.classList.add('icon-back');
+            }
+        }
+        editor.clearAll();
+        event.stopPropagation();
+    }
+    function onToggleTemplate(event, id) {
+        const target = document.getElementById(id);
+        const template = target.dataset.template;
+        if (template) {
+            delete target.dataset.template;
+            event.target.parentNode.classList.remove('template');
+        } else {
+            target.dataset.template = 1;
+            event.target.parentNode.classList.add('template');
+        }
+        editor.clearAll();
         event.stopPropagation();
     }
     function getRelyLine(target) {
@@ -143,6 +190,7 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
     // 全局函数
     window.onComponentLineClick = onComponentLineClick;
     window.onToggleView = onToggleView;
+    window.onToggleLock = onToggleLock;
     window.showAnimateRelyComponent = showAnimateRelyComponent;
     window.setAnimateRelyComponent = setAnimateRelyComponent;
     window.removeAnimateRelyComponent = removeAnimateRelyComponent;

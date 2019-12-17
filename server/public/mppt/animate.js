@@ -248,7 +248,7 @@ layui.define(['jquery', 'form', 'utils', 'history'], function(exports) {
         }
     }
     function playCurrentPage() {
-        editor.removeAll();
+        editor.clearAll();
         const root = $('#editor>span');
         root.children().each(function(){
             const animates = parseAnimate(this.dataset.animate);

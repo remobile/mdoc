@@ -78,20 +78,20 @@ function setTopHistory(index) {
     historyIndex = index;
     root.innerHTML = history[historyIndex].html;
     showHistory();
-    removeAll();
+    clearAll();
 }
 function popHistory() {
     if (history.length > 2) {
         historyIndex--;
         root.innerHTML = history[historyIndex].html;
-        removeAll();
+        clearAll();
     }
 }
 function recoverHistory() {
     if (history.length > historyIndex + 1) {
         historyIndex++;
         root.innerHTML = history[historyIndex].html;
-        removeAll();
+        clearAll();
     }
 }
 function initialize() {
@@ -221,7 +221,7 @@ function createReferentForTarget(target, isGroup) {
     !referents.push(referent);
     log("create referent");
 };
-function removeAll() {
+function clearAll() {
     removeAllReferents();
     removeColorPicker();
     removeAnimateSelector();
@@ -229,7 +229,7 @@ function removeAll() {
 }
 function createReferents(target) {
     if (!isAltKeyPress) {
-        removeAll();
+        clearAll();
     }
     if (!target.dataset.group) {
         createReferentForTarget(target);
@@ -470,7 +470,7 @@ function removeTargets(referents) {
 function onDocumentKeyDown(e) {
     if (referents.length) {
         if (e.keyCode === 27) { // esc
-            removeAll();
+            clearAll();
             pushHistory('取消选择');
         } else if (e.altKey && e.keyCode === 37) { // alt + left key
             moveByStep({ x: -1, y: 0 });

@@ -164,7 +164,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         referents.push(referent);
         utils.log("create referent");
     };
-    function removeAll() {
+    function clearAll() {
         control.updateValues(); // 关闭属性窗口
         removeAllReferents();
         component.selectComponentLine();
@@ -375,7 +375,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         }
     }
     function createTextTarget() {
-        removeAll();
+        clearAll();
         const zIndex = +((_.maxBy($('#editor .target'), o=>o.style.zIndex)||{}).style.zIndex||0)+1;
         const target = document.createElement('DIV');
         target.className = 'target text';
@@ -394,7 +394,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         component.update();
     }
     function createImageTarget() {
-        removeAll();
+        clearAll();
         const zIndex = +((_.maxBy($('#editor .target'), o=>o.style.zIndex)||{}).style.zIndex||0)+1;
         const target = document.createElement('IMG');
         target.className = 'target';
@@ -417,13 +417,13 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             refrent.target.remove();
             component.update();
         }
-        removeAll();
+        clearAll();
     }
     function onDocumentKeyDown(e) {
         utils.log("[onDocumentKeyDown]:", e.keyCode);
         if (referents.length) {
             if (e.keyCode === 27) { // esc
-                removeAll();
+                clearAll();
             } else if ( e.keyCode === 37) { // left key
                 moveByStep({ x: -1, y: 0 });
             } else if ( e.keyCode === 38) { // up key
@@ -502,7 +502,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         onDocumentMouseUp,
         onDocumentKeyDown,
         onDocumentKeyUp,
-        removeAll,
+        clearAll,
         selectTarget,
         createImageTarget,
         createTextTarget,
