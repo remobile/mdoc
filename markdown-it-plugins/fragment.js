@@ -36,6 +36,7 @@ module.exports = function fragment_plugin(md, page) {
             let dataset = '';
             options.g && (dataset = ` data-group=${options.g}`);
             options.a && (dataset = `${dataset} data-animate=${options.a}`);
+            options.k && (dataset = `${dataset} data-lock=1`);
 
             let html = '';
             if (options.img) {
