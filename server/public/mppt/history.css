@@ -1,25 +1,12 @@
-.component-line {
-    line-height: 40px;
-    border-bottom: solid #E0EEEE 1px;
-    padding-left: 10px;
-    padding-right: 10px;
+#historyContent {
+    overflow: scroll;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+#historyContent .history-item {
     cursor: pointer;
-    display: flex;
-    align-items: center;
-}
-.component-line i {
-    margin-right: 10px;
-}
-.component-line.select {
-    background-color: #E0EEEE;
-}
-.component-text {
-    font-size: 14px;
-    overflow: hidden;
-}
-.component-image {
-    height: 34px;
-    border: solid #D4D4D4 1px;
-    border-radius: 4px;
-    margin: 2px;
+    margin-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 10px;
+    border-bottom: solid #E0EEEE 1px;
 }

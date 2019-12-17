@@ -267,6 +267,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
     function selectTarget(target) {
         createReferents(target);
         setClickTarget(target);
+        component.selectComponentLine(target.id);
     }
     function toggleTargetGroup() {
         if (referents.length < 2) {

@@ -65,6 +65,10 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
         utils.removeList(animateRelyList, target);
         $(`.component-line[data-id="${target.id}"]`).remove();
     }
+    function selectComponentLine(id) {
+        $('.component-line.select').removeClass('select');
+        $('.component-line[data-id="'+id+'"]').addClass('select');
+    }
     function onComponentLineClick(id) {
         editor.selectTarget(document.getElementById(id));
     }
@@ -156,6 +160,7 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
         add,
         remove,
         getRelyItem,
+        selectComponentLine,
         showHelp,
     });
 

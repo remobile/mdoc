@@ -27,6 +27,8 @@
     width: 375px;
     height: 667px;
     border: 1px solid #000;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
 }
 #rightPanel {
     position: absolute;
@@ -60,18 +62,6 @@
 }
 #componentBottom .layui-btn-group {
     padding-left: 1px;
-}
-#historyContent {
-    overflow: scroll;
-    padding-left: 6px;
-    padding-right: 6px;
-}
-#historyContent .history-item {
-    cursor: pointer;
-    margin-top: 6px;
-    padding-bottom: 6px;
-    padding-left: 10px;
-    border-bottom: solid #E0EEEE 1px;
 }
 #help {
     padding: 10px;

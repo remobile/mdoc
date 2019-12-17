@@ -41,7 +41,7 @@ class PPTEditLayout extends React.Component {
                         </div>
                     </div>
                     <div id="phone"></div>
-                    <div id="editor">
+                    <div id="editor" style={{backgroundColor: page.backgroundColor||page.config.backgroundColor, backgroundImage: `url(${page.backgroundImage||page.config.backgroundImage})` }}>
                         <MarkdownView source={page.content} page={page} container={null} />
                     </div>
                     <div id="rightPanel">
