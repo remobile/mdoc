@@ -22,8 +22,8 @@ module.exports = function fragment_plugin(md, page) {
                 options.w && (style = `${style}width:${options.w}px;`);
                 options.h && (style = `${style}height:${options.h}px;`);
             }
-            style = `${style}${(options.x < 0) ? `right:${-options.x}px;` : `left:${options.x}px;`}`;
-            style = `${style}${(options.y < 0) ? `bottom:${-options.y}px;` : `top:${options.y}px;`}`;
+            style = `${style}left:${options.x}px;`;
+            style = `${style}top:${options.y}px;`;
 
             options.s && (style = `${style}font-size:${options.s}px;`);
             options.b && (style = `${style}font-weight:bold;`);
