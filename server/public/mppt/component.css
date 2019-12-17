@@ -14,7 +14,8 @@
     align-items: center;
 }
 .component-line i {
-    margin-right: 10px;
+    width: 30px;
+    padding-left: 10px;
 }
 .component-line.select {
     background-color: #E0EEEE;

@@ -52,20 +52,34 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
     }
     function getTargetHtml(target) {
         return target.classList.contains('text') ?
-        `<i class="layui-icon layui-icon-list"></i><div class="component-text">${target.innerHTML.trim()}</div>`
+        `<div class="component-text">${target.innerHTML.trim()}</div>`
         :
-        `<i class="layui-icon layui-icon-picture-fine"></i><img  class="component-image" src="${target.getAttribute('src')}" />`;
+        `<img  class="component-image" src="${target.getAttribute('src')}" />`;
     }
     function getComponentLine(target) {
-        const id = target.getAttribute('id');
-        return `<div class="component-line" data-id="${id}" onmousedown="window.onComponentLineClick('${id}')">${getTargetHtml(target)}</div>`;
+        const id = target.id;
+        return `<div class="component-line" data-id="${id}" onmousedown="window.onComponentLineClick('${id}')"><i onmousedown="window.onToggleView(event, '${id}')" class="iconfont icon-noview"></i>${getTargetHtml(target)}</div>`;
     }
     function selectComponentLine(id) {
         $('.component-line.select').removeClass('select');
-        $('.component-line[data-id="'+id+'"]').addClass('select');
+        id && $('.component-line[data-id="'+id+'"]').addClass('select');
     }
     function onComponentLineClick(id) {
         editor.selectTarget(document.getElementById(id));
+    }
+    function onToggleView(event, id) {
+        const target = document.getElementById(id);
+        if (target.style.display !== 'none') {
+            target.style.display = 'none';
+            event.target.classList.remove('icon-noview');
+            event.target.classList.add('icon-view');
+        } else {
+            target.style.display = 'block';
+            event.target.classList.remove('icon-view');
+            event.target.classList.add('icon-noview');
+        }
+        editor.removeAll();
+        event.stopPropagation();
     }
     function getRelyLine(target) {
         const id = target.getAttribute('id');
@@ -128,6 +142,7 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
 
     // 全局函数
     window.onComponentLineClick = onComponentLineClick;
+    window.onToggleView = onToggleView;
     window.showAnimateRelyComponent = showAnimateRelyComponent;
     window.setAnimateRelyComponent = setAnimateRelyComponent;
     window.removeAnimateRelyComponent = removeAnimateRelyComponent;

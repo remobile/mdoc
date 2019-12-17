@@ -167,6 +167,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
     function removeAll() {
         control.updateValues(); // 关闭属性窗口
         removeAllReferents();
+        component.selectComponentLine();
     }
     function createReferents(target) {
         if (!isAltKeyPress) {
