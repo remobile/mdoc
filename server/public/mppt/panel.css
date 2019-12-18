@@ -39,7 +39,7 @@ body {
     position: absolute;
     left: 800px;
     top: 75px;
-    width: 250px;
+    width: 256px;
     height: 667px;
     padding-bottom: 36px;
     border: 1px solid #E6E6E6;
@@ -48,9 +48,20 @@ body {
 }
 #historyPanel {
     position: absolute;
-    left: 1070px;
+    left: 1060px;
     top: 75px;
-    width: 250px;
+    width: 204px;
+    height: 667px;
+    padding-bottom: 36px;
+    border: 1px solid #E6E6E6;
+    border-radius: 10px;
+    background-color: #FFF;
+}
+#pagePanel {
+    position: absolute;
+    left: 1268px;
+    top: 75px;
+    width: 266px;
     height: 667px;
     padding-bottom: 36px;
     border: 1px solid #E6E6E6;

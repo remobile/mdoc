@@ -1,9 +1,9 @@
-#historyContent {
+#pageContent {
     overflow: scroll;
     padding-left: 6px;
     padding-right: 6px;
 }
-#historyContent .history-item {
+#pageContent .page-item {
     cursor: pointer;
     margin-top: 6px;
     padding-bottom: 6px;
@@ -26,21 +26,24 @@
 #help span {
     color: #FF7256;
 }
-#historyButtonBack::after {
-    left: 25%;
+#pageButtonCopy::after {
+    left: 16%;
 }
-#historyButtonBack::before {
-    transform: translateX(25%);
+#pageButtonCopy::before {
+    transform: translateX(16%);
 }
-#historyButtonForward::before,#historyButtonForward::after {
-    left: 37%;
+#pageButtonDelete::before,#pageButtonDelete::after {
+    left: 30%;
 }
-#historyButtonHistory::before,#historyButtonHistory::after {
-    left: 61%;
+#pageButtonNew::before,#pageButtonNew::after {
+    left: 48%;
 }
-#historyButtonPlay::after {
+#pageButtonSetBackground::before,#pageButtonSetBackground::after {
     left: 68%;
 }
-#historyButtonPlay::before {
+#pageButtonHelp::after {
+    left: 72%;
+}
+#pageButtonHelp::before {
     transform: translateX(0);
 }

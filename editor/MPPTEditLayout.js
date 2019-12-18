@@ -5,6 +5,7 @@ const PropertyPanel = require('./PropertyPanel');
 const AnimatePanel = require('./AnimatePanel');
 const ComponentPanel = require('./ComponentPanel');
 const HistoryPanel = require('./HistoryPanel');
+const PagePanel = require('./PagePanel');
 
 class PPTEditLayout extends React.Component {
     render() {
@@ -23,6 +24,7 @@ class PPTEditLayout extends React.Component {
                     <link rel="stylesheet" href="mppt/animate.css" />
                     <link rel="stylesheet" href="mppt/component.css" />
                     <link rel="stylesheet" href="mppt/history.css" />
+                    <link rel="stylesheet" href="mppt/page.css" />
                 </head>
                 <body>
                     <div id="leftPanel">
@@ -48,7 +50,7 @@ class PPTEditLayout extends React.Component {
                     <div id="componentPanel">
                         <div className="layui-tab layui-tab-brief">
                             <ul className="layui-tab-title">
-                                <li className="layui-this">组件</li>
+                                <li className="layui-this">组件列表</li>
                             </ul>
                             <div className="layui-tab-content">
                                 <ComponentPanel />
@@ -59,10 +61,20 @@ class PPTEditLayout extends React.Component {
                     <div id="historyPanel">
                         <div className="layui-tab layui-tab-brief">
                             <ul className="layui-tab-title">
-                                <li className="layui-this">历史</li>
+                                <li className="layui-this">历史列表</li>
                             </ul>
                             <div className="layui-tab-content">
                                 <HistoryPanel />
+                            </div>
+                        </div>
+                    </div>
+                    <div id="pagePanel">
+                        <div className="layui-tab layui-tab-brief">
+                            <ul className="layui-tab-title">
+                                <li className="layui-this">页面列表</li>
+                            </ul>
+                            <div className="layui-tab-content">
+                                <PagePanel />
                             </div>
                         </div>
                     </div>
