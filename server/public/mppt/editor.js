@@ -168,6 +168,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         control.updateValues(); // 关闭属性窗口
         removeAllReferents();
         !noUpdateComponent && component.selectComponentLine();
+        $('.no-animate-ext').hide();
     }
     function createReferents(target) {
         if (!isAltKeyPress) {
@@ -354,8 +355,9 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             }
             const group = el.dataset.group !== undefined ? ` g=${el.dataset.group}` : '';
             const _animate = el.dataset.animate !== undefined ? ` a=${el.dataset.animate}` : '';
+            const lock = el.dataset.lock == 1 ? ' k' : el.dataset.lock == 2 ? ' t' : '';
 
-            text.push(`::: fm${type} x=${x} y=${y} w=${w} h=${h}${style}${group}${_animate} id=${id}`);
+            text.push(`::: fm${lock}${type} x=${x} y=${y} w=${w} h=${h}${style}${group}${_animate} id=${id}`);
             (el.src || el.innerText) && text.push(isText ? el.innerText : el.src.replace(window.location.href, ''));
             text.push(':::');
             text.push('');
