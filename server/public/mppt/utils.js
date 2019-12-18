@@ -41,6 +41,10 @@ layui.define(['layer'], function(exports) {
         + Math.random().toString().substr(2, 2);
     }
     function postPlain (url, data, fn) {
+        if (typeof data === 'function') {
+            fn = data;
+            data = '';
+        }
         const xhr = new XMLHttpRequest();
         xhr.open("POST", url, true);
         xhr.onreadystatechange = function() {

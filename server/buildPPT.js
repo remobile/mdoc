@@ -41,6 +41,24 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
     let distFile;
     reloadSiteConfig();
 
+    function getHtmlInDir(dir) {
+        var html = `<div style="display:flex; flex-direction: row; flex-wrap: wrap;">`;
+        fs.readdirSync(dir).forEach(function(file, index) {
+            var fullname = path.join(dir, file);
+            var info = fs.statSync(fullname);
+            if(info.isDirectory()) {
+                html += getHtmlInDir(fullname);
+            } else if (/\.png|\.jpg|\.gif|\.jpeg/.test(file)) {
+                fullname = fullname.replace(CWD + 'static/', '');
+                html += `<div style="position:relative; width:144px; height: 144px; display: flex; justify-content: center; align-items: center; margin: 10px; padding:2px; background-color: #EBEBEB">`;
+                html += `<img src="${fullname}" style="max-width: 140px; max-height: 140px;">`;
+                html += `<span style="position: absolute; font-size: 10px; max-width: 140px; height: 12px; overflow: scroll; word-break: keep-all; top: 150px;">${fullname}</span></div>`;
+            }
+        });
+        html += `</div>`;
+        return html;
+    }
+
     const app = express();
     const http = require('http').Server(app);
 
@@ -72,8 +90,8 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
     app.use(config.baseUrl, express.static(__dirname + '/static'));
     app.use(config.baseUrl, express.static(__dirname + '/public'));
 
-    app.get(config.baseUrl, (req, res, next) => {
-        if (index === undefined) {
+    app.get(config.baseUrl, (req, res) => {
+        if (index === undefined || req.query.play) {
             const layout = mobile ? '../lib/MPPTLayout.js' : '../lib/PPTLayout.js';
             removeModuleAndChildrenFromCache(layout);
             const PPTLayout = require(layout);
@@ -188,6 +206,12 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
             index = Math.min(index, len-1);
             reloadSiteConfig();
             res.send('');
+        });
+    });
+    app.post('/getImageFiles', (req, res) => {
+        req.on('data', function(chunk) {});
+        req.on('end', function() {
+            res.send(getHtmlInDir(CWD + 'static/' + config.imagePath));
         });
     });
     app.post('/getHistory', (req, res) => {

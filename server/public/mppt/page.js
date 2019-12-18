@@ -27,7 +27,8 @@ layui.define(['jquery', 'utils'], function(exports) {
             showHelp();
         });
         $('#pageButtonSetBackground').click(function(){
-            showHelp();
+            console.log("=======", 123);
+            getImageFiles();
         });
         $('#pageButtonHelp').click(function(){
             showHelp();
@@ -70,6 +71,17 @@ layui.define(['jquery', 'utils'], function(exports) {
         $('.page-line[data-index="'+pageIndex+'"]').addClass('select');
         utils.post('/deletePage', ()=>{
             location.reload();
+        });
+    }
+    function getImageFiles() {
+        utils.postPlain('/getImageFiles', (content)=>{
+            layer.open({
+                type: 1,
+                title: '图片',
+                offset: ['100px', '300px'], //位置
+                area: ['840px', '600px'], //宽高
+                content,
+            });
         });
     }
     function savePage() {
