@@ -63,6 +63,9 @@ layui.define(['jquery', 'utils'], function(exports) {
         });
     }
     function deletePage() {
+        if (pages.length === 1) {
+            return utils.toast('只剩最后一张，不能删除', '#pageButtonDelete');
+        }
         $('.page-line.select').removeClass('select');
         $('.page-line[data-index="'+pageIndex+'"]').addClass('select');
         utils.post('/deletePage', ()=>{

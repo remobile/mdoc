@@ -61,7 +61,7 @@ if (file) {
     buildFile(port*1, file, build);
 } else if (ppt) {
     const buildPPT = require('./server/buildPPT.js');
-    buildPPT(port*1, ppt, build, edit, mobile);
+    buildPPT(port*1, ppt, build, edit, mobile, open);
 } else if (build) {
     const buildProject = require('./server/buildProject.js');
     buildProject(hasDomain, verbose);

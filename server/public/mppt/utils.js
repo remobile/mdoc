@@ -11,8 +11,12 @@ layui.define(['layer'], function(exports) {
     function log(...args) {
         hasLog && console.log(...args);
     }
-    function toast(text) {
-        layer.msg(text, { offset: 't', anim: 1 });
+    function toast(text, id) {
+        if (id) {
+            layer.tips(text, id, { tips: 1 });
+        } else {
+            layer.msg(text, { offset: 't', anim: 1 });
+        }
     }
     function unshiftUnique(list, item) {
         removeList(list, item).unshift(item);

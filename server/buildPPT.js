@@ -1,4 +1,4 @@
-function buildMarkdown(port, configPath, build, index, mobile) {
+function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
     const React = require('react');
     const express = require('express');
     const inliner = require('inliner');
@@ -142,18 +142,18 @@ function buildMarkdown(port, configPath, build, index, mobile) {
         req.on('end', function() {
             removeModuleAndChildrenFromCache(CWD + configPath);
             const _config = require(CWD + configPath);
-            let i = _config.pages.length - 1;
+            let i = _config.pages.length;
             let page;
             while (i > index) {
                 if (i === index + 1) {
                     page = _.clone(_config.pages[index]);
-                    fs.copySync(getDocumentPath(`${i+1}.md`), getDocumentPath(`${i+2}.md`), { overwrite: true });
+                    fs.copySync(getDocumentPath(`${i}.md`), getDocumentPath(`${i+1}.md`), { overwrite: true });
                 } else {
                     page = _config.pages[i-1];
-                    fs.moveSync(getDocumentPath(`${i+1}.md`), getDocumentPath(`${i+2}.md`), { overwrite: true });
+                    fs.moveSync(getDocumentPath(`${i}.md`), getDocumentPath(`${i+1}.md`), { overwrite: true });
                 }
-                page.name = `第${i+2}页`;
-                page.path = `${i+2}.md`;
+                page.name = `第${i+1}页`;
+                page.path = `${i+1}.md`;
                 _config.pages[i] = page;
                 i--;
             }
@@ -182,19 +182,8 @@ function buildMarkdown(port, configPath, build, index, mobile) {
             }
             _config.pages.length = len;
             fs.writeFileSync(CWD + configPath, 'module.exports = ' + formatStandardObject(_config)+';');
-            index = index - 1;
+            index = Math.max(index - 1, 0);
             reloadSiteConfig();
-            res.send('');
-        });
-    });
-    app.post('/savePages', (req, res) => {
-        let text = '';
-        req.on('data', function(chunk) { text += chunk });
-        req.on('end', function() {
-            const _index = JSON.parse(text).pageIndex;
-
-            fs.copySync('/tmp/myfile', '/tmp/mynewfile')
-            fs.writeFileSync(CWD + configPath, `module.exports = ${JSON.stringify(config.pages, null, 4)}`, 'utf8');
             res.send('');
         });
     });
@@ -241,9 +230,9 @@ function buildMarkdown(port, configPath, build, index, mobile) {
             gulp.task('browser', function() {
                 browserSync.init({
                     proxy: url,
-                    files: [CWD + config.documentPath],
+                    files: hasAutoReload ? [CWD + config.documentPath] : [],
                     notify: false,
-                    open: true,
+                    open: hasAutoReload,
                 });
             });
             gulp.task('server', function() {
@@ -258,7 +247,7 @@ function buildMarkdown(port, configPath, build, index, mobile) {
             gulp.task('config', function() {
                 gulp.watch([path.resolve(CWD, configPath)], function(item) {
                     reloadSiteConfig();
-                    browserSync.reload();
+                    hasAutoReload && browserSync.reload();
                 });
             });
             gulp.start(['browser', 'server', 'config']);
