@@ -1,10 +1,11 @@
-layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(exports) {
+layui.define(['jquery', 'utils', 'history', 'control', 'page', 'component'], function(exports) {
     const $ = layui.$;
     const utils = layui.utils;
     const history = layui.history;
     const control = layui.control;
     const animate = layui.animate;
     const component = layui.component;
+    const page = layui.page;
 
     let action = { cmd: '' }; // 当前操作的对象
     let referents = []; // 当前选中的refrent列表
@@ -28,6 +29,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             group = Math.max(group, +target.dataset.group||0);
         });
         offset = { x: root.offsetLeft + 3, y: root.offsetTop + 3 };
+        page.initialize();
         control.initialize();
         component.initialize();
         history.initialize();
@@ -315,56 +317,6 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             }
         }
     }
-    function saveMarkdown() {
-        const text = [];
-        const list = _.sortBy($('#editor .target'), o=>-(o.style.zIndex||0));
-
-        for (const el of list) {
-            const id = el.id;
-            const x = el.offsetLeft;
-            const y = el.offsetTop;
-            const w = el.offsetWidth;
-            const h = el.offsetHeight;
-            const isText = el.classList.contains('text');
-            const type = !isText ? ' img' : '';
-            let style = '';
-            if (isText) {
-                const fontSize = el.style.fontSize;
-                if (fontSize) {
-                    style = `${style}s=${parseFloat(fontSize)} `;
-                }
-                const fontWeight = el.style.fontWeight;
-                if (fontWeight === 'bold') {
-                    style = `${style}b `;
-                }
-                const fontStyle = el.style.fontStyle;
-                if (fontStyle === 'italic') {
-                    style = `${style}i `;
-                }
-                const color = el.style.color;
-                if (color) {
-                    style = `${style}c=${utils.rgbaToHex(color)} `;
-                }
-                const bgcolor = el.style.backgroundColor;
-                if (bgcolor) {
-                    style = `${style}bc=${utils.rgbaToHex(bgcolor)} `;
-                }
-                if (style) {
-                    style = ` ${style.trim()}`;
-                }
-            }
-            const group = el.dataset.group !== undefined ? ` g=${el.dataset.group}` : '';
-            const _animate = el.dataset.animate !== undefined ? ` a=${el.dataset.animate}` : '';
-            const lock = el.dataset.lock == 1 ? ' k' : el.dataset.lock == 2 ? ' t' : '';
-
-            text.push(`::: fm${lock}${type} x=${x} y=${y} w=${w} h=${h}${style}${group}${_animate} id=${id}`);
-            (el.src || el.innerText) && text.push(isText ? el.innerText : el.src.replace(window.location.href, ''));
-            text.push(':::');
-            text.push('');
-        }
-        utils.post('/saveMarkdown', text.join('\n'));
-        utils.toast('保存成功');
-    }
     function copyTargetAcctribute (target) {
         copiedTarget = target;
     }
@@ -471,11 +423,11 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
             }
         }
         if (e.altKey && e.keyCode === 83) { // alt + s 保存
-            saveMarkdown();
+            page.saveMarkdown();
         } else if (e.altKey && e.keyCode === 72) { // alt + h 优化历史记录
             history.optimizeHistory();
         } else if (e.altKey && e.keyCode === 191) { // alt + ? 查看帮助
-            history.showHelp();
+            page.showHelp();
         } else if (e.altKey && e.keyCode === 90) { // alt + z 回退
             history.popHistory();
         } else if (e.altKey && e.keyCode === 89) { // alt + y 取消回退
@@ -508,7 +460,6 @@ layui.define(['jquery', 'utils', 'history', 'control', 'component'], function(ex
         selectTarget,
         createImageTarget,
         createTextTarget,
-        saveMarkdown,
         removeTargets,
         getRootHtml: () => root.innerHTML,
         setRootHtml: (html) => { root.innerHTML = html; },

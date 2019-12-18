@@ -36,7 +36,7 @@ layui.define(['layer'], function(exports) {
         + Math.random().toString().substr(2, 2)
         + Math.random().toString().substr(2, 2);
     }
-    function post (url, data, fn) {
+    function postPlain (url, data, fn) {
         const xhr = new XMLHttpRequest();
         xhr.open("POST", url, true);
         xhr.onreadystatechange = function() {
@@ -45,6 +45,9 @@ layui.define(['layer'], function(exports) {
             }
         };
         xhr.send(data);
+    }
+    function post(url, data, fn) {
+        postPlain(url, JSON.stringify(data), (text)=>{fn(text ? JSON.parse(text) : null)});
     }
     //rgba(31,147,255,0.73)
     //rgb(31,147,255)
@@ -69,6 +72,7 @@ layui.define(['layer'], function(exports) {
         log,
         toast,
         uuid,
+        postPlain,
         post,
         unshiftUnique,
         pushUnique,

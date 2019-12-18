@@ -10,7 +10,7 @@ function buildMarkdown(port, configPath, build, index, mobile) {
     const chalk = require('chalk');
     const CWD = process.cwd() + '/';
     const { removeModuleAndChildrenFromCache } = require('../lib/utils');
-
+    index === true && (index = 0);
     function getDocumentPath(file) {
         return CWD + config.documentPath + '/' + file;
     }
@@ -24,11 +24,6 @@ function buildMarkdown(port, configPath, build, index, mobile) {
         const pages = config.pages;
         if (!config.pages || !config.pages.length) {
             console.error(chalk.red('请设置页面'));
-            process.exit(0);
-        }
-
-        if (!config.colors || !config.colors.primaryColor || !config.colors.secondaryColor) {
-            console.error(chalk.red('缺少颜色配置'));
             process.exit(0);
         }
         if (path.extname(config.dist) === '.html') {
@@ -59,13 +54,14 @@ function buildMarkdown(port, configPath, build, index, mobile) {
         }
 
         let cssContent = fs.readFileSync(cssPath, {encoding: 'utf8'});
-        Object.keys(config.colors).forEach(key => {
-            const color = config.colors[key];
-            cssContent = cssContent.replace(new RegExp('\\$' + key, 'g'), color);
-        });
-        const codeColor = color(config.colors.primaryColor).alpha(0.07).string();
-        cssContent = cssContent.replace(new RegExp('\\$codeColor', 'g'), codeColor);
-
+        if (config.colors) {
+            Object.keys(config.colors).forEach(key => {
+                const color = config.colors[key];
+                cssContent = cssContent.replace(new RegExp('\\$' + key, 'g'), color);
+            });
+            const codeColor = color(config.colors.primaryColor).alpha(0.07).string();
+            cssContent = cssContent.replace(new RegExp('\\$codeColor', 'g'), codeColor);
+        }
         res.send(cssContent);
     });
 
@@ -125,15 +121,41 @@ function buildMarkdown(port, configPath, build, index, mobile) {
         });
         req.on('end', function() {
             fs.writeFileSync(getDocumentPath(config.pages[index].path), text, 'utf8');
-            res.sendStatus(200);
+            res.send('');
         });
     });
-    app.post('/getHistory', (req, res) => {
+    app.post('/getPages', (req, res) => {
+        req.on('data', function(chunk) {});
+        req.on('end', function() {
+            removeModuleAndChildrenFromCache(CWD + configPath);
+            const _config = require(CWD + configPath);
+            res.send(JSON.stringify({ pages: _config.pages, index }));
+        });
+    });
+    app.post('/setPageIndex', (req, res) => {
         let text = '';
-        const file = `.${config.projectName}_${index}_history.log`;
         req.on('data', function(chunk) {
             text += chunk;
         });
+        req.on('end', function() {
+            index = JSON.parse(text).pageIndex;
+            res.send('');
+        });
+    });
+    app.post('/savePages', (req, res) => {
+        let text = '';
+        req.on('data', function(chunk) {
+            text += chunk;
+        });
+        req.on('end', function() {
+            config.pages = JSON.parse(text).pages;
+            fs.writeFileSync(CWD + configPath, `module.exports = ${JSON.stringify(config.pages, null, 4)}`, 'utf8');
+            res.send('');
+        });
+    });
+    app.post('/getHistory', (req, res) => {
+        const file = `.${config.projectName}_${index}_history.log`;
+        req.on('data', function(chunk) {});
         req.on('end', function() {
             res.send(fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '');
         });
@@ -146,7 +168,7 @@ function buildMarkdown(port, configPath, build, index, mobile) {
         });
         req.on('end', function() {
             fs.writeFileSync(file, text, 'utf8');
-            res.sendStatus(200);
+            res.send('');
         });
     });
     app.get('*', (req, res) => {

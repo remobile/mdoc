@@ -4,39 +4,107 @@ layui.define(['jquery', 'utils'], function(exports) {
     let animate;
     const $ = layui.$;
     const utils = layui.utils;
-    let page = []; // 历史记录
-    let pageIndex = 0; // 当前历史记录的指针
+    let pages = []; // 页面列表
+    let pageIndex = 0; // 当前页面的index
     let lastAction = {}; // 上一次操作的对象
 
     function initialize() {
         editor = layui.editor;
         component = layui.component;
         animate = layui.animate;
-        utils.post('/getHistory', '', (text)=>{
-            if (!text) {
-                page.push({ name: '创建文件', html: editor.getRootHtml()});
-                pageIndex = 0;
-            } else {
-                page = JSON.parse(text);
-                pageIndex = page.length - 1;
-            }
-            showHistory();
+        utils.post('/getPages', '', (data)=>{
+            pages = data.pages;
+            pageIndex = data.index;
+            update();
         });
-        $('#pageButtonBack').click(function(){
+        $('#pageButtonCopy').click(function(){
             popHistory();
         });
-        $('#pageButtonForward').click(function(){
+        $('#pageButtonDelete').click(function(){
             recoverHistory();
         });
-        $('#pageButtonHistory').click(function(){
+        $('#pageButtonNew').click(function(){
             optimizeHistory();
         });
-        $('#pageButtonPlay').click(function(){
+        $('#pageButtonSetBackground').click(function(){
             animate.playCurrentPage();
         });
         $('#pageButtonHelp').click(function(){
             showHelp();
         });
+    }
+    function update() {
+        const html = pages.map((page, index)=>{
+            return getPageLine(page, index);
+        });
+        $('#pageContent').html(html.join(''));
+    }
+    function getPageLine(page, index) {
+        return `
+        <div class="page-line${index==pageIndex ? ' select' : ''}" data-index="${index}"  onmousedown="window.onPageLineClick('${index}')">
+            <i class="layui-icon layui-icon-align-center handle"></i>
+            <div>${page.name}</div>
+        </div>
+        `;
+    }
+    function onPageLineClick(index) {
+        pageIndex = index;
+        $('.page-line.select').removeClass('select');
+        $('.page-line[data-index="'+index+'"]').addClass('select');
+        utils.post('/setPageIndex', { pageIndex }, ()=>{
+            location.reload();
+        });
+
+    }
+    function saveMarkdown() {
+        const text = [];
+        const list = _.sortBy($('#editor .target'), o=>-(o.style.zIndex||0));
+
+        for (const el of list) {
+            const id = el.id;
+            const x = el.offsetLeft;
+            const y = el.offsetTop;
+            const w = el.offsetWidth;
+            const h = el.offsetHeight;
+            const isText = el.classList.contains('text');
+            const type = !isText ? ' img' : '';
+            let style = '';
+            if (isText) {
+                const fontSize = el.style.fontSize;
+                if (fontSize) {
+                    style = `${style}s=${parseFloat(fontSize)} `;
+                }
+                const fontWeight = el.style.fontWeight;
+                if (fontWeight === 'bold') {
+                    style = `${style}b `;
+                }
+                const fontStyle = el.style.fontStyle;
+                if (fontStyle === 'italic') {
+                    style = `${style}i `;
+                }
+                const color = el.style.color;
+                if (color) {
+                    style = `${style}c=${utils.rgbaToHex(color)} `;
+                }
+                const bgcolor = el.style.backgroundColor;
+                if (bgcolor) {
+                    style = `${style}bc=${utils.rgbaToHex(bgcolor)} `;
+                }
+                if (style) {
+                    style = ` ${style.trim()}`;
+                }
+            }
+            const group = el.dataset.group !== undefined ? ` g=${el.dataset.group}` : '';
+            const _animate = el.dataset.animate !== undefined ? ` a=${el.dataset.animate}` : '';
+            const lock = el.dataset.lock == 1 ? ' k' : el.dataset.lock == 2 ? ' t' : '';
+
+            text.push(`::: fm${type}${lock} x=${x} y=${y} w=${w} h=${h}${style}${group}${_animate} id=${id}`);
+            (el.src || el.innerText) && text.push(isText ? el.innerText : el.src.replace(window.location.href, ''));
+            text.push(':::');
+            text.push('');
+        }
+        utils.postPlain('/saveMarkdown', text.join('\n'));
+        utils.toast('保存成功');
     }
     function showHelp() {
         layer.open({
@@ -68,9 +136,10 @@ layui.define(['jquery', 'utils'], function(exports) {
     // 导出函数
     exports('page', {
         initialize,
+        saveMarkdown,
         showHelp,
     });
 
     // 全局函数
-    // window.setTopHistory = setTopHistory;
+    window.onPageLineClick = onPageLineClick;
 });

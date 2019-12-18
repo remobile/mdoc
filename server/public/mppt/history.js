@@ -12,12 +12,12 @@ layui.define(['jquery', 'utils'], function(exports) {
         editor = layui.editor;
         component = layui.component;
         animate = layui.animate;
-        utils.post('/getHistory', '', (text)=>{
-            if (!text) {
+        utils.post('/getHistory', '', (data)=>{
+            if (!data) {
                 history.push({ name: '创建文件', html: editor.getRootHtml()});
                 historyIndex = 0;
             } else {
-                history = JSON.parse(text);
+                history = data;
                 historyIndex = history.length - 1;
             }
             showHistory();
@@ -50,7 +50,7 @@ layui.define(['jquery', 'utils'], function(exports) {
                 }
                 history = newHistory.concat(history.slice(history.length-10));
                 historyIndex = history.length - 1;
-                utils.post('/updateHistory', JSON.stringify(history));
+                // utils.post('/updateHistory', history);
                 showHistory();
                 layer.close(dialog);
                 utils.toast('优化成功');

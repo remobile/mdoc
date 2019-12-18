@@ -10,7 +10,20 @@
     padding-left: 10px;
     border-bottom: solid #E0EEEE 1px;
 }
-
+.page-line {
+    line-height: 40px;
+    border-bottom: solid #E0EEEE 1px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+.page-line>i:nth-child(1) {
+    width: 30px;
+    padding-left: 10px;
+}
+.page-line.select {
+    background-color: #E0EEEE;
+}
 #help {
     padding: 10px;
     font-size: 18px;
