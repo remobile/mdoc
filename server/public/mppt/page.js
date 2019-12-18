@@ -12,22 +12,22 @@ layui.define(['jquery', 'utils'], function(exports) {
         editor = layui.editor;
         component = layui.component;
         animate = layui.animate;
-        utils.post('/getPages', '', (data)=>{
+        utils.post('/getPages', (data)=>{
             pages = data.pages;
             pageIndex = data.index;
             update();
         });
         $('#pageButtonCopy').click(function(){
-            popHistory();
+            copyPage();
         });
         $('#pageButtonDelete').click(function(){
-            recoverHistory();
+            deletePage();
         });
         $('#pageButtonNew').click(function(){
-            optimizeHistory();
+            showHelp();
         });
         $('#pageButtonSetBackground').click(function(){
-            animate.playCurrentPage();
+            showHelp();
         });
         $('#pageButtonHelp').click(function(){
             showHelp();
@@ -54,7 +54,22 @@ layui.define(['jquery', 'utils'], function(exports) {
         utils.post('/setPageIndex', { pageIndex }, ()=>{
             location.reload();
         });
-
+    }
+    function copyPage(index) {
+        pageIndex = index;
+        $('.page-line.select').removeClass('select');
+        $('.page-line[data-index="'+index+'"]').addClass('select');
+        utils.post('/copyPage', ()=>{
+            location.reload();
+        });
+    }
+    function deletePage(index) {
+        pageIndex = index;
+        $('.page-line.select').removeClass('select');
+        $('.page-line[data-index="'+index+'"]').addClass('select');
+        utils.post('/deletePage', ()=>{
+            location.reload();
+        });
     }
     function saveMarkdown() {
         const text = [];

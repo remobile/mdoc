@@ -47,7 +47,11 @@ layui.define(['layer'], function(exports) {
         xhr.send(data);
     }
     function post(url, data, fn) {
-        postPlain(url, JSON.stringify(data), (text)=>{fn(text ? JSON.parse(text) : null)});
+        if (typeof data === 'function') {
+            fn = data;
+            data = '';
+        }
+        postPlain(url, data && JSON.stringify(data), (text)=>{fn(text ? JSON.parse(text) : null)});
     }
     //rgba(31,147,255,0.73)
     //rgb(31,147,255)

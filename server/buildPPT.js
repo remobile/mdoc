@@ -8,8 +8,9 @@ function buildMarkdown(port, configPath, build, index, mobile) {
     const path = require('path');
     const color = require('color');
     const chalk = require('chalk');
+    const _ = require('lodash');
     const CWD = process.cwd() + '/';
-    const { removeModuleAndChildrenFromCache } = require('../lib/utils');
+    const { removeModuleAndChildrenFromCache, formatStandardObject } = require('../lib/utils');
     index === true && (index = 0);
     function getDocumentPath(file) {
         return CWD + config.documentPath + '/' + file;
@@ -115,10 +116,7 @@ function buildMarkdown(port, configPath, build, index, mobile) {
     });
     app.post('/saveMarkdown', (req, res) => {
         let text = '';
-        // req.setEncoding('utf8');
-        req.on('data', function(chunk) {
-            text += chunk;
-        });
+        req.on('data', function(chunk) { text += chunk });
         req.on('end', function() {
             fs.writeFileSync(getDocumentPath(config.pages[index].path), text, 'utf8');
             res.send('');
@@ -127,28 +125,73 @@ function buildMarkdown(port, configPath, build, index, mobile) {
     app.post('/getPages', (req, res) => {
         req.on('data', function(chunk) {});
         req.on('end', function() {
-            removeModuleAndChildrenFromCache(CWD + configPath);
-            const _config = require(CWD + configPath);
-            res.send(JSON.stringify({ pages: _config.pages, index }));
+            res.send(JSON.stringify({ pages: config.pages.map(o=>_.pick(o, name)), index }));
         });
     });
     app.post('/setPageIndex', (req, res) => {
         let text = '';
-        req.on('data', function(chunk) {
-            text += chunk;
-        });
+        req.on('data', function(chunk) { text += chunk });
         req.on('end', function() {
             index = JSON.parse(text).pageIndex;
             res.send('');
         });
     });
+    app.post('/copyPage', (req, res) => {
+        let text = '';
+        req.on('data', function(chunk) { text += chunk });
+        req.on('end', function() {
+            removeModuleAndChildrenFromCache(CWD + configPath);
+            const _config = require(CWD + configPath);
+            let i = _config.pages.length;
+            let page;
+            while (i > index) {
+                if (i === index + 1) {
+                    page = _.clone(_config.pages[index]);
+                    fs.copySync(getDocumentPath(`${i+1}.md`), getDocumentPath(`${i+2}.md`));
+                } else {
+                    page = _config.pages[i-1];
+                    fs.moveSync(getDocumentPath(`${i+1}.md`), getDocumentPath(`${i+2}.md`));
+                }
+                page.name = `第${i+2}页`;
+                page.path = `${i+2}.md`;
+                _config.pages[i] = page;
+            }
+            fs.writeFileSync(CWD + configPath, 'module.exports = ' + formatStandardObject(_config));
+            index = index + 1;
+            reloadSiteConfig();
+            res.send('');
+        });
+    });
+    app.post('/deletePage', (req, res) => {
+        let text = '';
+        req.on('data', function(chunk) { text += chunk });
+        req.on('end', function() {
+            removeModuleAndChildrenFromCache(CWD + configPath);
+            const _config = require(CWD + configPath);
+            const len = _config.pages.length - 1;
+            let i = index;
+            let page;
+            while (i < len) {
+                page = _config.pages[i+1];
+                fs.moveSync(getDocumentPath(`${i+2}.md`), getDocumentPath(`${i+1}.md`), { overwrite: true });
+                page.name = `第${i+1}页`;
+                page.path = `${i+1}.md`;
+                _config.pages[i] = page;
+            }
+            _config.pages.length = len;
+            fs.writeFileSync(CWD + configPath, 'module.exports = ' + formatStandardObject(_config));
+            index = index - 1;
+            reloadSiteConfig();
+            res.send('');
+        });
+    });
     app.post('/savePages', (req, res) => {
         let text = '';
-        req.on('data', function(chunk) {
-            text += chunk;
-        });
+        req.on('data', function(chunk) { text += chunk });
         req.on('end', function() {
-            config.pages = JSON.parse(text).pages;
+            const _index = JSON.parse(text).pageIndex;
+
+            fs.copySync('/tmp/myfile', '/tmp/mynewfile')
             fs.writeFileSync(CWD + configPath, `module.exports = ${JSON.stringify(config.pages, null, 4)}`, 'utf8');
             res.send('');
         });
@@ -163,9 +206,7 @@ function buildMarkdown(port, configPath, build, index, mobile) {
     app.post('/updateHistory', (req, res) => {
         let text = '';
         const file = `.${config.projectName}_${index}_history.log`;
-        req.on('data', function(chunk) {
-            text += chunk;
-        });
+        req.on('data', function(chunk) { text += chunk });
         req.on('end', function() {
             fs.writeFileSync(file, text, 'utf8');
             res.send('');
