@@ -114,14 +114,6 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
             );
         }
     });
-    app.post('/saveMarkdown', (req, res) => {
-        let text = '';
-        req.on('data', function(chunk) { text += chunk });
-        req.on('end', function() {
-            fs.writeFileSync(getDocumentPath(config.pages[index].path), text, 'utf8');
-            res.send('');
-        });
-    });
     app.post('/getPages', (req, res) => {
         req.on('data', function(chunk) {});
         req.on('end', function() {
@@ -133,6 +125,14 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
         req.on('data', function(chunk) { text += chunk });
         req.on('end', function() {
             index = JSON.parse(text).pageIndex;
+            res.send('');
+        });
+    });
+    app.post('/savePage', (req, res) => {
+        let text = '';
+        req.on('data', function(chunk) { text += chunk });
+        req.on('end', function() {
+            fs.writeFileSync(getDocumentPath(config.pages[index].path), text, 'utf8');
             res.send('');
         });
     });
@@ -172,6 +172,9 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
             const len = _config.pages.length - 1;
             let i = index;
             let page;
+            if (i === len) {
+                fs.removeSync(getDocumentPath(`${i+1}.md`));
+            }
             while (i < len) {
                 page = _config.pages[i+1];
                 fs.moveSync(getDocumentPath(`${i+2}.md`), getDocumentPath(`${i+1}.md`), { overwrite: true });
@@ -182,7 +185,7 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
             }
             _config.pages.length = len;
             fs.writeFileSync(CWD + configPath, 'module.exports = ' + formatStandardObject(_config)+';');
-            index = Math.max(index - 1, 0);
+            index = Math.min(index, len-1);
             reloadSiteConfig();
             res.send('');
         });

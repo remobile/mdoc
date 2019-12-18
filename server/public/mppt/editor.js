@@ -423,7 +423,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'page', 'component'], fun
             }
         }
         if (e.altKey && e.keyCode === 83) { // alt + s 保存
-            page.saveMarkdown();
+            page.savePage();
         } else if (e.altKey && e.keyCode === 72) { // alt + h 优化历史记录
             history.optimizeHistory();
         } else if (e.altKey && e.keyCode === 191) { // alt + ? 查看帮助

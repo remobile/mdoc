@@ -278,7 +278,7 @@ function post (url, data, fn) {
     };
     xhr.send(data);
 }
-function saveMarkdown(e) {
+function savePage(e) {
     const text = [];
     const list = document.querySelectorAll('.target');
     for (const el of list) {
@@ -322,7 +322,7 @@ function saveMarkdown(e) {
         text.push(':::');
         text.push('');
     }
-    post('/saveMarkdown', text.join('\n'));
+    post('/savePage', text.join('\n'));
 }
 function copyTargetAcctribute (target) {
     copiedTarget = target;
@@ -544,7 +544,7 @@ function onDocumentKeyDown(e) {
 
     }
     if (e.altKey && e.keyCode === 83) { // alt + s 保存
-        saveMarkdown();
+        savePage();
     } else if (e.altKey && e.keyCode === 72) { // alt + h 优化历史记录
         optimizeHistory();
     } else if (e.altKey && e.keyCode === 90) { // alt + z 回退

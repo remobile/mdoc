@@ -72,7 +72,7 @@ layui.define(['jquery', 'utils'], function(exports) {
             location.reload();
         });
     }
-    function saveMarkdown() {
+    function savePage() {
         const text = [];
         const list = _.sortBy($('#editor .target'), o=>-(o.style.zIndex||0));
 
@@ -119,7 +119,7 @@ layui.define(['jquery', 'utils'], function(exports) {
             text.push(':::');
             text.push('');
         }
-        utils.postPlain('/saveMarkdown', text.join('\n'));
+        utils.postPlain('/savePage', text.join('\n'));
         utils.toast('保存成功');
     }
     function showHelp() {
@@ -152,7 +152,7 @@ layui.define(['jquery', 'utils'], function(exports) {
     // 导出函数
     exports('page', {
         initialize,
-        saveMarkdown,
+        savePage,
         showHelp,
     });
 
