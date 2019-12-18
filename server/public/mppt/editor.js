@@ -138,7 +138,6 @@ layui.define(['jquery', 'layer', 'utils', 'history', 'control', 'page', 'compone
         for (const el of list) {
             root.removeChild(el);
         }
-        action.target = null;
         referents = [];
     }
     // 删除除了该组的其他所有的referent
