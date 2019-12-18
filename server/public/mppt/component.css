@@ -22,11 +22,15 @@
     padding-left: 10px;
     right: 0;
     position: absolute;
+    display: none;
+}
+.component-line.template>i:nth-child(4), .component-line.lock>i:nth-child(4) {
+    display: block;
 }
 .component-line.template>i:nth-child(4) {
     color: #D3D3D3;
 }
-.component-line.lock > .layui-icon-align-center {
+.component-line.template>.layui-icon-align-center, .component-line.lock>.layui-icon-align-center {
     color: #D3D3D3;
 }
 .component-line.select {
@@ -42,24 +46,6 @@
     border: solid #D4D4D4 1px;
     border-radius: 4px;
     margin: 2px;
-}
-#componentButtonText::before,#componentButtonText::after {
-    left: 10%;
-}
-#componentButtonImage::before,#componentButtonImage::after {
-    left: 25%;
-}
-#componentButtonDelete::before,#componentButtonNext::after {
-    left: 42%;
-}
-#componentButtonHistory::before,#componentButtonNext::after {
-    left: 58%;
-}
-#componentButtonPlay::before,#componentButtonNext::after {
-    left: 73%;
-}
-#componentButtonHelp::before,#componentButtonPre::after {
-    left: 90%;
 }
 .bottom-buttons {
     position: absolute;
@@ -108,19 +94,24 @@ button.tip:hover::before {
 .blue-background-class {
     background-color: #F0FFFF;
 }
-
-#help {
-    padding: 10px;
-    font-size: 18px;
-    line-height: 25px;
-    color: grey;
+#componentButtonText::after {
+    left: 25%;
 }
-#help .title {
-    color: #159688;
+#componentButtonText::before {
+    transform: translateX(25%);
 }
-#help :not(.title) {
-    margin-left: 20px;
+#componentButtonImage::before,#componentButtonImage::after {
+    left: 32%;
 }
-#help span {
-    color: #FF7256;
+#componentButtonDelete::before,#componentButtonDelete::after {
+    left: 52%;
+}
+#componentButtonToggleLock::before,#componentButtonToggleLock::after {
+    left: 70%;
+}
+#componentButtonToggleShow::after {
+    left: 65%;
+}
+#componentButtonToggleShow::before {
+    transform: translateX(0);
 }

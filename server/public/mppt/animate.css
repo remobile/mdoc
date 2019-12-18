@@ -28,3 +28,7 @@
 .no-animate, .no-animate-ext {
     display: none;
 }
+.rely-list {
+    padding-left: 20px;
+    padding-right: 20px;
+}

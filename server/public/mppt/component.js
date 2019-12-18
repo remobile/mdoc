@@ -8,6 +8,7 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
     const utils = layui.utils;
     let animateRelyList = [];
     let relyDialog;
+    let showTemplate = false;
 
     function initialize() {
         editor = layui.editor;
@@ -41,9 +42,12 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
         animateRelyList = [];
         const html = _.sortBy($('#editor .target'), o=>-(o.style.zIndex||0)).map(target=>{
             animateRelyList.push(target);
+            if (!showTemplate && target.dataset.lock == 2) {
+                return '';
+            }
             return getComponentLine(target);
         });
-        $('#componentContent').html(html);
+        $('#componentContent').html(html.join(''));
     }
     function updateTargetOrder() {
         const ids = $.map($('#componentContent').children(), o=>o.dataset.id);
@@ -60,14 +64,13 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
     function getComponentLine(target) {
         const id = target.id;
         const lock = target.dataset.lock;
-        const template = target.dataset.template;
-        const className = `component-line${lock||template ? ' lock' : ''}${template ? ' template' : ''}`;
+        const className = `component-line${lock==1 ? ' lock' : lock==2 ? ' template' : ''}`;
         return `
-        <div class="${className}" data-id="${id}" onmousedown="window.onComponentLineClick('${id}', ${lock}, ${template})">
+        <div class="${className}" data-id="${id}" onmousedown="window.onComponentLineClick('${id}')">
             <i onmousedown="window.onToggleView(event, '${id}')" class="iconfont icon-noview"></i>
-            <i class="layui-icon layui-icon-align-center${lock||template ? '' : ' handle'}"></i>
+            <i class="layui-icon layui-icon-align-center${lock ? '' : ' handle'}"></i>
             ${getTargetHtml(target)}
-            ${lock||template ? `<i class="iconfont icon-lock"></i>` : ''}
+            <i class="iconfont icon-lock" onmousedown="window.onLockClick('${id}')"></i>
         </div>
         `;
     }
@@ -75,9 +78,10 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
         $('.component-line.select').removeClass('select');
         id && $('.component-line[data-id="'+id+'"]').addClass('select');
     }
-    function onComponentLineClick(id, lock, template) {
-        if (!lock && !template) {
-            editor.selectTarget(document.getElementById(id));
+    function onComponentLineClick(id) {
+        const target = document.getElementById(id);
+        if (!target.dataset.lock) {
+            editor.selectTarget(target);
         } else {
             editor.clearAll();
             selectComponentLine(id);
@@ -93,37 +97,6 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
             target.style.display = 'block';
             event.target.classList.remove('icon-view');
             event.target.classList.add('icon-noview');
-        }
-        editor.clearAll();
-        event.stopPropagation();
-    }
-    function onToggleLock(event, id) {
-        const target = document.getElementById(id);
-        const lock = target.dataset.lock;
-        const template = target.dataset.template;
-        if (!template) {
-            if (lock) {
-                delete target.dataset.lock;
-                event.target.classList.remove('icon-back');
-                event.target.classList.add('icon-lock');
-            } else {
-                target.dataset.lock = 1;
-                event.target.classList.remove('icon-lock');
-                event.target.classList.add('icon-back');
-            }
-        }
-        editor.clearAll();
-        event.stopPropagation();
-    }
-    function onToggleTemplate(event, id) {
-        const target = document.getElementById(id);
-        const template = target.dataset.template;
-        if (template) {
-            delete target.dataset.template;
-            event.target.parentNode.classList.remove('template');
-        } else {
-            target.dataset.template = 1;
-            event.target.parentNode.classList.add('template');
         }
         editor.clearAll();
         event.stopPropagation();
@@ -166,7 +139,7 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
                 title: '选择动画依赖组件',
                 offset: ['290px', '30px'], //位置
                 area: ['240px', '500px'], //宽高
-                content: `<div>${html}</div>`,
+                content: `<div class="rely-list">${html}</div>`,
             });
         }
     }
@@ -177,6 +150,40 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
     }
     function removeAnimateRelyComponent() {
         animate.setAnimate({ rely: '' });
+    }
+    function onLockClick(id) {
+        const target = document.getElementById(id);
+        const el = $('.component-line[data-id="'+id+'"]')[0];
+        const lock = target.dataset.lock;
+        if (lock == 1) {
+            el.classList.remove('lock');
+            delete target.dataset.lock;
+        }
+    }
+    function toggleLock() {
+        const el = $('.component-line.select')[0];
+        if (el) {
+            const id = el.dataset.id;
+            const target = document.getElementById(id);
+            const lock = target.dataset.lock;
+            if (!lock) {
+                el.classList.add('lock');
+                target.dataset.lock = 1;
+                editor.clearAll(true);
+            } else if (lock == 1) {
+                el.classList.remove('lock');
+                el.classList.add('template');
+                target.dataset.lock = 2;
+            } else if (lock == 2) {
+                el.classList.remove('template');
+                delete target.dataset.lock;
+                editor.selectTarget(target);
+            }
+        }
+    }
+    function toggleShowTemplate() {
+        showTemplate = !showTemplate;
+        update();
     }
 
     // 导出函数
@@ -189,8 +196,8 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
 
     // 全局函数
     window.onComponentLineClick = onComponentLineClick;
+    window.onLockClick = onLockClick;
     window.onToggleView = onToggleView;
-    window.onToggleLock = onToggleLock;
     window.showAnimateRelyComponent = showAnimateRelyComponent;
     window.setAnimateRelyComponent = setAnimateRelyComponent;
     window.removeAnimateRelyComponent = removeAnimateRelyComponent;

@@ -15,7 +15,7 @@ module.exports = () => {
                     <button id="componentButtonDelete" title="删除元素(alt+del)" type="button" className="layui-btn tip">
                         <i className="layui-icon">&#xe640;</i>
                     </button>
-                    <button id="componentButtonToggleLock" title="锁定模板(alt+l)" type="button" className="layui-btn tip">
+                    <button id="componentButtonToggleLock" title="切换锁定(alt+l)" type="button" className="layui-btn tip">
                         <i className="iconfont icon-lock"></i>
                     </button>
                     <button id="componentButtonToggleShow" title="切换模板可见(alt+d)" type="button" className="layui-btn tip">

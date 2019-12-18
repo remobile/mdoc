@@ -37,7 +37,7 @@ module.exports = function fragment_plugin(md, page) {
             options.g && (dataset = ` data-group=${options.g}`);
             options.a && (dataset = `${dataset} data-animate=${options.a}`);
             options.k && (dataset = `${dataset} data-lock=1`);
-            options.t && (dataset = `${dataset} data-template=1`);
+            options.t && (dataset = `${dataset} data-lock=2`);
 
             let html = '';
             if (options.img) {

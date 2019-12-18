@@ -1,3 +1,6 @@
+body {
+    background-color: #000;
+}
 #leftPanel {
     position: absolute;
     left: 20px;
@@ -8,6 +11,7 @@
     border: 1px solid #E6E6E6;
     overflow: scroll;
     border-radius: 10px;
+    background-color: #FFF;
 }
 #phone {
     position: absolute;
@@ -29,6 +33,7 @@
     border: 1px solid #000;
     background-repeat: no-repeat;
     background-size: 100% 100%;
+    background-color: #FFF;
 }
 #componentPanel {
     position: absolute;
@@ -39,6 +44,7 @@
     padding-bottom: 36px;
     border: 1px solid #E6E6E6;
     border-radius: 10px;
+    background-color: #FFF;
 }
 #historyPanel {
     position: absolute;
@@ -49,4 +55,8 @@
     padding-bottom: 36px;
     border: 1px solid #E6E6E6;
     border-radius: 10px;
+    background-color: #FFF;
+}
+.hide {
+    display: none;
 }
