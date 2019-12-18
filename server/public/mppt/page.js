@@ -41,7 +41,7 @@ layui.define(['jquery', 'utils'], function(exports) {
     }
     function getPageLine(page, index) {
         return `
-        <div class="page-line${index==pageIndex ? ' select' : ''}" data-index="${index}"  onmousedown="window.onPageLineClick('${index}')">
+        <div class="page-line${index==pageIndex ? ' select' : ''}" data-index="${index}"  onmousedown="window.onPageLineClick(${index})">
             <i class="layui-icon layui-icon-align-center handle"></i>
             <div>${page.name}</div>
         </div>
@@ -55,18 +55,16 @@ layui.define(['jquery', 'utils'], function(exports) {
             location.reload();
         });
     }
-    function copyPage(index) {
-        pageIndex = index;
+    function copyPage() {
         $('.page-line.select').removeClass('select');
-        $('.page-line[data-index="'+index+'"]').addClass('select');
+        $('.page-line[data-index="'+pageIndex+'"]').addClass('select');
         utils.post('/copyPage', ()=>{
             location.reload();
         });
     }
-    function deletePage(index) {
-        pageIndex = index;
+    function deletePage() {
         $('.page-line.select').removeClass('select');
-        $('.page-line[data-index="'+index+'"]').addClass('select');
+        $('.page-line[data-index="'+pageIndex+'"]').addClass('select');
         utils.post('/deletePage', ()=>{
             location.reload();
         });

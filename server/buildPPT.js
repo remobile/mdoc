@@ -11,7 +11,7 @@ function buildMarkdown(port, configPath, build, index, mobile) {
     const _ = require('lodash');
     const CWD = process.cwd() + '/';
     const { removeModuleAndChildrenFromCache, formatStandardObject } = require('../lib/utils');
-    index === true && (index = 0);
+    index === true && (index = 0) || (index = +index);
     function getDocumentPath(file) {
         return CWD + config.documentPath + '/' + file;
     }
@@ -99,7 +99,7 @@ function buildMarkdown(port, configPath, build, index, mobile) {
             const PPTEditLayout = require(editLayout);
             const page = config.pages[index];
             if (!page) {
-                return res.send('错误的index');
+                return res.send(`错误的index: ${index}, 总数：${config.pages.length}`);
             }
             const file = getDocumentPath(page.path);
             if (path.extname(file) !== '.md') {
@@ -125,7 +125,7 @@ function buildMarkdown(port, configPath, build, index, mobile) {
     app.post('/getPages', (req, res) => {
         req.on('data', function(chunk) {});
         req.on('end', function() {
-            res.send(JSON.stringify({ pages: config.pages.map(o=>_.pick(o, name)), index }));
+            res.send(JSON.stringify({ pages: config.pages.map(o=>_.pick(o, 'name')), index }));
         });
     });
     app.post('/setPageIndex', (req, res) => {
@@ -142,21 +142,22 @@ function buildMarkdown(port, configPath, build, index, mobile) {
         req.on('end', function() {
             removeModuleAndChildrenFromCache(CWD + configPath);
             const _config = require(CWD + configPath);
-            let i = _config.pages.length;
+            let i = _config.pages.length - 1;
             let page;
             while (i > index) {
                 if (i === index + 1) {
                     page = _.clone(_config.pages[index]);
-                    fs.copySync(getDocumentPath(`${i+1}.md`), getDocumentPath(`${i+2}.md`));
+                    fs.copySync(getDocumentPath(`${i+1}.md`), getDocumentPath(`${i+2}.md`), { overwrite: true });
                 } else {
                     page = _config.pages[i-1];
-                    fs.moveSync(getDocumentPath(`${i+1}.md`), getDocumentPath(`${i+2}.md`));
+                    fs.moveSync(getDocumentPath(`${i+1}.md`), getDocumentPath(`${i+2}.md`), { overwrite: true });
                 }
                 page.name = `第${i+2}页`;
                 page.path = `${i+2}.md`;
                 _config.pages[i] = page;
+                i--;
             }
-            fs.writeFileSync(CWD + configPath, 'module.exports = ' + formatStandardObject(_config));
+            fs.writeFileSync(CWD + configPath, 'module.exports = ' + formatStandardObject(_config)+';');
             index = index + 1;
             reloadSiteConfig();
             res.send('');
@@ -177,9 +178,10 @@ function buildMarkdown(port, configPath, build, index, mobile) {
                 page.name = `第${i+1}页`;
                 page.path = `${i+1}.md`;
                 _config.pages[i] = page;
+                i++;
             }
             _config.pages.length = len;
-            fs.writeFileSync(CWD + configPath, 'module.exports = ' + formatStandardObject(_config));
+            fs.writeFileSync(CWD + configPath, 'module.exports = ' + formatStandardObject(_config)+';');
             index = index - 1;
             reloadSiteConfig();
             res.send('');
