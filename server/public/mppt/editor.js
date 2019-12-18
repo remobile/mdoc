@@ -1,6 +1,7 @@
-layui.define(['jquery', 'utils', 'history', 'control', 'page', 'component'], function(exports) {
+layui.define(['jquery', 'layer', 'utils', 'history', 'control', 'page', 'component'], function(exports) {
     const $ = layui.$;
     const utils = layui.utils;
+    const layer = layui.layer;
     const history = layui.history;
     const control = layui.control;
     const animate = layui.animate;
@@ -137,7 +138,6 @@ layui.define(['jquery', 'utils', 'history', 'control', 'page', 'component'], fun
         for (const el of list) {
             root.removeChild(el);
         }
-        editingTarget = null;
         action.target = null;
         referents = [];
     }
@@ -171,6 +171,7 @@ layui.define(['jquery', 'utils', 'history', 'control', 'page', 'component'], fun
         removeAllReferents();
         !noUpdateComponent && component.selectComponentLine();
         $('.no-animate-ext').hide();
+        layer.closeAll();
     }
     function createReferents(target) {
         if (!isAltKeyPress) {
@@ -191,6 +192,9 @@ layui.define(['jquery', 'utils', 'history', 'control', 'page', 'component'], fun
             removeAllReferents();
             target.setAttribute("contenteditable", "true");
             editingTarget = target;
+            action.editingTargetInnerText = target.innerText;
+        } else {
+            control.showImageSelect();
         }
     }
     function onReferentMouseDown(e, cmd) {
@@ -199,12 +203,13 @@ layui.define(['jquery', 'utils', 'history', 'control', 'page', 'component'], fun
         clickX = location.x;
         action.cmd = cmd;
         action.from = 'referent';
+        action.location = location;
         e.stopPropagation();
         if (cmd === 'move') {
             if (isAltKeyPress) {
                 copyTargets();
             }
-            if (Date.now() - doubleClickStartTime < 200) {
+            if (Date.now() - doubleClickStartTime < 500) {
                 onReferentDoubleClick(e.target.target);
                 doubleClickStartTime = undefined;
             } else {
@@ -226,10 +231,13 @@ layui.define(['jquery', 'utils', 'history', 'control', 'page', 'component'], fun
             }
         }
     }
-    function onDocumentMouseUp() {
+    function onDocumentMouseUp(e) {
         root.style.cursor = "auto";
         if (action.from === 'referent') {
-            history.pushHistory(action.cmd === 'move' ? '移动' : '改变大小');
+            const location = getLocation(e);
+            if (action.location.x !== location.x || action.location.y !== location.y) {
+                history.pushHistory(action.cmd === 'move' ? '移动' : '改变大小');
+            }
             action.from = undefined;
         }
     }
@@ -253,13 +261,12 @@ layui.define(['jquery', 'utils', 'history', 'control', 'page', 'component'], fun
     function onDocumentMouseDown(e) {
         let target;
         if (editingTarget && e.target !== editingTarget) {
-            editingTarget.setAttribute('contenteditable', 'false');
             if (!e.target.classList.contains('target')) {
                 target = editingTarget;
             } else {
                 target = e.target;
             }
-            editingTarget = undefined;
+            editingTargetEnd();
         } else if (e.target.classList.contains('target')) {
             if (e.target.getAttribute("contenteditable") !== 'true') {
                 target = e.target;
@@ -327,6 +334,13 @@ layui.define(['jquery', 'utils', 'history', 'control', 'page', 'component'], fun
             target.style.fontSize = copiedTarget.style.fontSize;
             target.style.fontStyle = copiedTarget.style.fontStyle;
         }
+    }
+    function editingTargetEnd() {
+        editingTarget.setAttribute('contenteditable', 'false');
+        if (editingTarget.innerText !== action.editingTargetInnerText) {
+            history.pushHistory('改变文字内容');
+        }
+        editingTarget = undefined;
     }
     function createTextTarget() {
         clearAll();
@@ -416,9 +430,8 @@ layui.define(['jquery', 'utils', 'history', 'control', 'page', 'component'], fun
         } else {
             if (e.keyCode === 27 || e.keyCode === 13) { // esc |  enter
                 if (editingTarget) {
-                    editingTarget.setAttribute('contenteditable', 'false');
                     createReferents(editingTarget);
-                    editingTarget = undefined;
+                    editingTargetEnd();
                 }
             }
         }

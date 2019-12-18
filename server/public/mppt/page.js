@@ -28,7 +28,6 @@ layui.define(['jquery', 'utils'], function(exports) {
         });
         $('#pageButtonSetBackground').click(function(){
             console.log("=======", 123);
-            getImageFiles();
         });
         $('#pageButtonHelp').click(function(){
             showHelp();
@@ -71,17 +70,6 @@ layui.define(['jquery', 'utils'], function(exports) {
         $('.page-line[data-index="'+pageIndex+'"]').addClass('select');
         utils.post('/deletePage', ()=>{
             location.reload();
-        });
-    }
-    function getImageFiles() {
-        utils.postPlain('/getImageFiles', (content)=>{
-            layer.open({
-                type: 1,
-                title: '图片',
-                offset: ['100px', '300px'], //位置
-                area: ['840px', '600px'], //宽高
-                content,
-            });
         });
     }
     function savePage() {
@@ -140,6 +128,7 @@ layui.define(['jquery', 'utils'], function(exports) {
             title: '帮助',
             offset: ['100px', '500px'], //位置
             area: ['440px', '600px'], //宽高
+            shadeClose: true,
             content: `
             <div id="help">
                 <div class="title">基础用法：</div>

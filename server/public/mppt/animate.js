@@ -256,6 +256,7 @@ layui.define(['jquery', 'form', 'utils', 'history'], function(exports) {
         });
     }
 
+    // 导出函数
     exports('animate', {
         initialize,
         updateValues,

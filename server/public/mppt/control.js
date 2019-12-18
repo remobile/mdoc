@@ -1,16 +1,18 @@
-layui.define(['jquery', 'form', 'colorpicker', 'animate', 'history'], function(exports) {
+layui.define(['jquery', 'form', 'colorpicker', 'utils', 'animate', 'history'], function(exports) {
     const $ = layui.$;
     const form = layui.form;
     const slider = layui.slider;
     const colorpicker = layui.colorpicker;
     const history = layui.history;
     const animate = layui.animate;
+    const utils = layui.utils;
 
     let editor;
     let textColorList;
     let textBackgroundColorList;
     let imageColorList;
     let imageBackgroundColorList;
+    let imageDialog;
 
     function initialize() {
         editor = layui.editor;
@@ -289,11 +291,36 @@ layui.define(['jquery', 'form', 'colorpicker', 'animate', 'history'], function(e
         style = style || getComputedStyle(target);
         $('#textPositionSize').html(`x: ${parseInt(style.left)}&emsp;y: ${parseInt(style.top)}&emsp;w: ${parseInt(style.width)}&emsp;h: ${parseInt(style.height)}`);
     }
+    function showImageSelect() {
+        utils.postPlain('/getImageFiles', (content)=>{
+            imageDialog = layer.open({
+                type: 1,
+                title: '图片',
+                offset: ['100px', '300px'], //位置
+                area: ['840px', '600px'], //宽高
+                shadeClose: true,
+                content,
+            });
+        });
+    }
+    function onSelectImage(src) {
+        const target = editor.getAction().target;
+        if (target.src !== src) {
+            target.src = src;
+            history.pushHistory('改变图片地址');
+        }
+        layer.close(imageDialog);
+    }
 
+    // 导出函数
     exports('control', {
         initialize,
         updateValues,
         updatePositionSize,
+        showImageSelect,
         setTextStyle,
     });
+
+    // 全局函数
+    window.onSelectImage = onSelectImage;
 });

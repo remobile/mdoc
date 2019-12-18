@@ -49,9 +49,10 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
             if(info.isDirectory()) {
                 html += getHtmlInDir(fullname);
             } else if (/\.png|\.jpg|\.gif|\.jpeg/.test(file)) {
-                fullname = fullname.replace(CWD + 'static/', '');
-                html += `<div style="position:relative; width:144px; height: 144px; display: flex; justify-content: center; align-items: center; margin: 10px; padding:2px; background-color: #EBEBEB">`;
-                html += `<img src="${fullname}" style="max-width: 140px; max-height: 140px;">`;
+                fullname = fullname.replace(CWD + 'static/' + config.imagePath + '/', '');
+                const src = config.imagePath + '/' +fullname;
+                html += `<div onclick="window.onSelectImage('${src}')" style="position:relative; width:144px; height: 144px; display: flex; cursor: pointer; justify-content: center; align-items: center; margin: 10px; padding:2px; background-color: #EBEBEB">`;
+                html += `<img src="${src}" style="max-width: 140px; max-height: 140px;">`;
                 html += `<span style="position: absolute; font-size: 10px; max-width: 140px; height: 12px; overflow: scroll; word-break: keep-all; top: 150px;">${fullname}</span></div>`;
             }
         });
@@ -257,7 +258,7 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
             gulp.task('browser', function() {
                 browserSync.init({
                     proxy: url,
-                    files: hasAutoReload ? [CWD + config.documentPath] : [],
+                    files: [],
                     notify: false,
                     open: hasAutoReload,
                 });
@@ -274,7 +275,7 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
             gulp.task('config', function() {
                 gulp.watch([path.resolve(CWD, configPath)], function(item) {
                     reloadSiteConfig();
-                    hasAutoReload && browserSync.reload();
+                    browserSync.reload();
                 });
             });
             gulp.start(['browser', 'server', 'config']);
