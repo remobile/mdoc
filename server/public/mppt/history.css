@@ -10,37 +10,3 @@
     padding-left: 10px;
     border-bottom: solid #E0EEEE 1px;
 }
-
-#help {
-    padding: 10px;
-    font-size: 18px;
-    line-height: 25px;
-    color: grey;
-}
-#help .title {
-    color: #159688;
-}
-#help :not(.title) {
-    margin-left: 20px;
-}
-#help span {
-    color: #FF7256;
-}
-#historyButtonBack::after {
-    left: 25%;
-}
-#historyButtonBack::before {
-    transform: translateX(25%);
-}
-#historyButtonForward::before,#historyButtonForward::after {
-    left: 37%;
-}
-#historyButtonHistory::before,#historyButtonHistory::after {
-    left: 61%;
-}
-#historyButtonPlay::after {
-    left: 68%;
-}
-#historyButtonPlay::before {
-    transform: translateX(0);
-}

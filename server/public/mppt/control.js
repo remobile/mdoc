@@ -13,7 +13,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'utils', 'animate', 'history'], f
     let imageColorList;
     let imageBackgroundColorList;
     let imageDialog;
-    let imageDialogType;
+    let musicDialog;
 
     function initialize() {
         editor = layui.editor;
@@ -292,9 +292,8 @@ layui.define(['jquery', 'form', 'colorpicker', 'utils', 'animate', 'history'], f
         style = style || getComputedStyle(target);
         $('#textPositionSize').html(`x: ${parseInt(style.left)}&emsp;y: ${parseInt(style.top)}&emsp;w: ${parseInt(style.width)}&emsp;h: ${parseInt(style.height)}`);
     }
-    function showImageSelect(type) {
-        imageDialogType = type;
-        utils.postPlain('/getImageFiles', (content)=>{
+    function showImageSelect(subtype) {
+        utils.postPlain('/getMediaFiles', { type: 0, subtype }, (content)=>{
             imageDialog = layer.open({
                 type: 1,
                 title: '图片',
@@ -305,17 +304,35 @@ layui.define(['jquery', 'form', 'colorpicker', 'utils', 'animate', 'history'], f
             });
         });
     }
-    function onSelectImage(src) {
-        if (imageDialogType === 0) { // 修改图片地址
-            const target = editor.getAction().target;
-            if (target.src !== src) {
-                target.src = src;
-                history.pushHistory('改变图片地址');
+    function showMusicSelect() {
+        utils.postPlain('/getMediaFiles', { type: 1 }, (content)=>{
+            musicDialog = layer.open({
+                type: 1,
+                title: '音乐',
+                offset: ['100px', '300px'], //位置
+                area: ['840px', '600px'], //宽高
+                shadeClose: true,
+                content,
+            });
+        });
+    }
+    function onSelectMediaFile(src, type, subtype) {
+        if (type === 0) {
+            if (subtype === 0) { // 修改图片地址
+                const target = editor.getAction().target;
+                if (target.src !== src) {
+                    target.src = src;
+                    history.pushHistory('改变图片地址');
+                }
+                layer.close(imageDialog);
+            } else if (subtype === 1) { // 修改背景图片
+                utils.post('/setBackgroundImage', { src }, ()=>{
+                    location.reload();
+                });
             }
-            layer.close(imageDialog);
-        } else if (imageDialogType === 1) { // 修改背景图片
-            utils.post('/setBackgroundImage', { src }, ()=>{
-                location.reload();
+        } else {
+            utils.post('/setBackgroundMusic', { src }, ()=>{
+                utils.toast('设置成功');
             });
         }
     }
@@ -330,5 +347,5 @@ layui.define(['jquery', 'form', 'colorpicker', 'utils', 'animate', 'history'], f
     });
 
     // 全局函数
-    window.onSelectImage = onSelectImage;
+    window.onSelectMediaFile = onSelectMediaFile;
 });

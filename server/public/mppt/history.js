@@ -34,8 +34,8 @@ layui.define(['jquery', 'utils'], function(exports) {
         $('#historyButtonPlay').click(function(){
             animate.playCurrentPage();
         });
-        $('#historyButtonHelp').click(function(){
-            showHelp();
+        $('#historyButtonPlayAll').click(function(){
+            playAllPage();
         });
     }
     function optimizeHistory() {
@@ -91,6 +91,24 @@ layui.define(['jquery', 'utils'], function(exports) {
         if (history.length > historyIndex + 1) {
             setTopHistory(historyIndex + 1);
         }
+    }
+
+    function playAllPage() {
+        layer.open({
+            id: 'playAllPage',
+            type: 2,
+            title: '预览全页',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['380px', '710px'],
+            content: '/mdoc-ppt?play=true',
+            success: function(layero, index){
+                const container = layer.getChildFrame('#container', index);
+                container.find('#music')[0].play();
+                container.find('#music_button').addClass('rotate');
+            }
+        });
+        $('#playAllPage>iframe').focus();
     }
 
     // 导出函数

@@ -17,6 +17,9 @@ module.exports = () => {
                     <button id="historyButtonPlay" title="预览本页(alt+p)" type="button" className="layui-btn tip">
                         <i className="layui-icon">&#xe652;</i>
                     </button>
+                    <button id="historyButtonPlayAll" title="预览全页" type="button" className="layui-btn tip">
+                        <i className="iconfont icon-film"></i>
+                    </button>
                 </div>
             </div>
         </div>

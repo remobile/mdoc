@@ -29,8 +29,8 @@ layui.define(['jquery', 'layer', 'utils'], function(exports) {
         $('#pageButtonSetBackground').click(function(){
             control.showImageSelect(1);
         });
-        $('#pageButtonPlay').click(function(){
-            playAllPage();
+        $('#pageButtonSetMusic').click(function(){
+            control.showMusicSelect();
         });
         $('#pageButtonHelp').click(function(){
             showHelp();
@@ -124,23 +124,6 @@ layui.define(['jquery', 'layer', 'utils'], function(exports) {
         }
         utils.postPlain('/savePage', text.join('\n'));
         utils.toast('保存成功');
-    }
-    function playAllPage() {
-        layer.open({
-            id: 'playAllPage',
-            type: 2,
-            title: '预览全页',
-            shadeClose: true,
-            shade: 0.8,
-            area: ['380px', '710px'],
-            content: '/mdoc-ppt?play=true',
-            success: function(layero, index){
-                const container = layer.getChildFrame('#container', index);
-                container.find('#music')[0].play();
-                container.find('#music_button').addClass('rotate');
-            }
-        });
-        $('#playAllPage>iframe').focus();
     }
     function showHelp() {
         layer.open({

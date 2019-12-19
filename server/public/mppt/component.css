@@ -50,10 +50,11 @@
 .bottom-buttons {
     position: absolute;
     bottom: 0px;
-    width: 98%;
+    width: 316px;
     background-color: #E6E6E6;
     border-radius: 4px;
     padding-bottom: 4px;
+    text-align: center;
 }
 .bottom-buttons .layui-btn-group {
     padding-left: 6px;
@@ -93,25 +94,4 @@ button.tip:hover::before {
 }
 .blue-background-class {
     background-color: #F0FFFF;
-}
-#componentButtonText::after {
-    left: 25%;
-}
-#componentButtonText::before {
-    transform: translateX(25%);
-}
-#componentButtonImage::before,#componentButtonImage::after {
-    left: 32%;
-}
-#componentButtonDelete::before,#componentButtonDelete::after {
-    left: 52%;
-}
-#componentButtonToggleLock::before,#componentButtonToggleLock::after {
-    left: 70%;
-}
-#componentButtonToggleShow::after {
-    left: 65%;
-}
-#componentButtonToggleShow::before {
-    transform: translateX(0);
 }

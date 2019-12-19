@@ -44,18 +44,23 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
     let distFile;
     reloadSiteConfig();
 
-    function getHtmlInDir(dir) {
+    function getHtmlInDir(dir, type, subtype) {
         var html = `<div style="display:flex; flex-direction: row; flex-wrap: wrap;">`;
         fs.readdirSync(dir).forEach(function(file, index) {
             var fullname = path.join(dir, file);
             var info = fs.statSync(fullname);
             if(info.isDirectory()) {
-                html += getHtmlInDir(fullname);
-            } else if (/\.png|\.jpg|\.gif|\.jpeg/.test(file)) {
-                fullname = fullname.replace(CWD + 'static/' + config.imagePath + '/', '');
-                const src = config.imagePath + '/' +fullname;
-                html += `<div onclick="window.onSelectImage('${src}')" style="position:relative; width:144px; height: 144px; display: flex; cursor: pointer; justify-content: center; align-items: center; margin: 10px; padding:2px; background-color: #EBEBEB">`;
-                html += `<img src="${src}" style="max-width: 140px; max-height: 140px;">`;
+                html += getHtmlInDir(fullname, type, subtype);
+            } else if ((type === 0 && /\.png|\.jpg|\.gif|\.jpeg/.test(file))||(type === 1 && /\.mp3|\.ogg/.test(file))) {
+                const _path = type === 0 ? config.imagePath : config.audioPath;
+                fullname = fullname.replace(CWD + 'static/' + _path + '/', '');
+                const src = _path + '/' +fullname;
+                html += `<div onclick="window.onSelectMediaFile('${src}', ${type}, ${subtype})" style="position:relative; width:144px; height: 144px; display: flex; cursor: pointer; justify-content: center; align-items: center; margin: 10px; padding:2px; background-color: #EBEBEB">`;
+                if (type === 0) {
+                    html += `<img src="${src}" style="max-width: 140px; max-height: 140px;">`;
+                } else {
+                    html += `<audio src="${src}" style="max-width: 140px; max-height: 140px;">`;
+                }
                 html += `<span style="position: absolute; font-size: 10px; max-width: 140px; height: 12px; overflow: scroll; word-break: keep-all; top: 150px;">${fullname}</span></div>`;
             }
         });
@@ -212,10 +217,16 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
             res.send('');
         });
     });
-    app.post('/getImageFiles', (req, res) => {
-        req.on('data', function(chunk) {});
+    app.post('/getMediaFiles', (req, res) => {
+        let text = '';
+        req.on('data', function(chunk) { text += chunk });
         req.on('end', function() {
-            res.send(getHtmlInDir(CWD + 'static/' + config.imagePath));
+            const data = JSON.parse(text);
+            if (data.type === 0) {
+                res.send(getHtmlInDir(CWD + 'static/' + config.imagePath, data.type, data.subtype));
+            } else {
+                res.send(getHtmlInDir(CWD + 'static/' + config.audioPath, data.type, data.subtype));
+            }
         });
     });
     app.post('/setBackgroundImage', (req, res) => {
@@ -226,6 +237,19 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
             const _config = require(CWD + configPath);
             const src = JSON.parse(text).src;
             _config.backgroundImage = src;
+            rewriteConfigFile(_config);
+            reloadSiteConfig();
+            res.send('');
+        });
+    });
+    app.post('/setBackgroundMusic', (req, res) => {
+        let text = '';
+        req.on('data', function(chunk) { text += chunk });
+        req.on('end', function() {
+            removeModuleAndChildrenFromCache(CWD + configPath);
+            const _config = require(CWD + configPath);
+            const src = JSON.parse(text).src;
+            _config.backgroundMusic = src;
             rewriteConfigFile(_config);
             reloadSiteConfig();
             res.send('');

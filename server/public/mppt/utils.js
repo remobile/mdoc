@@ -45,6 +45,9 @@ layui.define(['layer'], function(exports) {
             fn = data;
             data = '';
         }
+        if (typeof data === 'object') {
+            data = JSON.stringify(data);
+        }
         const xhr = new XMLHttpRequest();
         xhr.open("POST", url, true);
         xhr.onreadystatechange = function() {

@@ -39,24 +39,3 @@
 #help span {
     color: #FF7256;
 }
-#pageButtonCopy::after {
-    left: 16%;
-}
-#pageButtonCopy::before {
-    transform: translateX(16%);
-}
-#pageButtonDelete::before,#pageButtonDelete::after {
-    left: 30%;
-}
-#pageButtonSetBackground::before,#pageButtonSetBackground::after {
-    left: 48%;
-}
-#pageButtonPlay::before,#pageButtonPlay::after {
-    left: 68%;
-}
-#pageButtonHelp::after {
-    left: 72%;
-}
-#pageButtonHelp::before {
-    transform: translateX(0);
-}

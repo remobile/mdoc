@@ -47,33 +47,16 @@ class PPTEditLayout extends React.Component {
                     <div id="editor" style={{backgroundColor: page.backgroundColor||page.config.backgroundColor, backgroundImage: `url(${page.backgroundImage||page.config.backgroundImage})` }}>
                         <MarkdownView source={page.content} page={page} container={null} />
                     </div>
-                    <div id="componentPanel">
+                    <div id="rightPanel">
                         <div className="layui-tab layui-tab-brief">
                             <ul className="layui-tab-title">
-                                <li className="layui-this">组件列表</li>
+                                <li className="layui-this">组件</li>
+                                <li>历史</li>
+                                <li>页面</li>
                             </ul>
                             <div className="layui-tab-content">
                                 <ComponentPanel />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="historyPanel">
-                        <div className="layui-tab layui-tab-brief">
-                            <ul className="layui-tab-title">
-                                <li className="layui-this">历史列表</li>
-                            </ul>
-                            <div className="layui-tab-content">
                                 <HistoryPanel />
-                            </div>
-                        </div>
-                    </div>
-                    <div id="pagePanel">
-                        <div className="layui-tab layui-tab-brief">
-                            <ul className="layui-tab-title">
-                                <li className="layui-this">页面列表</li>
-                            </ul>
-                            <div className="layui-tab-content">
                                 <PagePanel />
                             </div>
                         </div>

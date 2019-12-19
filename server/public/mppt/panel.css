@@ -36,33 +36,11 @@ body {
     background-size: 100% 100%;
     background-color: #FFF;
 }
-#componentPanel {
+#rightPanel {
     position: absolute;
     left: 800px;
     top: 75px;
-    width: 256px;
-    height: 667px;
-    padding-bottom: 36px;
-    border: 1px solid #E6E6E6;
-    border-radius: 10px;
-    background-color: #FFF;
-}
-#historyPanel {
-    position: absolute;
-    left: 1060px;
-    top: 75px;
-    width: 204px;
-    height: 667px;
-    padding-bottom: 36px;
-    border: 1px solid #E6E6E6;
-    border-radius: 10px;
-    background-color: #FFF;
-}
-#pagePanel {
-    position: absolute;
-    left: 1268px;
-    top: 75px;
-    width: 266px;
+    width: 320px;
     height: 667px;
     padding-bottom: 36px;
     border: 1px solid #E6E6E6;
