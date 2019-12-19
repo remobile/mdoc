@@ -136,8 +136,8 @@ layui.define(['jquery', 'layer', 'utils'], function(exports) {
             content: '/mdoc-ppt?play=true',
             success: function(layero, index){
                 const container = layer.getChildFrame('#container', index);
-                container.find('#audio')[0].play();
-                container.find('#audio_button').addClass('rotate');
+                container.find('#music')[0].play();
+                container.find('#music_button').addClass('rotate');
             }
         });
         $('#playAllPage>iframe').focus();

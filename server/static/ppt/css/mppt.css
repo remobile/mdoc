@@ -14,7 +14,7 @@ html, body {
 .hide {
     display: none;
 }
-#audio_button {
+#music_button {
     position: absolute;
     right: 20px;
     top: 20px;

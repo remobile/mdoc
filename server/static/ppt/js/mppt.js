@@ -65,16 +65,16 @@ function setArrowColor(page, arrows) {
 }
 function initPage($){
     // 音乐开关
-    const audio = document.getElementById('audio');
-    if (audio.paused) {
-        $('#audio_button').removeClass('rotate');
+    const music = document.getElementById('music');
+    if (music.paused) {
+        $('#music_button').removeClass('rotate');
     };
-    $('#audio_button').on('touchend', function() {
+    $('#music_button').on('touchend', function() {
         if (this.classList.contains('rotate')) {
-            audio.pause();
+            music.pause();
             this.classList.remove('rotate');
         } else {
-            audio.play();
+            music.play();
             this.classList.add('rotate');
         }
     });
