@@ -41,7 +41,7 @@ layui.define(['layer'], function(exports) {
         + Math.random().toString().substr(2, 2);
     }
     function getURL(target) {
-        return target.style.backgroundImage.replace(/^url\("?/, '').replace(/"?\)$/, '');
+        return (target.style.backgroundImage||'').replace(/^url\("?/, '').replace(/"?\)$/, '');
     }
     function postPlain (url, data, fn) {
         if (typeof data === 'function') {

@@ -20,7 +20,7 @@ module.exports = function fragment_plugin(md, page) {
             style.push(`left:${options.x}px`);
             style.push(`top:${options.y}px`);
             if (options.img) {
-                style.push(`background-image:url("${content}")`);
+                style.push(`background-image:url(${content})`);
                 style.push(`background-repeat:no-repeat`);
                 style.push(`background-size:100% 100%`);
                 style.push(`background-position:center`);
@@ -45,7 +45,7 @@ module.exports = function fragment_plugin(md, page) {
             options.t && dataset.push(`data-lock=2`);
             dataset = dataset.length ? ` ${dataset.join(' ')}` : '';
 
-            return `<div id="${options.id}"${className}${style}${dataset}">${options.img?'':content}</div>`;
+            return `<div id="${options.id}"${className}${style}${dataset}>${options.img?'':content}</div>`;
         },
         render: function (tokens, idx) {
             const token = tokens[idx];

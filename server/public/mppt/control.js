@@ -372,9 +372,9 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
         if (type === 0) {
             if (subtype === 0) { // 修改图片地址
                 const target = editor.getAction().target;
-                const url = `url("${src}")`;
-                if (target.style.backgroundImage !== url) {
-                    target.style.backgroundImage = url;
+                const url = utils.getURL(target);
+                if (src !== url) {
+                    target.style.backgroundImage = `url(${src})`;
                     history.pushHistory('改变图片地址');
                 }
                 layer.close(imageDialog);

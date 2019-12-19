@@ -116,9 +116,10 @@ layui.define(['jquery', 'layer', 'utils'], function(exports) {
             const group = el.dataset.group !== undefined ? ` g=${el.dataset.group}` : '';
             const _animate = el.dataset.animate !== undefined ? ` a=${el.dataset.animate}` : '';
             const lock = el.dataset.lock == 1 ? ' k' : el.dataset.lock == 2 ? ' t' : '';
+            const url = utils.getURL(el).replace(window.location.href, '');
 
             text.push(`::: fm${type}${lock} x=${x} y=${y} w=${w} h=${h}${style}${group}${_animate} id=${id}`);
-            (el.src || el.innerText) && text.push(isText ? el.innerText : el.src.replace(window.location.href, ''));
+            (url || el.innerText) && text.push(isText ? el.innerText : url);
             text.push(':::');
             text.push('');
         }
