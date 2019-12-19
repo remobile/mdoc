@@ -64,7 +64,7 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
         return target.classList.contains('text') ?
         `<div class="component-text">${target.innerHTML.trim()}</div>`
         :
-        `<img  class="component-image" src="${target.getAttribute('src')}" />`;
+        `<img  class="component-image" src="${utils.getURL(target)}" />`;
     }
     function getComponentLine(target) {
         const id = target.id;

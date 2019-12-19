@@ -286,10 +286,10 @@ function savePage(e) {
         const y = el.offsetTop;
         const w = el.offsetWidth;
         const h = el.offsetHeight;
-        const isImg = !!el.src;
-        const type = isImg ? ' img' : '';
+        const isText = el.classList.contains('text');
+        const type = !isText ? ' img' : '';
         let style = '';
-        if (!isImg) {
+        if (isText) {
             const fontSize = el.style.fontSize;
             if (fontSize) {
                 style = `${style}font-size:${fontSize};`;
@@ -318,7 +318,7 @@ function savePage(e) {
         const animate = el.dataset.animate !== undefined ? ` animate=${el.dataset.animate}` : '';
 
         text.push(`::: fm${type} x=${x} y=${y} w=${w} h=${h}${style}${group}${animate}`);
-        (el.src || el.innerText) && text.push(isImg ? el.src : el.innerText);
+        (el.src || el.innerText) && text.push(isText ? el.innerText : el.src);
         text.push(':::');
         text.push('');
     }
@@ -413,16 +413,16 @@ function editTargetText (target, referent) {
         removeTargetTextInput();
         return;
     }
-    const isImg = !/text/.test(target.className);
+    const isText = target.classList.contains('text');
     targetTextInput = document.createElement('INPUT');
     targetTextInput.type = 'text';
-    targetTextInput.value = !isImg ? target.innerText : target.src.replace(window.location.href, '');
+    targetTextInput.value = isText ? target.innerText : target.src.replace(window.location.href, '');
     targetTextInput.className = 'target_input';
     targetTextInput.style.left = (referent.offsetLeft +referent.offsetWidth) + "px";
     targetTextInput.style.top = referent.offsetTop + "px";
     document.body.appendChild(targetTextInput);
     targetTextInput.oninput = function(e) {
-        if (!isImg) {
+        if (isText) {
             target.innerText = e.target.value;
         } else {
             target.src = e.target.value;

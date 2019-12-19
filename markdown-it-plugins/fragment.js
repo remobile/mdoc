@@ -12,44 +12,40 @@ module.exports = function fragment_plugin(md, page) {
             return params.trim().match(/^fm\s*/);
         },
         content: function (tokens, idx) {
-            const content = tokens[idx].markup;
-            let style = 'position: absolute;';
-            let append = '';
+            const content = tokens[idx].markup.split(/\r\n|\n|\r/).join('');
+            let style = options.style ? options.style.split(';') : [];
+            style.push('position: absolute');
+            style.push(`width:${options.w}px`);
+            style.push(`height:${options.h}px`);
+            style.push(`left:${options.x}px`);
+            style.push(`top:${options.y}px`);
             if (options.img) {
-                options.w && (append = `${append}width="${options.w}px" `);
-                options.h && (append = `${append}height="${options.h}px" `);
+                style.push(`background-image:url("${content}")`);
+                style.push(`background-repeat:no-repeat`);
+                style.push(`background-size: 100% 100%`);
+                style.push(`background-position: center`);
             } else {
-                options.w && (style = `${style}width:${options.w}px;`);
-                options.h && (style = `${style}height:${options.h}px;`);
+                options.s && style.push(`font-size:${options.s}px`);
+                options.b && style.push(`font-weight:bold`);
+                options.i && style.push(`font-style:italic`);
+                options.c && style.push(`color:${hexToRgba(options.c)}`);
+                options.bc && style.push(`background-color:${hexToRgba(options.bc)}`);
             }
-            style = `${style}left:${options.x}px;`;
-            style = `${style}top:${options.y}px;`;
+            style = style.length ? ` style="${style.join(';')}"` : '';
 
-            options.s && (style = `${style}font-size:${options.s}px;`);
-            options.b && (style = `${style}font-weight:bold;`);
-            options.i && (style = `${style}font-style:italic;`);
-            options.c && (style = `${style}color:${hexToRgba(options.c)};`);
-            options.bc && (style = `${style}background-color:${hexToRgba(options.bc)};`);
+            let className = options.className ? options.className.split(';') : [];
+            page.edit && className.push('target');
+            !options.img && className.push('text');
+            className = className.length ? ` class="${className.join(' ')}"` : '';
 
-            options.style && (style = `${style}${options.style}`);
-            const className = `${options.className||''}${page.edit ? ' target' : ''} ${options.img ? '' : ' text'}`.trim();
-            let dataset = '';
-            options.g && (dataset = ` data-group=${options.g}`);
-            options.a && (dataset = `${dataset} data-animate=${options.a}`);
-            options.k && (dataset = `${dataset} data-lock=1`);
-            options.t && (dataset = `${dataset} data-lock=2`);
+            let dataset = [];
+            options.g && dataset.push(`data-group=${options.g}`);
+            options.a && dataset.push(`data-animate=${options.a}`);
+            options.k && dataset.push(`data-lock=1`);
+            options.t && dataset.push(`data-lock=2`);
+            dataset = dataset.length ? ` ${dataset.join(' ')}` : '';
 
-            let html = '';
-            if (options.img) {
-                html = `<img id="${options.id}" class="${className}" ${dataset} src="${content}" ${append} style="${style}" />`;
-            } else {
-                html = `
-                <div id="${options.id}" class="${className}" ${dataset} style="${style}">
-                    ${content}
-                </div>
-                `;
-            }
-            return html;
+            return `<div id="${options.id}"${className}${style}${dataset}">${options.img?'':content}</div>`;
         },
         render: function (tokens, idx) {
             const token = tokens[idx];
