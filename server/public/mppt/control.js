@@ -1,4 +1,4 @@
-layui.define(['jquery', 'form', 'colorpicker', 'utils', 'animate', 'history'], function(exports) {
+layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'history'], function(exports) {
     const $ = layui.$;
     const form = layui.form;
     const slider = layui.slider;
@@ -246,6 +246,58 @@ layui.define(['jquery', 'form', 'colorpicker', 'utils', 'animate', 'history'], f
             updatePositionSize(target, style);
         } else {
             $('#propertyPanel').addClass('for-image');
+            // 模式
+            $('#imageModeSelect').attr('lay-filter', 'imageModeSelect');
+            form.on(`select(imageModeSelect)`, function(data){
+                switch (data.value) {
+                    case 'stretch': {
+                        target.style.backgroundRepeat = 'no-repeat';
+                        target.style.backgroundSize = '100% 100%';
+                        target.style.backgroundPosition = '0px 0px';
+                        break;
+                    }
+                    case 'center': {
+                        target.style.backgroundRepeat = 'no-repeat';
+                        target.style.backgroundSize = 'auto';
+                        target.style.backgroundPosition = 'center';
+                        break;
+                    }
+                    case 'contain': {
+                        target.style.backgroundRepeat = 'no-repeat';
+                        target.style.backgroundSize = 'contain';
+                        target.style.backgroundPosition = 'center';
+                        break;
+                    }
+                    case 'cover': {
+                        target.style.backgroundRepeat = 'no-repeat';
+                        target.style.backgroundSize = 'cover';
+                        target.style.backgroundPosition = 'center';
+                        break;
+                    }
+                    case 'repeat': {
+                        target.style.backgroundRepeat = 'repeat';
+                        target.style.backgroundSize = 'auto';
+                        target.style.backgroundPosition = 'center';
+                        break;
+                    }
+                    case 'custom': {
+                        target.style.backgroundRepeat = 'no-repeat';
+                        target.style.backgroundSize = 'auto';
+                        target.style.backgroundPosition = 'center';
+                        break;
+                    }
+                }
+                if (data.value === 'none') {
+                    $('.no-animate').hide();
+                    $('.no-animate-ext').hide();
+                    setAnimate();
+                } else {
+                    $('.no-animate').show();
+                    $('.no-animate-ext').show();
+                    setAnimate({ name: data.value });
+                    updateValues(target);
+                }
+            });
             // 颜色
             colorpicker.render({
                 elem: '#colorSlider',

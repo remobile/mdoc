@@ -6,7 +6,7 @@ module.exports = () => {
             <div className="layui-form-item for-text">
                 <label className="layui-form-label">字体</label>
                 <div className="layui-input-block">
-                    <select lay-filter="myselect">
+                    <select id="fontSelect">
                         <option value="SimSun">宋体</option>
                         <option value="SimHei">黑体</option>
                         <option value="KaiTi">楷体</option>
@@ -57,7 +57,7 @@ module.exports = () => {
                     </div>
                 </div>
             </div>
-            <div className="layui-form-item">
+            <div className="layui-form-item for-text">
                 <label className="layui-form-label">颜色</label>
                 <div className="layui-input-inline">
                     <div>
@@ -66,13 +66,26 @@ module.exports = () => {
                     </div>
                 </div>
             </div>
-            <div className="layui-form-item">
+            <div className="layui-form-item for-text">
                 <label className="layui-form-label">背景</label>
                 <div className="layui-input-inline">
                     <div>
                         <input type="hidden" name="color" value="" id="textBackgroundColorPicker" />
                         <div id="backgroundColorSlider"></div>
                     </div>
+                </div>
+            </div>
+            <div className="layui-form-item for-image">
+                <label className="layui-form-label">模式</label>
+                <div className="layui-input-block">
+                    <select id="imageModeSelect">
+                        <option value="stretch">拉伸</option>
+                        <option value="center">居中</option>
+                        <option value="contain">包裹</option>
+                        <option value="cover">覆盖</option>
+                        <option value="repeat">重复</option>
+                        <option value="custom">自定义</option>
+                    </select>
                 </div>
             </div>
             <div className="layui-form-item">

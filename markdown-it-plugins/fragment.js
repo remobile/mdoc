@@ -22,8 +22,8 @@ module.exports = function fragment_plugin(md, page) {
             if (options.img) {
                 style.push(`background-image:url("${content}")`);
                 style.push(`background-repeat:no-repeat`);
-                style.push(`background-size: 100% 100%`);
-                style.push(`background-position: center`);
+                style.push(`background-size:100% 100%`);
+                style.push(`background-position:center`);
             } else {
                 options.s && style.push(`font-size:${options.s}px`);
                 options.b && style.push(`font-weight:bold`);

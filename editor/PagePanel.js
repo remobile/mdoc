@@ -1,7 +1,7 @@
 const React = require('react');
 module.exports = () => {
     return (
-        <div className="layui-tab-item layui-show">
+        <div className="layui-tab-item">
             <div id="pageContent"></div>
             <div className="bottom-buttons">
                 <div className="layui-btn-group">
