@@ -134,6 +134,11 @@ layui.define(['jquery', 'layer', 'utils'], function(exports) {
             shade: 0.8,
             area: ['380px', '710px'],
             content: '/mdoc-ppt?play=true',
+            success: function(layero, index){
+                const container = layer.getChildFrame('#container', index);
+                container.find('#audio')[0].play();
+                container.find('#audio_button').addClass('rotate');
+            }
         });
         $('#playAllPage>iframe').focus();
     }
