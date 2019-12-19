@@ -1,5 +1,6 @@
 layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], function(exports) {
     let editor;
+    let page;
     const $ = layui.$;
     const layer = layui.layer;
     const control = layui.control;
@@ -12,6 +13,7 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
 
     function initialize() {
         editor = layui.editor;
+        page = layui.page;
         $('#componentButtonText').click(function(){
             editor.createTextTarget();
         });
@@ -26,6 +28,9 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
         });
         $('#componentButtonToggleShow').click(function(){
             toggleShowTemplate();
+        });
+        $('#componentButtonSave').click(function(){
+            page.savePage();
         });
         update();
         Sortable.create(document.getElementById('componentContent'), {
