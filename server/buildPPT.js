@@ -15,6 +15,9 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
     function getDocumentPath(file) {
         return CWD + config.documentPath + '/' + file;
     }
+    function rewriteConfigFile(_config) {
+        fs.writeFileSync(CWD + configPath, 'module.exports = ' + formatStandardObject(_config)+';\n');
+    }
     function reloadSiteConfig() {
         removeModuleAndChildrenFromCache(CWD + configPath);
         config = require(CWD + configPath);
@@ -176,7 +179,7 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
                 _config.pages[i] = page;
                 i--;
             }
-            fs.writeFileSync(CWD + configPath, 'module.exports = ' + formatStandardObject(_config)+';');
+            rewriteConfigFile(_config);
             index = index + 1;
             reloadSiteConfig();
             res.send('');
@@ -203,7 +206,7 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
                 i++;
             }
             _config.pages.length = len;
-            fs.writeFileSync(CWD + configPath, 'module.exports = ' + formatStandardObject(_config)+';');
+            rewriteConfigFile(_config);
             index = Math.min(index, len-1);
             reloadSiteConfig();
             res.send('');
@@ -213,6 +216,19 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
         req.on('data', function(chunk) {});
         req.on('end', function() {
             res.send(getHtmlInDir(CWD + 'static/' + config.imagePath));
+        });
+    });
+    app.post('/setBackgroundImage', (req, res) => {
+        let text = '';
+        req.on('data', function(chunk) { text += chunk });
+        req.on('end', function() {
+            removeModuleAndChildrenFromCache(CWD + configPath);
+            const _config = require(CWD + configPath);
+            const src = JSON.parse(text).src;
+            _config.backgroundImage = src;
+            rewriteConfigFile(_config);
+            reloadSiteConfig();
+            res.send('');
         });
     });
     app.post('/getHistory', (req, res) => {

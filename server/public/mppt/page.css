@@ -48,10 +48,10 @@
 #pageButtonDelete::before,#pageButtonDelete::after {
     left: 30%;
 }
-#pageButtonNew::before,#pageButtonNew::after {
+#pageButtonSetBackground::before,#pageButtonSetBackground::after {
     left: 48%;
 }
-#pageButtonSetBackground::before,#pageButtonSetBackground::after {
+#pageButtonPlay::before,#pageButtonPlay::after {
     left: 68%;
 }
 #pageButtonHelp::after {

@@ -2,6 +2,7 @@ layui.define(['jquery', 'utils'], function(exports) {
     let editor;
     let component;
     let animate;
+    let control;
     const $ = layui.$;
     const utils = layui.utils;
     let pages = []; // 页面列表
@@ -12,6 +13,7 @@ layui.define(['jquery', 'utils'], function(exports) {
         editor = layui.editor;
         component = layui.component;
         animate = layui.animate;
+        control = layui.control;
         utils.post('/getPages', (data)=>{
             pages = data.pages;
             pageIndex = data.index;
@@ -23,11 +25,11 @@ layui.define(['jquery', 'utils'], function(exports) {
         $('#pageButtonDelete').click(function(){
             deletePage();
         });
-        $('#pageButtonNew').click(function(){
-            showHelp();
-        });
         $('#pageButtonSetBackground').click(function(){
-            console.log("=======", 123);
+            control.showImageSelect(1);
+        });
+        $('#pageButtonPlay').click(function(){
+            showHelp();
         });
         $('#pageButtonHelp').click(function(){
             showHelp();

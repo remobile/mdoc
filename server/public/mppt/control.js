@@ -13,6 +13,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'utils', 'animate', 'history'], f
     let imageColorList;
     let imageBackgroundColorList;
     let imageDialog;
+    let imageDialogType;
 
     function initialize() {
         editor = layui.editor;
@@ -291,7 +292,8 @@ layui.define(['jquery', 'form', 'colorpicker', 'utils', 'animate', 'history'], f
         style = style || getComputedStyle(target);
         $('#textPositionSize').html(`x: ${parseInt(style.left)}&emsp;y: ${parseInt(style.top)}&emsp;w: ${parseInt(style.width)}&emsp;h: ${parseInt(style.height)}`);
     }
-    function showImageSelect() {
+    function showImageSelect(type) {
+        imageDialogType = type;
         utils.postPlain('/getImageFiles', (content)=>{
             imageDialog = layer.open({
                 type: 1,
@@ -304,12 +306,18 @@ layui.define(['jquery', 'form', 'colorpicker', 'utils', 'animate', 'history'], f
         });
     }
     function onSelectImage(src) {
-        const target = editor.getAction().target;
-        if (target.src !== src) {
-            target.src = src;
-            history.pushHistory('改变图片地址');
+        if (imageDialogType === 0) { // 修改图片地址
+            const target = editor.getAction().target;
+            if (target.src !== src) {
+                target.src = src;
+                history.pushHistory('改变图片地址');
+            }
+            layer.close(imageDialog);
+        } else if (imageDialogType === 1) { // 修改背景图片
+            utils.post('/setBackgroundImage', { src }, ()=>{
+                location.reload();
+            });
         }
-        layer.close(imageDialog);
     }
 
     // 导出函数

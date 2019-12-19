@@ -170,7 +170,6 @@ layui.define(['jquery', 'layer', 'utils', 'history', 'control', 'page', 'compone
         removeAllReferents();
         !noUpdateComponent && component.selectComponentLine();
         $('.no-animate-ext').hide();
-        layer.closeAll();
     }
     function createReferents(target) {
         if (!isAltKeyPress) {
@@ -193,7 +192,7 @@ layui.define(['jquery', 'layer', 'utils', 'history', 'control', 'page', 'compone
             editingTarget = target;
             action.editingTargetInnerText = target.innerText;
         } else {
-            control.showImageSelect();
+            control.showImageSelect(0);
         }
     }
     function onReferentMouseDown(e, cmd) {
@@ -388,6 +387,9 @@ layui.define(['jquery', 'layer', 'utils', 'history', 'control', 'page', 'compone
     }
     function onDocumentKeyDown(e) {
         utils.log("[onDocumentKeyDown]:", e.keyCode);
+        if (e.keyCode === 27) { // esc
+            layer.closeAll();
+        }
         if (referents.length) {
             if (e.keyCode === 27) { // esc
                 clearAll();
