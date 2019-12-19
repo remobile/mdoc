@@ -57,11 +57,11 @@ function buildMarkdown(port, configPath, build, index, mobile, hasAutoReload) {
                 const src = _path + '/' +fullname;
                 html += `<div onclick="window.onSelectMediaFile('${src}', ${type}, ${subtype})" style="position:relative; width:144px; height: 144px; display: flex; cursor: pointer; justify-content: center; align-items: center; margin: 10px; padding:2px; background-color: #EBEBEB">`;
                 if (type === 0) {
-                    html += `<img src="${src}" style="max-width: 140px; max-height: 140px;">`;
+                    html += `<img src="${src}" style="max-width: 130px; max-height: 130px;" />`;
                 } else {
-                    html += `<audio src="${src}" style="max-width: 140px; max-height: 140px;">`;
+                    html += `<div style="overflow:hidden;width:54px;height:54px;border-radius:54px;"><audio src="${src}" style="width: 130px; height: 54px;" controls></audio></div>`;
                 }
-                html += `<span style="position: absolute; font-size: 10px; max-width: 140px; height: 12px; overflow: scroll; word-break: keep-all; top: 150px;">${fullname}</span></div>`;
+                html += `<span style="position: absolute; font-size: 10px; max-width: 140px; height: 14px; overflow: scroll; word-break: keep-all; top: 150px;">${fullname}</span></div>`;
             }
         });
         html += `</div>`;

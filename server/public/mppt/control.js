@@ -343,6 +343,7 @@ layui.define(['jquery', 'form', 'colorpicker', 'utils', 'animate', 'history'], f
         updateValues,
         updatePositionSize,
         showImageSelect,
+        showMusicSelect,
         setTextStyle,
     });
 
