@@ -102,7 +102,7 @@ function initPage($){
         },
         onLoaded: function(pages, curPage) {
             setArrowColor(pages[curPage], arrows);
-            pages.forEach(function(page, index){
+            pages.each(function(index, page){
                 const el = $(page.childNodes[0].childNodes[0]);
                 el.children().each(function(){
                     if (curPage === index) {

@@ -1,9 +1,10 @@
-layui.define(['jquery', 'utils'], function(exports) {
+layui.define(['jquery', 'layer', 'utils'], function(exports) {
     let editor;
     let component;
     let animate;
     let control;
     const $ = layui.$;
+    const layer = layui.layer;
     const utils = layui.utils;
     let pages = []; // 页面列表
     let pageIndex = 0; // 当前页面的index
@@ -29,7 +30,7 @@ layui.define(['jquery', 'utils'], function(exports) {
             control.showImageSelect(1);
         });
         $('#pageButtonPlay').click(function(){
-            showHelp();
+            playAllPage();
         });
         $('#pageButtonHelp').click(function(){
             showHelp();
@@ -123,6 +124,18 @@ layui.define(['jquery', 'utils'], function(exports) {
         }
         utils.postPlain('/savePage', text.join('\n'));
         utils.toast('保存成功');
+    }
+    function playAllPage() {
+        layer.open({
+            id: 'playAllPage',
+            type: 2,
+            title: '预览全页',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['380px', '710px'],
+            content: '/mdoc-ppt?play=true',
+        });
+        $('#playAllPage>iframe').focus();
     }
     function showHelp() {
         layer.open({

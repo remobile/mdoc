@@ -341,6 +341,15 @@
                     });
                 }
             });
+
+            // keys
+            document.onkeydown = function (e) {
+                if ( e.keyCode === 37) { // left key
+                    instance.movePrev();
+                } else if ( e.keyCode === 39) { // left key
+                    instance.moveNext();
+                }
+            };
         });
     };
 
