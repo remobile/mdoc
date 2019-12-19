@@ -172,7 +172,7 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
         // 设置样式
         const style = getComputedStyle(target);
         if (target.classList.contains('text')) {
-            $('#propertyPanel').removeClass('for-image');
+            $('#propertyPanel').removeClass('for-image').addClass('for-text');
             // 字体大小
             let fontSize = parseInt(style.fontSize);
             slider.render({
@@ -245,7 +245,7 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
             // 位置大小
             updatePositionSize(target, style);
         } else {
-            $('#propertyPanel').addClass('for-image');
+            $('#propertyPanel').removeClass('for-text').addClass('for-image');
             // 模式
             $('#imageModeSelect').attr('lay-filter', 'imageModeSelect');
             form.on(`select(imageModeSelect)`, function(data){
@@ -253,50 +253,106 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
                     case 'stretch': {
                         target.style.backgroundRepeat = 'no-repeat';
                         target.style.backgroundSize = '100% 100%';
-                        target.style.backgroundPosition = '0px 0px';
                         break;
                     }
-                    case 'center': {
+                    case 'origin': {
                         target.style.backgroundRepeat = 'no-repeat';
                         target.style.backgroundSize = 'auto';
-                        target.style.backgroundPosition = 'center';
                         break;
                     }
                     case 'contain': {
                         target.style.backgroundRepeat = 'no-repeat';
                         target.style.backgroundSize = 'contain';
-                        target.style.backgroundPosition = 'center';
                         break;
                     }
                     case 'cover': {
                         target.style.backgroundRepeat = 'no-repeat';
                         target.style.backgroundSize = 'cover';
-                        target.style.backgroundPosition = 'center';
                         break;
                     }
                     case 'repeat': {
-                        target.style.backgroundRepeat = 'repeat';
+                        target.style.backgroundRepeatX = 'repeat';
+                        target.style.backgroundRepeatY = 'repeat';
                         target.style.backgroundSize = 'auto';
-                        target.style.backgroundPosition = 'center';
                         break;
                     }
-                    case 'custom': {
-                        target.style.backgroundRepeat = 'no-repeat';
+                    case 'repeatX': {
+                        target.style.backgroundRepeatX = 'repeat';
+                        target.style.backgroundRepeatY = 'no-repeat';
                         target.style.backgroundSize = 'auto';
-                        target.style.backgroundPosition = 'center';
+                        break;
+                    }
+                    case 'repeatY': {
+                        target.style.backgroundRepeatX = 'no-repeat';
+                        target.style.backgroundRepeatY = 'repeat';
+                        target.style.backgroundSize = 'auto';
                         break;
                     }
                 }
-                if (data.value === 'none') {
-                    $('.no-animate').hide();
-                    $('.no-animate-ext').hide();
-                    setAnimate();
+            });
+            // 中心
+            $('#imagePositionSelect').attr('lay-filter', 'imagePositionSelect');
+            form.on(`select(imagePositionSelect)`, function(data){
+                if (data.value === 'custom') {
+                    $('.for-custom').removeClass('hide');
                 } else {
-                    $('.no-animate').show();
-                    $('.no-animate-ext').show();
-                    setAnimate({ name: data.value });
-                    updateValues(target);
+                    $('.for-custom').addClass('hide');
                 }
+                switch (data.value) {
+                    case 'center': {
+                        target.style.backgroundPositionX= 'center';
+                        target.style.backgroundPositionY= 'center';
+                        break;
+                    }
+                    case 'lt': {
+                        target.style.backgroundPositionX= 'left';
+                        target.style.backgroundPositionY= 'top';
+                        break;
+                    }
+                    case 'rt': {
+                        target.style.backgroundPositionX= 'right';
+                        target.style.backgroundPositionY= 'top';
+                        break;
+                    }
+                    case 'lb': {
+                        target.style.backgroundPositionX= 'left';
+                        target.style.backgroundPositionY= 'bottom';
+                        break;
+                    }
+                    case 'rb': {
+                        target.style.backgroundPositionX= 'right';
+                        target.style.backgroundPositionY= 'bottom';
+                        break;
+                    }
+                }
+            });
+            // 横向
+            let fontSize = parseInt(style.fontSize);
+            slider.render({
+                elem: '#imagePositionXSlider',
+                value: fontSize,
+                min: 9,
+                max: 180,
+                change: function(fontSize){
+                    setTextStyle((target)=>{
+                        target.style.fontSize = fontSize + 'px';
+                    });
+                    history.pushHistory('设置字体大小');
+                },
+            });
+            // 纵向
+            let fontSize = parseInt(style.fontSize);
+            slider.render({
+                elem: '#imagePositionYSlider',
+                value: fontSize,
+                min: 9,
+                max: 180,
+                change: function(fontSize){
+                    setTextStyle((target)=>{
+                        target.style.fontSize = fontSize + 'px';
+                    });
+                    history.pushHistory('设置字体大小');
+                },
             });
             // 颜色
             colorpicker.render({
