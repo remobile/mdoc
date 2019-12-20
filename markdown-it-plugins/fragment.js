@@ -21,9 +21,37 @@ module.exports = function fragment_plugin(md, page) {
             style.push(`top:${options.y}px`);
             if (options.img) {
                 style.push(`background-image:url(${content})`);
-                style.push(`background-repeat:no-repeat`);
-                style.push(`background-size:100% 100%`);
-                style.push(`background-position:center`);
+                if (options.it == 'r') {
+                    style.push(`background-repeat:repeat`);
+                    style.push(`background-size:auto`);
+                } else  if (options.it == 'hr') {
+                    style.push(`background-repeat-x:repeat`);
+                    style.push(`background-repeat-y:no-repeat`);
+                    style.push(`background-size:auto`);
+                } else  if (options.it == 'vr') {
+                    style.push(`background-repeat-x:no-repeat`);
+                    style.push(`background-repeat-y:repeat`);
+                    style.push(`background-size:auto`);
+                } else  if (options.it == 'o') {
+                    style.push(`background-repeat:no-repeat`);
+                    style.push(`background-size:auto`);
+                } else  if (options.it == 'cn') {
+                    style.push(`background-repeat:no-repeat`);
+                    style.push(`background-size:contain`);
+                } else  if (options.it == 'cr') {
+                    style.push(`background-repeat:no-repeat`);
+                    style.push(`background-size:cover`);
+                } else {
+                    style.push(`background-repeat:no-repeat`);
+                    style.push(`background-size:100% 100%`);
+                }
+                if (options.ic == 'r') {
+                    const list = options.ic.split(':');
+                    style.push(`background-position-x:${list[0] ? `${list[0]}px` : 'center'}`);
+                    style.push(`background-position-y:${list[1] ? `${list[1]}px` : 'center'}`);
+                } else {
+                    style.push(`background-position:center`);
+                }
             } else {
                 options.s && style.push(`font-size:${options.s}px`);
                 options.b && style.push(`font-weight:bold`);

@@ -87,31 +87,62 @@ layui.define(['jquery', 'layer', 'utils'], function(exports) {
             const h = el.offsetHeight;
             const isText = el.classList.contains('text');
             const type = !isText ? ' img' : '';
-            let style = '';
+            let style = [];
             if (isText) {
                 const fontSize = el.style.fontSize;
                 if (fontSize) {
-                    style = `${style}s=${parseFloat(fontSize)} `;
+                    style.push(`s=${parseFloat(fontSize)}`);
                 }
                 const fontWeight = el.style.fontWeight;
                 if (fontWeight === 'bold') {
-                    style = `${style}b `;
+                    style.push('b');
                 }
                 const fontStyle = el.style.fontStyle;
                 if (fontStyle === 'italic') {
-                    style = `${style}i `;
+                    style.push('i');
                 }
                 const color = el.style.color;
                 if (color) {
-                    style = `${style}c=${utils.rgbaToHex(color)} `;
+                    style.push(`c=${utils.rgbaToHex(color)}`);
                 }
                 const bgcolor = el.style.backgroundColor;
                 if (bgcolor) {
-                    style = `${style}bc=${utils.rgbaToHex(bgcolor)} `;
+                    style.push(`bc=${utils.rgbaToHex(bgcolor)}`);
                 }
-                if (style) {
-                    style = ` ${style.trim()}`;
+            } else {
+                const size = el.style.backgroundSize;
+                const repeatX = el.style.backgroundRepeatX;
+                const repeatY = el.style.backgroundRepeatY;
+                let type = '';
+                if (size === 'auto') {
+                    if (repeatX === 'repeat' && repeatY === 'repeat') {
+                        style.push('it=r');
+                    } else if (repeatX === 'repeat') {
+                        style.push('it=hr');
+                    } else if (repeatY === 'repeat') {
+                        style.push('it=vr');
+                    } else {
+                        style.push('it=o');
+                    }
+                } else if (size === 'contain') {
+                    style.push('it=cn');
+                } else if (size === 'cover') {
+                    style.push('it=cr');
                 }
+                const px = el.style.backgroundPositionX;
+                const py = el.style.backgroundPositionY;
+                let ic = '';
+                if (px !== 'center' && px !== '50%') {
+                    style.push(`ic=${parseInt(px)}`);
+                    ic=`${parseInt(px)}`;
+                }
+                if (py !== 'center' && px !== '50%') {
+                    ic=`${ct}:${parseInt(py)}`;
+                }
+                ic && style.push(`ic=${ic}`);
+            }
+            if (style) {
+                style = ` ${style.trim()}`;
             }
             const group = el.dataset.group !== undefined ? ` g=${el.dataset.group}` : '';
             const _animate = el.dataset.animate !== undefined ? ` a=${el.dataset.animate}` : '';
