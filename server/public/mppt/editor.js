@@ -167,6 +167,7 @@ layui.define(['jquery', 'layer', 'utils', 'history', 'control', 'page', 'compone
     };
     function clearAll(noUpdateComponent) {
         control.updateValues(); // 关闭属性窗口
+        control.hideImageCenter();
         removeAllReferents();
         !noUpdateComponent && component.selectComponentLine();
         $('.no-animate-ext').hide();
@@ -196,6 +197,9 @@ layui.define(['jquery', 'layer', 'utils', 'history', 'control', 'page', 'compone
         }
     }
     function onReferentMouseDown(e, cmd) {
+        if (control.isImageCenterShow()) {
+            return false;
+        }
         const location = getLocation(e);
         clickY = location.y;
         clickX = location.x;
@@ -240,6 +244,9 @@ layui.define(['jquery', 'layer', 'utils', 'history', 'control', 'page', 'compone
         }
     }
     function onDocumentMouseMove(e) {
+        if (control.isImageCenterShow()) {
+            return false;
+        }
         if (editingTarget) {
             return true;
         }
@@ -387,11 +394,11 @@ layui.define(['jquery', 'layer', 'utils', 'history', 'control', 'page', 'compone
     }
     function onDocumentKeyDown(e) {
         utils.log("[onDocumentKeyDown]:", e.keyCode);
-        if (e.keyCode === 27) { // esc
+        if (e.keyCode === 27 || e.keyCode === 13) { // esc | enter
             layer.closeAll();
         }
         if (referents.length) {
-            if (e.keyCode === 27) { // esc
+            if (e.keyCode === 27 || e.keyCode === 13) { // esc | enter
                 clearAll();
             } else if ( e.keyCode === 37) { // left key
                 moveByStep({ x: -1, y: 0 });

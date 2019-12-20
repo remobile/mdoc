@@ -17,6 +17,7 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
 
     let clickX = null; // 保留上次的X轴位置
     let clickY = null; // 保留上次的Y轴位置
+    let imageCenterShow = false; // 中心点是否显示
 
     function initialize() {
         editor = layui.editor;
@@ -69,7 +70,7 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
         const imagePositionTarget = $('#imagePositionTarget');
         const positionTarget = imagePositionTarget[0];
         imagePositionTarget.on('mousedown', function(e) {
-            const location = { x: e.x||e.clientX, y: e.y||e.clientY };
+            const location = editor.getLocation(e);
             clickY = location.y;
             clickX = location.x;
         });
@@ -79,14 +80,22 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
         });
         imagePositionTarget.on('mousemove', function(e) {
             if (clickX) {
-                const location = { x: e.x||e.clientX, y: e.y||e.clientY };
+                const target = editor.getAction().target;
+                const tx = target.offsetLeft;
+                const tw = parseInt(target.style.width);
+                const ty = target.offsetTop;
+                const th = parseInt(target.style.height);
+                const location = editor.getLocation(e);
                 const deltaX = clickX - location.x;
                 const deltaY = clickY - location.y;
                 positionTarget.style.left = (positionTarget.offsetLeft - deltaX) + "px";
                 positionTarget.style.top = (positionTarget.offsetTop - deltaY) + "px";
                 const x = positionTarget.offsetLeft + 100; // 添加上偏移
                 const y = positionTarget.offsetTop + 100;
-                updateTargetCenter(editor.getAction().target, x, y);
+
+                target.style.backgroundPositionX = `${x-tx-th/2}px`;
+                target.style.backgroundPositionY = `${y-ty-th/2}px`;
+
                 clickX = location.x;
                 clickY = location.y;
             }
@@ -95,16 +104,9 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
 
         animate.initialize();
     }
-    function updateTargetCenter(target, x, y) {
-        const tx = target.offsetLeft;
-        const tw = parseInt(target.style.width);
-        const ty = target.offsetTop;
-        const th = parseInt(target.style.height);
+    function showImageCenter(el, target) {
+        imageCenterShow = true;
 
-        target.style.backgroundPositionX = `${x-tx-tw/2}px`;
-        target.style.backgroundPositionY = `${y-ty-th/2}px`;
-    }
-    function parseImageCenter(target) {
         const px = target.style.backgroundPositionX;
         const py = target.style.backgroundPositionY;
         let x = px === 'center' ? 0 : parseInt(px);
@@ -118,11 +120,15 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
         const th = parseInt(target.style.height);
         y = ty + th / 2 + y;
 
-        const el = document.getElementById('imagePositionTarget');
+        el.style.width = target.style.width;
+        el.style.height = target.style.height;
         el.style.left = `${x-100}px`;
         el.style.top = `${y-100}px`;
-
-        return { x, y };
+        el.classList.remove('hide');
+    }
+    function hideImageCenter() {
+        imageCenterShow = false;
+        document.getElementById('imagePositionTarget').classList.add('hide');
     }
     function toggleTextStyle(type) {
         if (type === 'italic') {
@@ -354,16 +360,14 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
             form.on(`select(imagePositionSelect)`, function(data){
                 const el = document.getElementById('imagePositionTarget');
                 if (data.value === 'center') {
-                    console.log("=======", 'center');
                     target.style.backgroundPositionX= 'center';
                     target.style.backgroundPositionY= 'center';
                     el.classList.add('hide');
                 } else {
-                    if (el.classList.contains('hide')) {
-                        parseImageCenter(target);
-                        el.classList.remove('hide');
+                    if (!imageCenterShow) {
+                        showImageCenter(el, target);
                     } else {
-                        el.classList.add('hide');
+                        hideImageCenter();
                     }
                 }
             });
@@ -467,6 +471,8 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
         showImageSelect,
         showMusicSelect,
         setTextStyle,
+        isImageCenterShow: ()=>imageCenterShow,
+        hideImageCenter,
     });
 
     // 全局函数
