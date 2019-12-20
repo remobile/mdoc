@@ -113,37 +113,34 @@ layui.define(['jquery', 'layer', 'utils'], function(exports) {
                 const size = el.style.backgroundSize;
                 const repeatX = el.style.backgroundRepeatX;
                 const repeatY = el.style.backgroundRepeatY;
-                let type = '';
                 if (size === 'auto') {
                     if (repeatX === 'repeat' && repeatY === 'repeat') {
-                        style.push('it=r');
+                        style.push('m=r');
                     } else if (repeatX === 'repeat') {
-                        style.push('it=hr');
+                        style.push('m=hr');
                     } else if (repeatY === 'repeat') {
-                        style.push('it=vr');
+                        style.push('m=vr');
                     } else {
-                        style.push('it=o');
+                        style.push('m=o');
                     }
                 } else if (size === 'contain') {
-                    style.push('it=cn');
+                    style.push('m=cn');
                 } else if (size === 'cover') {
-                    style.push('it=cr');
+                    style.push('m=cr');
                 }
                 const px = el.style.backgroundPositionX;
                 const py = el.style.backgroundPositionY;
-                let ic = '';
+                let p = '';
                 if (px !== 'center' && px !== '50%') {
-                    style.push(`ic=${parseInt(px)}`);
-                    ic=`${parseInt(px)}`;
+                    style.push(`p=${parseInt(px)}`);
+                    p=`${parseInt(px)}`;
                 }
                 if (py !== 'center' && px !== '50%') {
-                    ic=`${ct}:${parseInt(py)}`;
+                    p=`${p}:${parseInt(py)}`;
                 }
-                ic && style.push(`ic=${ic}`);
+                p && style.push(`p=${p}`);
             }
-            if (style) {
-                style = ` ${style.trim()}`;
-            }
+            style = style.length ? ` ${style.join(' ')}` : '';
             const group = el.dataset.group !== undefined ? ` g=${el.dataset.group}` : '';
             const _animate = el.dataset.animate !== undefined ? ` a=${el.dataset.animate}` : '';
             const lock = el.dataset.lock == 1 ? ' k' : el.dataset.lock == 2 ? ' t' : '';

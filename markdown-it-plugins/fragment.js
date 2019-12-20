@@ -21,32 +21,32 @@ module.exports = function fragment_plugin(md, page) {
             style.push(`top:${options.y}px`);
             if (options.img) {
                 style.push(`background-image:url(${content})`);
-                if (options.it == 'r') {
+                if (options.m == 'r') {
                     style.push(`background-repeat:repeat`);
                     style.push(`background-size:auto`);
-                } else  if (options.it == 'hr') {
+                } else  if (options.m == 'hr') {
                     style.push(`background-repeat-x:repeat`);
                     style.push(`background-repeat-y:no-repeat`);
                     style.push(`background-size:auto`);
-                } else  if (options.it == 'vr') {
+                } else  if (options.m == 'vr') {
                     style.push(`background-repeat-x:no-repeat`);
                     style.push(`background-repeat-y:repeat`);
                     style.push(`background-size:auto`);
-                } else  if (options.it == 'o') {
+                } else  if (options.m == 'o') {
                     style.push(`background-repeat:no-repeat`);
                     style.push(`background-size:auto`);
-                } else  if (options.it == 'cn') {
+                } else  if (options.m == 'cn') {
                     style.push(`background-repeat:no-repeat`);
                     style.push(`background-size:contain`);
-                } else  if (options.it == 'cr') {
+                } else  if (options.m == 'cr') {
                     style.push(`background-repeat:no-repeat`);
                     style.push(`background-size:cover`);
                 } else {
                     style.push(`background-repeat:no-repeat`);
                     style.push(`background-size:100% 100%`);
                 }
-                if (options.ic == 'r') {
-                    const list = options.ic.split(':');
+                if (options.p) {
+                    const list = options.p.split(':');
                     style.push(`background-position-x:${list[0] ? `${list[0]}px` : 'center'}`);
                     style.push(`background-position-y:${list[1] ? `${list[1]}px` : 'center'}`);
                 } else {

@@ -313,6 +313,7 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
             $('#propertyPanel').removeClass('for-text').addClass('for-image');
             // 模式
             $('#imageModeSelect').attr('lay-filter', 'imageModeSelect');
+            setModeSelectValue(target);
             form.on(`select(imageModeSelect)`, function(data){
                 switch (data.value) {
                     case 'stretch': {
@@ -412,6 +413,30 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
         }
 
         animate.updateValues(target);
+    }
+    function setModeSelectValue(el) {
+        const size = el.style.backgroundSize;
+        const repeatX = el.style.backgroundRepeatX;
+        const repeatY = el.style.backgroundRepeatY;
+        let type = '';
+        if (size === 'auto') {
+            if (repeatX === 'repeat' && repeatY === 'repeat') {
+                type = 'repeat';
+            } else if (repeatX === 'repeat') {
+                type = 'repeatX';
+            } else if (repeatY === 'repeat') {
+                type = 'repeatY';
+            } else {
+                type = 'origin';
+            }
+        } else if (size === 'contain') {
+            type = 'contain';
+        } else if (size === 'cover') {
+            type = 'cover';
+        } else {
+            type = 'stretch';
+        }
+        $(`#imageModeSelect`).val(type);
     }
     function updatePositionSize(target, style) {
         style = style || getComputedStyle(target);
