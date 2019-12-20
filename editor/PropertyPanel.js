@@ -91,11 +91,16 @@ module.exports = () => {
             </div>
             <div className="layui-form-item for-image">
                 <label className="layui-form-label">中心</label>
-                <div className="layui-input-block">
-                    <select id="imagePositionSelect">
-                        <option value="center">居中</option>
-                        <option value="custom">手动设置</option>
-                    </select>
+                <div className="row">
+                    <div id="imageCenter">{'x: 100  y: 100'}</div>
+                    <div className="layui-btn-group">
+                        <button id="imageCenterReset" type="button" className="layui-btn layui-btn-sm">
+                            <i className="layui-icon">&#xe669;</i>
+                        </button>
+                        <button id="imageCenterEdit" type="button" className="layui-btn layui-btn-sm">
+                            <i className="layui-icon layui-icon-edit"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div className="layui-form-item">

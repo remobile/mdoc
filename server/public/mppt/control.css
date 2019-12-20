@@ -69,3 +69,16 @@
 .layui-form-item .layui-inline {
     margin-left: 10px;
 }
+.row {
+    display: flex;
+    align-items: center;
+}
+#imageCenter {
+    width: 136px;
+    font-size: 16px;
+    height: 30px;
+    padding-top: 10px;
+    margin-left: 14px;
+    color: gray;
+    font-weight: 500;
+}

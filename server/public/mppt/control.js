@@ -93,19 +93,43 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
                 const x = positionTarget.offsetLeft + 100; // 添加上偏移
                 const y = positionTarget.offsetTop + 100;
 
-                target.style.backgroundPositionX = `${x-tx-th/2}px`;
-                target.style.backgroundPositionY = `${y-ty-th/2}px`;
+                const px = parseInt(x-tx-th/2);
+                const py = parseInt(y-ty-th/2);
+                target.style.backgroundPositionX = `${px}px`;
+                target.style.backgroundPositionY = `${py}px`;
+                $('#imageCenter').html(`x: ${px}&emsp;y: ${py}`);
 
                 clickX = location.x;
                 clickY = location.y;
             }
             return false;
         });
+        // 中心
+        $('#imageCenterReset').click(function(){
+            const target = editor.getAction().target;
+            target.style.backgroundPositionX= 'center';
+            target.style.backgroundPositionY= 'center';
+            $('#imageCenter').html(`x: 居中&emsp;y: 居中`);
+            hideImageCenter();
+        });
+        $('#imageCenterEdit').click(function(){
+            if (!imageCenterShow) {
+                showImageCenter();
+            } else {
+                hideImageCenter();
+            }
+        });
 
         animate.initialize();
     }
-    function showImageCenter(el, target) {
+    function showImageCenter() {
         imageCenterShow = true;
+        const target = editor.getAction().target;
+        const button = $('#imageCenterEdit>i')[0];
+        const el = document.getElementById('imagePositionTarget');
+
+        button.classList.remove('layui-icon-edit');
+        button.classList.add('layui-icon-ok');
 
         const px = target.style.backgroundPositionX;
         const py = target.style.backgroundPositionY;
@@ -128,6 +152,9 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
     }
     function hideImageCenter() {
         imageCenterShow = false;
+        const button = $('#imageCenterEdit>i')[0];
+        button.classList.add('layui-icon-edit');
+        button.classList.remove('layui-icon-ok');
         document.getElementById('imagePositionTarget').classList.add('hide');
     }
     function toggleTextStyle(type) {
@@ -353,22 +380,6 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
                         target.style.backgroundRepeatY = 'repeat';
                         target.style.backgroundSize = 'auto';
                         break;
-                    }
-                }
-            });
-            // 中心
-            $('#imagePositionSelect').attr('lay-filter', 'imagePositionSelect');
-            form.on(`select(imagePositionSelect)`, function(data){
-                const el = document.getElementById('imagePositionTarget');
-                if (data.value === 'center') {
-                    target.style.backgroundPositionX= 'center';
-                    target.style.backgroundPositionY= 'center';
-                    el.classList.add('hide');
-                } else {
-                    if (!imageCenterShow) {
-                        showImageCenter(el, target);
-                    } else {
-                        hideImageCenter();
                     }
                 }
             });
