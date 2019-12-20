@@ -15,6 +15,10 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
     let imageDialog;
     let musicDialog;
 
+    let clickX = 0; // 保留上次的X轴位置
+    let clickY = 0; // 保留上次的Y轴位置
+    let imageCenter = null; // 焦点时候被点击
+
     function initialize() {
         editor = layui.editor;
         const settings = layui.data('settings');
@@ -63,7 +67,56 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
             });
             pushHistory('清除样式');
         });
+        const imagePositionTarget = $('#imagePositionTarget');
+        const positionTarget = imagePositionTarget[0];
+        imagePositionTarget.on('mousedown', function(e) {
+            const location = { x: e.x||e.clientX, y: e.y||e.clientY };
+            clickY = location.y;
+            clickX = location.x;
+            imageCenter = parseImageCenter(editor.getAction().target);
+        });
+        imagePositionTarget.on('mouseup', function(e) {
+            imageCenter = null;
+        });
+        imagePositionTarget.on('mousemove', function(e) {
+            if (imageCenter) {
+                const location = { x: e.x||e.clientX, y: e.y||e.clientY };
+                const deltaX = clickX - location.x;
+                const deltaY = clickY - location.y;
+                positionTarget.style.left = (positionTarget.offsetLeft - deltaX) + "px";
+                positionTarget.style.top = (positionTarget.offsetTop - deltaY) + "px";
+                const x = positionTarget.offsetLeft + 100; // 添加上偏移
+                const y = positionTarget.offsetTop + 100;
+                updateTargetCenter(editor.getAction().target, imageCenter, x, y);
+                clickX = location.x;
+                clickY = location.y;
+            }
+            return false;
+        });
+
+
         animate.initialize();
+    }
+    function updateTargetCenter(target, center, x, y) {
+
+    }
+    function parseImageCenter(target) {
+        let x, y;
+        if (target.style.backgroundPositionX === 'center') {
+            const tx = target.offsetLeft;
+            const tw = parseInt(target.style.width);
+            x = tx + tw / 2;
+        } else {
+            x = parseInt(target.style.backgroundPositionX);
+        }
+        if (target.style.backgroundPositionY === 'center') {
+            const ty = target.offsetTop;
+            const th = parseInt(target.style.height);
+            y = ty + th / 2;
+        } else  {
+            x = parseInt(target.style.backgroundPositionY);
+        }
+        return { x, y };
     }
     function toggleTextStyle(type) {
         if (type === 'italic') {
@@ -293,66 +346,13 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
             // 中心
             $('#imagePositionSelect').attr('lay-filter', 'imagePositionSelect');
             form.on(`select(imagePositionSelect)`, function(data){
-                if (data.value === 'custom') {
-                    $('.for-custom').removeClass('hide');
+                if (data.value === 'center') {
+                    target.style.backgroundPositionX= 'center';
+                    target.style.backgroundPositionY= 'center';
+                    $('#imagePositionTarget').addClass('hide');
                 } else {
-                    $('.for-custom').addClass('hide');
+                    $('#imagePositionTarget').removeClass('hide');
                 }
-                switch (data.value) {
-                    case 'center': {
-                        target.style.backgroundPositionX= 'center';
-                        target.style.backgroundPositionY= 'center';
-                        break;
-                    }
-                    case 'lt': {
-                        target.style.backgroundPositionX= 'left';
-                        target.style.backgroundPositionY= 'top';
-                        break;
-                    }
-                    case 'rt': {
-                        target.style.backgroundPositionX= 'right';
-                        target.style.backgroundPositionY= 'top';
-                        break;
-                    }
-                    case 'lb': {
-                        target.style.backgroundPositionX= 'left';
-                        target.style.backgroundPositionY= 'bottom';
-                        break;
-                    }
-                    case 'rb': {
-                        target.style.backgroundPositionX= 'right';
-                        target.style.backgroundPositionY= 'bottom';
-                        break;
-                    }
-                }
-            });
-            // 横向
-            let fontSize = parseInt(style.fontSize);
-            slider.render({
-                elem: '#imagePositionXSlider',
-                value: fontSize,
-                min: 9,
-                max: 180,
-                change: function(fontSize){
-                    setTextStyle((target)=>{
-                        target.style.fontSize = fontSize + 'px';
-                    });
-                    history.pushHistory('设置字体大小');
-                },
-            });
-            // 纵向
-            let fontSize = parseInt(style.fontSize);
-            slider.render({
-                elem: '#imagePositionYSlider',
-                value: fontSize,
-                min: 9,
-                max: 180,
-                change: function(fontSize){
-                    setTextStyle((target)=>{
-                        target.style.fontSize = fontSize + 'px';
-                    });
-                    history.pushHistory('设置字体大小');
-                },
             });
             // 颜色
             colorpicker.render({

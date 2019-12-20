@@ -12,7 +12,7 @@ layui.define(['jquery', 'layer', 'utils', 'history', 'control', 'page', 'compone
     let referents = []; // 当前选中的refrent列表
     let isAltKeyPress = false; // alt是否被按住
     let clickX = 0; // 保留上次的X轴位置
-    let clickY = 0; // 保留上次的Y轴位置©
+    let clickY = 0; // 保留上次的Y轴位置
     let group = 0; // 集合的id最小值
     let copiedTarget = null; // 复制的target
     let editingTarget; // 正在编辑的target
@@ -475,6 +475,7 @@ layui.define(['jquery', 'layer', 'utils', 'history', 'control', 'page', 'compone
         createImageTarget,
         createTextTarget,
         removeTargets,
+        getLocation,
         getRootHtml: () => root.innerHTML,
         setRootHtml: (html) => { root.innerHTML = html; },
         getAllReferents: () => referents,

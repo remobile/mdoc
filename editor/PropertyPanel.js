@@ -94,24 +94,8 @@ module.exports = () => {
                 <div className="layui-input-block">
                     <select id="imagePositionSelect">
                         <option value="center">居中</option>
-                        <option value="lt">左上</option>
-                        <option value="rt">右上</option>
-                        <option value="lb">左下</option>
-                        <option value="rb">右下</option>
-                        <option value="custom">自定义</option>
+                        <option value="custom">手动设置</option>
                     </select>
-                </div>
-            </div>
-            <div className="layui-form-item for-image for-custom hide">
-                <label className="layui-form-label">横向</label>
-                <div className="layui-input-block">
-                    <div id="imagePositionXSlider" className="slider-container"></div>
-                </div>
-            </div>
-            <div className="layui-form-item for-image for-custom hide">
-                <label className="layui-form-label">纵向</label>
-                <div className="layui-input-block">
-                    <div id="imagePositionYSlider" className="slider-container"></div>
                 </div>
             </div>
             <div className="layui-form-item">

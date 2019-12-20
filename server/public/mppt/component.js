@@ -73,7 +73,7 @@ layui.define(['jquery', 'layer', 'utils', 'control', 'animate', 'history'], func
         return `
         <div class="${className}" data-id="${id}" onmousedown="window.onComponentLineClick('${id}')">
             <i onmousedown="window.onToggleView(event, '${id}')" class="iconfont icon-noview"></i>
-            <i class="layui-icon layui-icon-align-center${lock ? '' : ' handle'}"></i>
+            <i class="iconfont icon-move${lock ? '' : ' handle'}"></i>
             ${getTargetHtml(target)}
             <i class="iconfont icon-lock" onmousedown="window.onLockClick('${id}')"></i>
         </div>

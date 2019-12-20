@@ -45,7 +45,7 @@ layui.define(['jquery', 'layer', 'utils'], function(exports) {
     function getPageLine(page, index) {
         return `
         <div class="page-line${index==pageIndex ? ' select' : ''}" data-index="${index}"  onmousedown="window.onPageLineClick(${index})">
-            <i class="layui-icon layui-icon-align-center handle"></i>
+            <i class="iconfont icon-move handle"></i>
             <div>${page.name}</div>
         </div>
         `;
