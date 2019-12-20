@@ -49,5 +49,5 @@ body {
     background-color: #FFF;
 }
 .hide {
-    display: none;
+    display: none !important;
 }

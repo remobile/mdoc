@@ -15,9 +15,8 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
     let imageDialog;
     let musicDialog;
 
-    let clickX = 0; // 保留上次的X轴位置
-    let clickY = 0; // 保留上次的Y轴位置
-    let imageCenter = null; // 焦点时候被点击
+    let clickX = null; // 保留上次的X轴位置
+    let clickY = null; // 保留上次的Y轴位置
 
     function initialize() {
         editor = layui.editor;
@@ -73,13 +72,13 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
             const location = { x: e.x||e.clientX, y: e.y||e.clientY };
             clickY = location.y;
             clickX = location.x;
-            imageCenter = parseImageCenter(editor.getAction().target);
         });
         imagePositionTarget.on('mouseup', function(e) {
-            imageCenter = null;
+            clickX = null;
+            clickY = null;
         });
         imagePositionTarget.on('mousemove', function(e) {
-            if (imageCenter) {
+            if (clickX) {
                 const location = { x: e.x||e.clientX, y: e.y||e.clientY };
                 const deltaX = clickX - location.x;
                 const deltaY = clickY - location.y;
@@ -87,35 +86,42 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
                 positionTarget.style.top = (positionTarget.offsetTop - deltaY) + "px";
                 const x = positionTarget.offsetLeft + 100; // 添加上偏移
                 const y = positionTarget.offsetTop + 100;
-                updateTargetCenter(editor.getAction().target, imageCenter, x, y);
+                updateTargetCenter(editor.getAction().target, x, y);
                 clickX = location.x;
                 clickY = location.y;
             }
             return false;
         });
 
-
         animate.initialize();
     }
-    function updateTargetCenter(target, center, x, y) {
+    function updateTargetCenter(target, x, y) {
+        const tx = target.offsetLeft;
+        const tw = parseInt(target.style.width);
+        const ty = target.offsetTop;
+        const th = parseInt(target.style.height);
 
+        target.style.backgroundPositionX = `${x-tx-tw/2}px`;
+        target.style.backgroundPositionY = `${y-ty-th/2}px`;
     }
     function parseImageCenter(target) {
-        let x, y;
-        if (target.style.backgroundPositionX === 'center') {
-            const tx = target.offsetLeft;
-            const tw = parseInt(target.style.width);
-            x = tx + tw / 2;
-        } else {
-            x = parseInt(target.style.backgroundPositionX);
-        }
-        if (target.style.backgroundPositionY === 'center') {
-            const ty = target.offsetTop;
-            const th = parseInt(target.style.height);
-            y = ty + th / 2;
-        } else  {
-            x = parseInt(target.style.backgroundPositionY);
-        }
+        const px = target.style.backgroundPositionX;
+        const py = target.style.backgroundPositionY;
+        let x = px === 'center' ? 0 : parseInt(px);
+        let y = py === 'center' ? 0 : parseInt(py);
+
+        const tx = target.offsetLeft;
+        const tw = parseInt(target.style.width);
+        x = tx + tw / 2 + x;
+
+        const ty = target.offsetTop;
+        const th = parseInt(target.style.height);
+        y = ty + th / 2 + y;
+
+        const el = document.getElementById('imagePositionTarget');
+        el.style.left = `${x-100}px`;
+        el.style.top = `${y-100}px`;
+
         return { x, y };
     }
     function toggleTextStyle(type) {
@@ -346,12 +352,19 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
             // 中心
             $('#imagePositionSelect').attr('lay-filter', 'imagePositionSelect');
             form.on(`select(imagePositionSelect)`, function(data){
+                const el = document.getElementById('imagePositionTarget');
                 if (data.value === 'center') {
+                    console.log("=======", 'center');
                     target.style.backgroundPositionX= 'center';
                     target.style.backgroundPositionY= 'center';
-                    $('#imagePositionTarget').addClass('hide');
+                    el.classList.add('hide');
                 } else {
-                    $('#imagePositionTarget').removeClass('hide');
+                    if (el.classList.contains('hide')) {
+                        parseImageCenter(target);
+                        el.classList.remove('hide');
+                    } else {
+                        el.classList.add('hide');
+                    }
                 }
             });
             // 颜色
