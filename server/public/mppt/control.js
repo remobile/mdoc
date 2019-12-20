@@ -109,8 +109,8 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
 
         const px = target.style.backgroundPositionX;
         const py = target.style.backgroundPositionY;
-        let x = px === 'center' ? 0 : parseInt(px);
-        let y = py === 'center' ? 0 : parseInt(py);
+        let x = px === 'center' || px === '50%' ? 0 : parseInt(px);
+        let y = py === 'center' || py === '50%' ? 0 : parseInt(py);
 
         const tx = target.offsetLeft;
         const tw = parseInt(target.style.width);
