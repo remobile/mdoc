@@ -374,6 +374,7 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
             $('#imageModeSelect').attr('lay-filter', 'imageModeSelect');
             setModeSelectValue(target);
             form.on(`select(imageModeSelect)`, function(data){
+                hideImageCenter();
                 switch (data.value) {
                     case 'stretch': {
                         target.style.backgroundRepeat = 'no-repeat';
