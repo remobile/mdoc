@@ -145,27 +145,27 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
             const tw = parseInt(target.style.width);
             const th = parseInt(target.style.height);
 
-            const px = target.style.backgroundPositionX;
-            const py = target.style.backgroundPositionY;
+            let px = target.style.backgroundPositionX;
+            let py = target.style.backgroundPositionY;
 
-            let offsetX = 0, offsetY = 0, x, y;
+            let offsetX = 0, offsetY = 0;
             if (target.style.backgroundSize === 'auto') {
-                offsetX = -(imageSize.w + tw)/4;
-                offsetY = -(imageSize.h + th)/4;
-                x = px === 'center' || px === '50%' ? (tw-imageSize.w)/2 : parseInt(px);
-                y = py === 'center' || py === '50%' ? (th-imageSize.h)/2 : parseInt(py);
+                offsetX = -(tw-imageSize.w)/2;
+                offsetY = -(th-imageSize.h)/2;
+                px = px === 'center' || px === '50%' ? (tw-imageSize.w)/2 : parseInt(px);
+                py = py === 'center' || py === '50%' ? (th-imageSize.h)/2 : parseInt(py);
             } else {
-                x = px === 'center' || px === '50%' ? 0 : parseInt(px);
-                y = py === 'center' || py === '50%' ? 0 : parseInt(py);
+                px = px === 'center' || px === '50%' ? 0 : parseInt(px);
+                py = py === 'center' || py === '50%' ? 0 : parseInt(py);
             }
 
-            x += target.offsetLeft;
-            y += target.offsetTop;
+            const x = target.offsetLeft + px + offsetX;
+            const y = target.offsetTop + py + offsetX;
 
             el.style.width = target.style.width;
             el.style.height = target.style.height;
-            el.style.left = `${x+offsetX}px`;
-            el.style.top = `${y+offsetY}px`;
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
             el.classList.remove('hide');
         });
     }
