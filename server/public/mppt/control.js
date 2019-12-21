@@ -171,6 +171,7 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
     }
     function hideImageCenter() {
         imageCenterShow = false;
+        history.pushHistory('改变图片中心');
         $('#imageCenterReset').addClass('hide');
         const button = $('#imageCenterEdit>i')[0];
         button.classList.add('layui-icon-edit');
@@ -375,43 +376,58 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
             setModeSelectValue(target);
             form.on(`select(imageModeSelect)`, function(data){
                 hideImageCenter();
+                history.pushHistory('改变图片模式');
                 switch (data.value) {
                     case 'stretch': {
-                        target.style.backgroundRepeat = 'no-repeat';
-                        target.style.backgroundSize = '100% 100%';
+                        setImageStyle((target)=>{
+                            target.style.backgroundRepeat = 'no-repeat';
+                            target.style.backgroundSize = '100% 100%';
+                        });
                         break;
                     }
                     case 'origin': {
-                        target.style.backgroundRepeat = 'no-repeat';
-                        target.style.backgroundSize = 'auto';
+                        setImageStyle((target)=>{
+                            target.style.backgroundRepeat = 'no-repeat';
+                            target.style.backgroundSize = 'auto';
+                        });
                         break;
                     }
                     case 'contain': {
-                        target.style.backgroundRepeat = 'no-repeat';
-                        target.style.backgroundSize = 'contain';
+                        setImageStyle((target)=>{
+                            target.style.backgroundRepeat = 'no-repeat';
+                            target.style.backgroundSize = 'contain';
+                        });
                         break;
                     }
                     case 'cover': {
-                        target.style.backgroundRepeat = 'no-repeat';
-                        target.style.backgroundSize = 'cover';
+                        setImageStyle((target)=>{
+                            target.style.backgroundRepeat = 'no-repeat';
+                            target.style.backgroundSize = 'cover';
+                        });
                         break;
                     }
                     case 'repeat': {
-                        target.style.backgroundRepeatX = 'repeat';
-                        target.style.backgroundRepeatY = 'repeat';
-                        target.style.backgroundSize = 'auto';
+                        setImageStyle((target)=>{
+                            target.style.backgroundRepeatX = 'repeat';
+                            target.style.backgroundRepeatY = 'repeat';
+                            target.style.backgroundSize = 'auto';
+                        });
                         break;
                     }
                     case 'repeatX': {
-                        target.style.backgroundRepeatX = 'repeat';
-                        target.style.backgroundRepeatY = 'no-repeat';
-                        target.style.backgroundSize = 'auto';
+                        setImageStyle((target)=>{
+                            target.style.backgroundRepeatX = 'repeat';
+                            target.style.backgroundRepeatY = 'no-repeat';
+                            target.style.backgroundSize = 'auto';
+                        });
                         break;
                     }
                     case 'repeatY': {
-                        target.style.backgroundRepeatX = 'no-repeat';
-                        target.style.backgroundRepeatY = 'repeat';
-                        target.style.backgroundSize = 'auto';
+                        setImageStyle((target)=>{
+                            target.style.backgroundRepeatX = 'no-repeat';
+                            target.style.backgroundRepeatY = 'repeat';
+                            target.style.backgroundSize = 'auto';
+                        });
                         break;
                     }
                 }
