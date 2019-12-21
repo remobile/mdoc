@@ -92,11 +92,18 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
                 const deltaY = clickY - location.y;
                 positionTarget.style.left = (positionTarget.offsetLeft - deltaX) + "px";
                 positionTarget.style.top = (positionTarget.offsetTop - deltaY) + "px";
-                const x = positionTarget.offsetLeft + 100; // 添加上偏移
-                const y = positionTarget.offsetTop + 100;
+                const x = positionTarget.offsetLeft + tw / 2; // 添加上偏移
+                const y = positionTarget.offsetTop + th / 2;
 
-                const px = parseInt(x-tx-th/2);
-                const py = parseInt(y-ty-th/2);
+                let offsetX = 0, offsetY = 0;
+                if (target.style.backgroundSize === 'auto') {
+                    offsetX = (imageSize.w + tw)/4;
+                    offsetY = (imageSize.h + th)/4;
+                }
+
+                const px = x-tx-th/2+offsetX;
+                const py = y-ty-th/2+offsetY;
+
                 target.style.backgroundPositionX = `${px}px`;
                 target.style.backgroundPositionY = `${py}px`;
                 $('#imageCenter').html(`x: ${px}&emsp;y: ${py}`);
@@ -132,23 +139,33 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
             imageSize = size;
             const button = $('#imageCenterEdit>i')[0];
             const el = document.getElementById('imagePositionTarget');
-            el.style.top = target.style.top;
-            el.style.left = target.style.left;
             button.classList.remove('layui-icon-edit');
             button.classList.add('layui-icon-ok');
 
+            const tw = parseInt(target.style.width);
+            const th = parseInt(target.style.height);
+
             const px = target.style.backgroundPositionX;
             const py = target.style.backgroundPositionY;
-            let x = px === 'center' || px === '50%' ? 0 : parseInt(px);
-            let y = py === 'center' || py === '50%' ? 0 : parseInt(py);
 
-            x = += target.offsetLeft;
+            let offsetX = 0, offsetY = 0, x, y;
+            if (target.style.backgroundSize === 'auto') {
+                offsetX = -(imageSize.w + tw)/4;
+                offsetY = -(imageSize.h + th)/4;
+                x = px === 'center' || px === '50%' ? (tw-imageSize.w)/2 : parseInt(px);
+                y = py === 'center' || py === '50%' ? (th-imageSize.h)/2 : parseInt(py);
+            } else {
+                x = px === 'center' || px === '50%' ? 0 : parseInt(px);
+                y = py === 'center' || py === '50%' ? 0 : parseInt(py);
+            }
+
+            x += target.offsetLeft;
             y += target.offsetTop;
 
             el.style.width = target.style.width;
             el.style.height = target.style.height;
-            el.style.left = `${x}px`;
-            el.style.top = `${y}px`;
+            el.style.left = `${x+offsetX}px`;
+            el.style.top = `${y+offsetY}px`;
             el.classList.remove('hide');
         });
     }
