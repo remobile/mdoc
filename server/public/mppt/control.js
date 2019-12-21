@@ -6,6 +6,8 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
     const history = layui.history;
     const animate = layui.animate;
     const utils = layui.utils;
+    const imgCache = {}; // 图片缓存器
+    let imageSize;
 
     let editor;
     let textColorList;
@@ -126,30 +128,29 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
         imageCenterShow = true;
         $('#imageCenterReset').removeClass('hide');
         const target = editor.getAction().target;
-        const button = $('#imageCenterEdit>i')[0];
-        const el = document.getElementById('imagePositionTarget');
+        getTargetBackImageSize(target, function (size) {
+            imageSize = size;
+            const button = $('#imageCenterEdit>i')[0];
+            const el = document.getElementById('imagePositionTarget');
+            el.style.top = target.style.top;
+            el.style.left = target.style.left;
+            button.classList.remove('layui-icon-edit');
+            button.classList.add('layui-icon-ok');
 
-        button.classList.remove('layui-icon-edit');
-        button.classList.add('layui-icon-ok');
+            const px = target.style.backgroundPositionX;
+            const py = target.style.backgroundPositionY;
+            let x = px === 'center' || px === '50%' ? 0 : parseInt(px);
+            let y = py === 'center' || py === '50%' ? 0 : parseInt(py);
 
-        const px = target.style.backgroundPositionX;
-        const py = target.style.backgroundPositionY;
-        let x = px === 'center' || px === '50%' ? 0 : parseInt(px);
-        let y = py === 'center' || py === '50%' ? 0 : parseInt(py);
+            x = += target.offsetLeft;
+            y += target.offsetTop;
 
-        const tx = target.offsetLeft;
-        const tw = parseInt(target.style.width);
-        x = tx + tw / 2 + x;
-
-        const ty = target.offsetTop;
-        const th = parseInt(target.style.height);
-        y = ty + th / 2 + y;
-
-        el.style.width = target.style.width;
-        el.style.height = target.style.height;
-        el.style.left = `${x-100}px`;
-        el.style.top = `${y-100}px`;
-        el.classList.remove('hide');
+            el.style.width = target.style.width;
+            el.style.height = target.style.height;
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            el.classList.remove('hide');
+        });
     }
     function hideImageCenter() {
         imageCenterShow = false;
@@ -158,6 +159,18 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
         button.classList.add('layui-icon-edit');
         button.classList.remove('layui-icon-ok');
         document.getElementById('imagePositionTarget').classList.add('hide');
+    }
+    function getTargetBackImageSize(target, callback) {
+        const url = utils.getURL(target);
+        if (imgCache[url]) {
+            callback(imgCache[url]);
+        }
+        const img = new Image();
+        img.onload = function () {
+            imgCache[url] = { w: img.width, h:img.height };
+            callback(imgCache[url]);
+        };
+        img.src = url;
     }
     function toggleTextStyle(type) {
         if (type === 'italic') {
