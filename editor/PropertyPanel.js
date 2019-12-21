@@ -94,7 +94,7 @@ module.exports = () => {
                 <div className="row">
                     <div id="imageCenter">{'x: 100  y: 100'}</div>
                     <div className="layui-btn-group">
-                        <button id="imageCenterReset" type="button" className="layui-btn layui-btn-sm">
+                        <button id="imageCenterReset" type="button" className="layui-btn layui-btn-sm hide">
                             <i className="layui-icon">&#xe669;</i>
                         </button>
                         <button id="imageCenterEdit" type="button" className="layui-btn layui-btn-sm">

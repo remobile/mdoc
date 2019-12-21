@@ -110,7 +110,7 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
             target.style.backgroundPositionX= 'center';
             target.style.backgroundPositionY= 'center';
             $('#imageCenter').html(`x: 居中&emsp;y: 居中`);
-            hideImageCenter();
+            showImageCenter();
         });
         $('#imageCenterEdit').click(function(){
             if (!imageCenterShow) {
@@ -124,6 +124,7 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
     }
     function showImageCenter() {
         imageCenterShow = true;
+        $('#imageCenterReset').removeClass('hide');
         const target = editor.getAction().target;
         const button = $('#imageCenterEdit>i')[0];
         const el = document.getElementById('imagePositionTarget');
@@ -152,6 +153,7 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
     }
     function hideImageCenter() {
         imageCenterShow = false;
+        $('#imageCenterReset').addClass('hide');
         const button = $('#imageCenterEdit>i')[0];
         button.classList.add('layui-icon-edit');
         button.classList.remove('layui-icon-ok');
