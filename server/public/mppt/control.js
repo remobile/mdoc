@@ -57,7 +57,7 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
         $('#textItalic').click(()=>{
             toggleTextStyle('italic');
         });
-        $('#textResetStyle').click(()=>{
+        $('#resetStyle').click(()=>{
             setTextStyle((target)=>{
                 target.style.fontSize = 14;
                 target.style.textAlign = 'left';
@@ -67,7 +67,16 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
                 target.style.color = 'rgba(0,0,0,1)';
                 target.style.backgroundColor = 'rgba(255,255,255,1)';
             });
-            pushHistory('清除样式');
+            setImageStyle((target)=>{
+                target.style.backgroundPositionX= 'center';
+                target.style.backgroundPositionY= 'center';
+                target.style.borderRadius = 0;
+                target.style.backgroundRepeat = 'no-repeat';
+                target.style.backgroundSize = '100% 100%';
+                target.style.backgroundColor = 'rgba(0,0,0,0)';
+            });
+            updateValues(editor.getAction().target);
+            history.pushHistory('清除样式');
         });
         const imagePositionTarget = $('#imagePositionTarget');
         const positionTarget = imagePositionTarget[0];
@@ -107,6 +116,7 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
                 target.style.backgroundPositionX = `${px}px`;
                 target.style.backgroundPositionY = `${py}px`;
                 $('#imageCenter').html(`x: ${px}&emsp;y: ${py}`);
+                history.pushHistory('改变图片中心');
 
                 clickX = location.x;
                 clickY = location.y;
@@ -119,6 +129,7 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
             target.style.backgroundPositionX= 'center';
             target.style.backgroundPositionY= 'center';
             $('#imageCenter').html(`x: 居中&emsp;y: 居中`);
+            history.pushHistory('改变图片中心');
             showImageCenter();
         });
         $('#imageCenterEdit').click(function(){
@@ -159,6 +170,7 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
                 py = py === 'center' || py === '50%' ? 0 : parseInt(py);
             }
 
+            $('#imageCenter').html(`x: ${px}&emsp;y: ${py}`);
             const x = target.offsetLeft + px - offsetX;
             const y = target.offsetTop + py - offsetY;
 
@@ -171,7 +183,6 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
     }
     function hideImageCenter() {
         imageCenterShow = false;
-        history.pushHistory('改变图片中心');
         $('#imageCenterReset').addClass('hide');
         const button = $('#imageCenterEdit>i')[0];
         button.classList.add('layui-icon-edit');
@@ -432,6 +443,30 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
                     }
                 }
             });
+
+            // 中心
+            let px = target.style.backgroundPositionX;
+            let py = target.style.backgroundPositionY;
+            px = px === 'center' || px === '50%' ? '居中' : parseInt(px);
+            py = py === 'center' || py === '50%' ? '居中' : parseInt(py);
+            $('#imageCenter').html(`x: ${px}&emsp;y: ${py}`);
+
+            // 弧度
+            let max = Math.min(parseInt(target.style.width), parseInt(target.style.height))/2;
+            let br = parseInt(target.style.borderRadius) || 0;
+            slider.render({
+                elem: '#borderRadiusSlider',
+                value: br,
+                min: 0,
+                max,
+                change: function(borderRadius){
+                    setImageStyle((target)=>{
+                        target.style.borderRadius = `${borderRadius}px`;
+                    });
+                    history.pushHistory('设置图片弧度');
+                },
+            });
+
             // 颜色
             colorpicker.render({
                 elem: '#colorSlider',

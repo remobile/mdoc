@@ -57,24 +57,6 @@ module.exports = () => {
                     </div>
                 </div>
             </div>
-            <div className="layui-form-item for-text">
-                <label className="layui-form-label">颜色</label>
-                <div className="layui-input-inline">
-                    <div>
-                        <input type="hidden" name="color" value="" id="textColorPicker" />
-                        <div id="colorSlider"></div>
-                    </div>
-                </div>
-            </div>
-            <div className="layui-form-item for-text">
-                <label className="layui-form-label">背景</label>
-                <div className="layui-input-inline">
-                    <div>
-                        <input type="hidden" name="color" value="" id="textBackgroundColorPicker" />
-                        <div id="backgroundColorSlider"></div>
-                    </div>
-                </div>
-            </div>
             <div className="layui-form-item for-image">
                 <label className="layui-form-label">模式</label>
                 <div className="layui-input-block">
@@ -95,7 +77,7 @@ module.exports = () => {
                     <div id="imageCenter">{'x: 100  y: 100'}</div>
                     <div className="layui-btn-group">
                         <button id="imageCenterReset" type="button" className="layui-btn layui-btn-sm hide">
-                            <i className="layui-icon">&#xe669;</i>
+                            <i className="iconfont icon-target"></i>
                         </button>
                         <button id="imageCenterEdit" type="button" className="layui-btn layui-btn-sm">
                             <i className="layui-icon layui-icon-edit"></i>
@@ -103,11 +85,35 @@ module.exports = () => {
                     </div>
                 </div>
             </div>
+            <div className="layui-form-item for-image">
+                <label className="layui-form-label">弧度</label>
+                <div className="layui-input-block">
+                    <div id="borderRadiusSlider" className="slider-container"></div>
+                </div>
+            </div>
+            <div className="layui-form-item for-text">
+                <label className="layui-form-label">颜色</label>
+                <div className="layui-input-inline">
+                    <div>
+                        <input type="hidden" name="color" value="" id="textColorPicker" />
+                        <div id="colorSlider"></div>
+                    </div>
+                </div>
+            </div>
+            <div className="layui-form-item">
+                <label className="layui-form-label">背景</label>
+                <div className="layui-input-inline">
+                    <div>
+                        <input type="hidden" name="color" value="" id="textBackgroundColorPicker" />
+                        <div id="backgroundColorSlider"></div>
+                    </div>
+                </div>
+            </div>
             <div className="layui-form-item">
                 <label className="layui-form-label">清除</label>
                 <div className="layui-input-inline">
                     <div className="layui-btn-group">
-                        <button id="textResetStyle" type="button" className="layui-btn layui-btn-sm">
+                        <button id="resetStyle" type="button" className="layui-btn layui-btn-sm">
                             <i className="layui-icon">&#xe639;</i>
                         </button>
                     </div>

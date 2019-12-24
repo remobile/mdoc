@@ -101,13 +101,13 @@ layui.define(['jquery', 'layer', 'utils'], function(exports) {
                 if (fontStyle === 'italic') {
                     style.push('i');
                 }
-                const color = el.style.color;
+                const color = utils.rgbaToHex(el.style.color);
                 if (color) {
-                    style.push(`c=${utils.rgbaToHex(color)}`);
+                    style.push(`c=${color}`);
                 }
-                const bgcolor = el.style.backgroundColor;
-                if (bgcolor) {
-                    style.push(`bc=${utils.rgbaToHex(bgcolor)}`);
+                const bgcolor = utils.rgbaToHex(el.style.backgroundColor);
+                if (bgcolor && !/00$/.test(bgcolor)) {
+                    style.push(`bc=${bgcolor}`);
                 }
             } else {
                 const size = el.style.backgroundSize;
@@ -132,13 +132,22 @@ layui.define(['jquery', 'layer', 'utils'], function(exports) {
                 const py = el.style.backgroundPositionY;
                 let p = '';
                 if (px !== 'center' && px !== '50%') {
-                    style.push(`p=${parseInt(px)}`);
                     p=`${parseInt(px)}`;
                 }
                 if (py !== 'center' && px !== '50%') {
                     p=`${p}:${parseInt(py)}`;
                 }
                 p && style.push(`p=${p}`);
+
+                const bgcolor = utils.rgbaToHex(el.style.backgroundColor);
+                if (bgcolor && !/00$/.test(bgcolor)) {
+                    style.push(`bc=${bgcolor}`);
+                }
+
+                const borderRadius = parseInt(el.style.borderRadius);
+                if (borderRadius) {
+                    style.push(`br=${br}`);
+                }
             }
             style = style.length ? ` ${style.join(' ')}` : '';
             const group = el.dataset.group !== undefined ? ` g=${el.dataset.group}` : '';

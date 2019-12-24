@@ -344,9 +344,9 @@
 
             // keys
             document.onkeydown = function (e) {
-                if ( e.keyCode === 37) { // left key
+                if (e.keyCode === 37 || e.keyCode === 38) { // left key
                     instance.movePrev();
-                } else if ( e.keyCode === 39) { // left key
+                } else if (e.keyCode === 39 || e.keyCode === 40) { // left key
                     instance.moveNext();
                 }
             };

@@ -52,6 +52,8 @@ module.exports = function fragment_plugin(md, page) {
                 } else {
                     style.push(`background-position:center`);
                 }
+                options.bc && style.push(`background-color:${hexToRgba(options.bc)}`);
+                options.br && style.push(`border-radius:${options.br}px`);
             } else {
                 options.s && style.push(`font-size:${options.s}px`);
                 options.b && style.push(`font-weight:bold`);

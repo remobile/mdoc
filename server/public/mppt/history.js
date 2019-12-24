@@ -97,7 +97,7 @@ layui.define(['jquery', 'utils'], function(exports) {
         layer.open({
             id: 'playAllPage',
             type: 2,
-            title: '预览全页',
+            title: '预览全页（方向键控制上下页）',
             shadeClose: true,
             shade: 0.8,
             area: ['380px', '710px'],
