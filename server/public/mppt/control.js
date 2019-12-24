@@ -160,7 +160,7 @@ layui.define(['jquery', 'element', 'form', 'colorpicker', 'utils', 'animate', 'h
             }
 
             const x = target.offsetLeft + px + offsetX;
-            const y = target.offsetTop + py + offsetX;
+            const y = target.offsetTop + py + offsetY;
 
             el.style.width = target.style.width;
             el.style.height = target.style.height;
