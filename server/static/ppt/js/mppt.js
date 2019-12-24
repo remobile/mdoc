@@ -80,7 +80,7 @@ function initPage($){
     });
     // 箭头
     const arrows = $('.arrow-wrap>div');
-    $("#container").pageSlider({
+    window.pageSlider = showPageSlider('#container', {
         pageSelector:".page",
         loop:false,
         afterMove: function(pages, prePage, curPage, index) {
@@ -113,5 +113,5 @@ function initPage($){
                 });
             });
         },
-    });
+    }, $);
 }

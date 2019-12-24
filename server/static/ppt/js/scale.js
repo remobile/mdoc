@@ -55,6 +55,7 @@ function onDocumentKeyDown(e) {
         fixScreen();
     }
 }
+
 window.onload = function () {
     fixScreen();
     document.body.onresize = fixScreen;

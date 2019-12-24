@@ -1,8 +1,6 @@
 // https://github.com/mc-zone/Zepto.pageSlider
-;(function( $, window ){
-    if( typeof $ == "undefined" ){
-        throw new Error("Zepto not found!");
-    }
+function showPageSlider (id, parameters, Zepto) {
+    var $ = Zepto || window.Zepto;
     /* Common functions */
     var emptyFunction = function(){};
     var doAnimation = ( window.requestAnimationFrame || function(callback){ callback(); } );
@@ -315,42 +313,14 @@
         afterMove:  emptyFunction
     };
 
-    //fn extend
-    $.fn.pageSlider = function( parameters ){
-        var config = $.extend( true, {}, defaults, parameters );
-
-        return this.each(function( idx, el ){
-            //实例化PageSlider
-            var $el = $(el);
-            var instance = new PageSlider( $el, config );
-            instance.init();
-            config.onLoaded && config.onLoaded(instance.$pages, instance.curPage);
-
-            //auto play
-            if( instance.config.auto ){
-                instance.autoPlay();
-            }
-
-            //control button
-            [ "prevBtn", "nextBtn" ].forEach(function(btn,idx){
-                var $btn = instance.config[ btn ];
-                if( $btn && $btn.length>0 ){
-                    var oper = 'move' + btn.replace('Btn', '').replace(/./, function(m){ return m[0].toUpperCase(); });
-                    $btn.on("touchend",function(){
-                        instance[oper]();
-                    });
-                }
-            });
-
-            // keys
-            document.onkeydown = function (e) {
-                if (e.keyCode === 37 || e.keyCode === 38) { // left key
-                    instance.movePrev();
-                } else if (e.keyCode === 39 || e.keyCode === 40) { // left key
-                    instance.moveNext();
-                }
-            };
-        });
-    };
-
-}( window.Zepto, window ));
+    var config = $.extend( true, {}, defaults, parameters );
+    var $el = $(id);
+    var instance = new PageSlider( $el, config );
+    instance.init();
+    config.onLoaded && config.onLoaded(instance.$pages, instance.curPage);
+    //auto play
+    if( instance.config.auto ){
+        instance.autoPlay();
+    }
+    return instance;
+}

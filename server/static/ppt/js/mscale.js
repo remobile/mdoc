@@ -25,11 +25,11 @@ function fixScaleScreen() {
 
     if (bWidth*667 > 375*bHeight) {
         scale =  bHeight / H;
-        width = bHeight * 667 / 375;
+        width = bHeight * 375 / 667;
         left = (bWidth - width)/2;
     } else {
         scale =  bWidth / W;
-        height = bWidth * 667 / 667;
+        height = bWidth * 667 / 375;
         top = (bHeight - height)/2;
     }
     container.style.width = `${width}px`;
@@ -54,10 +54,15 @@ function onDocumentKeyDown(e) {
     if (e.altKey && e.keyCode === 70) { // alt + f
         fullscreen = !fullscreen;
         fixScreen();
+    } else if (e.keyCode === 37 || e.keyCode === 38) { // left key
+        window.pageSlider.movePrev();
+    } else if (e.keyCode === 39 || e.keyCode === 40) { // left key
+        window.pageSlider.moveNext();
     }
 }
 window.onload = function () {
     fixScreen();
     document.body.onresize = fixScreen;
+    document.body.style.backgroundColor = '#000';
     document.onkeydown = onDocumentKeyDown;
 }
