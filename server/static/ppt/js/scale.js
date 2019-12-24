@@ -16,7 +16,7 @@ function fixFullScreen() {
         el.style.transform = `scale(${scaleX}, ${scaleY}) translate(-1px, -1px)`;
     }
 }
-function fix16_9Screen() {
+function fixScaleScreen() {
     const W = 1066.67, H = 600;
     const container = document.getElementById('container');
     const bWidth = parseInt(getComputedStyle(document.body).width);
@@ -46,7 +46,7 @@ function fixScreen() {
     if (fullscreen) {
         fixFullScreen();
     } else {
-        fix16_9Screen();
+        fixScaleScreen();
     }
 }
 function onDocumentKeyDown(e) {

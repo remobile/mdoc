@@ -1,6 +1,6 @@
 let fullscreen = false;
 function fixFullScreen() {
-    const W = 1066.67, H = 600;
+    const W = 375, H = 667;
     const container = document.getElementById('container');
     const bWidth = parseInt(getComputedStyle(document.body).width);
     const bHeight = parseInt(getComputedStyle(document.body).height);
@@ -16,19 +16,20 @@ function fixFullScreen() {
         el.style.transform = `scale(${scaleX}, ${scaleY}) translate(-1px, -1px)`;
     }
 }
-function fix16_9Screen() {
-    const W = 1066.67, H = 600;
+function fixScaleScreen() {
+    const W = 375, H = 667;
     const container = document.getElementById('container');
     const bWidth = parseInt(getComputedStyle(document.body).width);
     const bHeight = parseInt(getComputedStyle(document.body).height);
     let scale = 1, left = 0, top = 0, width = bWidth, height = bHeight;
-    if (bWidth*9 > 16*bHeight) {
+
+    if (bWidth*667 > 375*bHeight) {
         scale =  bHeight / H;
-        width = bHeight * 16 / 9;
+        width = bHeight * 667 / 375;
         left = (bWidth - width)/2;
     } else {
         scale =  bWidth / W;
-        height = bWidth * 9 / 16;
+        height = bWidth * 667 / 667;
         top = (bHeight - height)/2;
     }
     container.style.width = `${width}px`;
@@ -46,7 +47,7 @@ function fixScreen() {
     if (fullscreen) {
         fixFullScreen();
     } else {
-        fix16_9Screen();
+        fixScaleScreen();
     }
 }
 function onDocumentKeyDown(e) {

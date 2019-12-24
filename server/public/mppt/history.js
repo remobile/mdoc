@@ -100,7 +100,7 @@ layui.define(['jquery', 'utils'], function(exports) {
             title: '预览全页（方向键控制上下页）',
             shadeClose: true,
             shade: 0.8,
-            area: ['380px', '710px'],
+            area: ['540px', '820px'],
             content: '/mdoc-ppt?play=true',
             success: function(layero, index){
                 const container = layer.getChildFrame('#container', index);
