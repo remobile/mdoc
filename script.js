@@ -19,6 +19,7 @@ program
 .option('-t, --ppt <config file>', 'start server single file with ppt')
 .option('-e, --edit [ppt index file]', 'edit ppt file')
 .option('-m, --mobile', 'is mppt file')
+.option('-w, --word <config file>', 'crate word with config')
 .option('-p, --port [4000]', 'port of server', 4000)
 .option('-o, --open', 'if open browser')
 .option('-v, --verbose', 'verbose mode')
@@ -55,13 +56,16 @@ require('babel-register')({
     presets: ['react'],
 });
 
-const { port, start, build, hasDomain, file, ppt, edit, mobile, verbose, open } = program;
+const { port, start, build, hasDomain, file, ppt, word, edit, mobile, verbose, open } = program;
 if (file) {
     const buildFile = require('./server/buildFile.js');
     buildFile(port*1, file, build);
 } else if (ppt) {
     const buildPPT = require('./server/buildPPT.js');
     buildPPT(port*1, ppt, build, edit, mobile, open);
+} else if (word) {
+    const buildWord = require('./server/buildWord.js');
+    buildWord(word);
 } else if (build) {
     const buildProject = require('./server/buildProject.js');
     buildProject(hasDomain, verbose);
