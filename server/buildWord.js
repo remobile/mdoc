@@ -31,7 +31,7 @@ function parseImage(line, list = []) {
 }
 function createImage(doc, dir, list, children) {
     let w, h;
-    const fontSize = 20; // 字体大小
+    const fontSize = config.imageTextFontSize; // 字体大小
     const tw = 600; // 总宽度
     if (list.length === 1) {
         w = tw;
@@ -43,7 +43,7 @@ function createImage(doc, dir, list, children) {
     const width = { size: 100, type: WidthType.PERCENTAGE }; // 表格总宽度
     const border = { color: "white", size: 1 };
     const borders = { top: border, bottom: border, left: border, right: border };
-    const text = (str) => new Paragraph({ children: [new TextRun({ text: str, size: fontSize, font: { name: 'Songti SC Regular' } })], alignment: AlignmentType.CENTER });
+    const text = (str) => new Paragraph({ children: [new TextRun({ text: str, size: fontSize, font: { name: config.fontName } })], alignment: AlignmentType.CENTER });
     const image = (img, w, h) => new Paragraph({ children: [Media.addImage(doc, fs.readFileSync(path.join(dir, img)), w, h)], alignment: AlignmentType.CENTER });
     const imageList = list.map(o=> new TableCell({ children: [image(o.image, w, h)], borders }));
     const textList = list.map(o=> new TableCell({ children: [text(o.text)], borders, margins: { top: 100 } }));
@@ -51,10 +51,10 @@ function createImage(doc, dir, list, children) {
     children.push(table);
 }
 function createExcel(excelTextList, children) {
-    const fontSize = 20; // 字体大小
+    const fontSize = config.tableFontSize; // 字体大小
     const width = { size: 100, type: WidthType.PERCENTAGE }; // 表格总宽度
     const list = (line) => line.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(o=>o.trim().replace(/<br>/g, '\n'));
-    const text = (str, alignment = AlignmentType.CENTER) => new Paragraph({ children: [new TextRun({ text: str, size: fontSize, font: { name: 'Songti SC Regular' } })], alignment });
+    const text = (str, alignment = AlignmentType.CENTER) => new Paragraph({ children: [new TextRun({ text: str, size: fontSize, font: { name: config.fontName } })], alignment });
     const row = (line, alignments = []) => list(line).map((o, i)=> new TableCell({ children: [text(o, alignments[i])] }));
     const header = new TableRow({ children: row(excelTextList[0]) });
     const alignments = list(excelTextList[1]).map(o=> /^:-+:$/.test(o) ? AlignmentType.CENTER : /-+:$/.test(o) ? AlignmentType.END : AlignmentType.START);
@@ -97,14 +97,14 @@ function crateWordLayer(doc, dir, children, level = -1) {
                         const head = [ '', '■', '\t◆', '\t\t ●' ][level];
                         children.push(new Paragraph({ children: [new TextRun({
                             text: `${head} ${title}`,
-                            size: 24,
-                            font: { name : 'Songti SC Regular' },
+                            size: config.paragraphFontSize,
+                            font: { name : config.fontName },
                         })], indent: { left: 900, hanging: 360 } }));
                     } else {
                         children.push(new Paragraph({ children: [new TextRun({
                             text: line,
-                            size: 24,
-                            font: { name : 'Songti SC Regular' },
+                            size: config.paragraphFontSize,
+                            font: { name : config.fontName },
                         })], indent: { left: 900, hanging: 360 } }));
                     }
                     if (isExcel) {
@@ -131,7 +131,7 @@ function buildMarkdown(configPath) {
     const numbering = config.numberingPathPath && fs.readFileSync(path.resolve(CWD, config.numberingPathPath), "utf-8");
     const doc = new Document({
         title: config.title || "点击这里修改标题",
-        background: { color: config.backgroundCcolor || "FFFFFF" },
+        background: { color: config.backgroundColor || "FFFFFF" },
         externalStyles: styles,
         externalNumbering: numbering,
     });
