@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const puppeteer = require('puppeteer-cn');
+const sizeOf = require('image-size');
 const _ = require('lodash');
 const {
     Document,
@@ -122,7 +123,8 @@ function createExcel(excelTextList, children) {
 async function createCode(doc, codeTextList, children) {
     console.log("[createCode]", codeTextList[0]);
     const buffer = await createCodeImage(codeTextList.join('\n'));
-    const image = Media.addImage(doc, buffer, 600);
+    const size = sizeOf(buffer);
+    const image = Media.addImage(doc, buffer, 600, 600*size.height/size.width);
     children.push(new Paragraph(image));
 }
 async function crateWordLayer(doc, dir, children, level = -1) {
@@ -150,6 +152,7 @@ async function crateWordLayer(doc, dir, children, level = -1) {
                         isCode = false;
                         // 生成代码片段
                         await createCode(doc, codeTextList, children);
+                        codeTextList = [];
                     }
                 } else {
                     if (isCode) { // 插入代码
