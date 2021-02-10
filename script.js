@@ -41,35 +41,37 @@ if (!fs.existsSync(CWD + 'config.js')) {
     process.exit(1);
 }
 
-require('babel-register')({
-    babelrc: false,
-    ignore: function(filename) {
-        if (/node_modules/.test(filename)) {
-            if (new RegExp(__dirname).test(filename)) {
-                return false;
-            }
-            return true;
-        }
-        return false;
-    },
-    extensions: [".js"],
-    presets: ['react'],
-});
-
 const { port, start, build, hasDomain, file, ppt, word, edit, mobile, verbose, open } = program;
-if (file) {
-    const buildFile = require('./server/buildFile.js');
-    buildFile(port*1, file, build);
-} else if (ppt) {
-    const buildPPT = require('./server/buildPPT.js');
-    buildPPT(port*1, ppt, build, edit, mobile, open);
-} else if (word) {
+if (word) {
     const buildWord = require('./server/buildWord.js');
     buildWord(word);
-} else if (build) {
-    const buildProject = require('./server/buildProject.js');
-    buildProject(hasDomain, verbose);
 } else {
-    const startServer = require('./server/startServer.js');
-    startServer(port*1, verbose, open);
+    require('babel-register')({
+        babelrc: false,
+        ignore: function(filename) {
+            if (/node_modules/.test(filename)) {
+                if (new RegExp(__dirname).test(filename)) {
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        },
+        extensions: [".js"],
+        presets: ['react'],
+    });
+
+    if (file) {
+        const buildFile = require('./server/buildFile.js');
+        buildFile(port*1, file, build);
+    } else if (ppt) {
+        const buildPPT = require('./server/buildPPT.js');
+        buildPPT(port*1, ppt, build, edit, mobile, open);
+    } else if (build) {
+        const buildProject = require('./server/buildProject.js');
+        buildProject(hasDomain, verbose);
+    } else {
+        const startServer = require('./server/startServer.js');
+        startServer(port*1, verbose, open);
+    }
 }
