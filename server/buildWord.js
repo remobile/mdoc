@@ -88,11 +88,11 @@ function parseImage(line, list = []) {
 function createImage(doc, dir, list, children) {
     console.log("[createImage]", list[0]);
     let w, h;
-    const fontSize = config.imageTextFontSize; // 字体大小
     const tw = 600; // 总宽度
     if (list.length === 1) {
         w = tw;
-        h = w * 3 / 5;
+        const size = sizeOf(path.join(dir, list[0].image));
+        h = w * size.height / size.width;
     } else {
         w = tw / list.length;
         h = w * 4 / 3;
@@ -100,7 +100,7 @@ function createImage(doc, dir, list, children) {
     const width = { size: 100, type: WidthType.PERCENTAGE }; // 表格总宽度
     const border = { color: "white", size: 1 };
     const borders = { top: border, bottom: border, left: border, right: border };
-    const text = (str) => new Paragraph({ children: [new TextRun({ text: str, size: fontSize, font: { name: config.fontName } })], alignment: AlignmentType.CENTER });
+    const text = (str) => new Paragraph({ text: str, style: 'Caption' });
     const image = (img, w, h) => new Paragraph({ children: [Media.addImage(doc, fs.readFileSync(path.join(dir, img)), w, h)], alignment: AlignmentType.CENTER });
     const imageList = list.map(o=> new TableCell({ children: [image(o.image, w, h)], borders }));
     const textList = list.map(o=> new TableCell({ children: [text(o.text)], borders, margins: { top: 100 } }));
