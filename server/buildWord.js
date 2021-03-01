@@ -207,7 +207,7 @@ async function buildMarkdown(configPath) {
     config = require(path.resolve(CWD, configPath));
 
     const styles = config.stylesPath && fs.readFileSync(path.resolve(CWD, config.stylesPath), "utf-8");
-    const numbering = config.numberingPathPath && fs.readFileSync(path.resolve(CWD, config.numberingPathPath), "utf-8");
+    const numbering = config.numberingPath && fs.readFileSync(path.resolve(CWD, config.numberingPath), "utf-8");
     const doc = new Document({
         title: config.title || "点击这里修改标题",
         background: { color: config.backgroundColor || "FFFFFF" },
