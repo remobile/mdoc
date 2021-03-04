@@ -15,7 +15,7 @@ const {
     TableRow,
     WidthType,
     Media,
-}  = require( "docx");
+}  = require('./res/docx');
 const CWD = process.cwd();
 const script = fs.readFileSync(path.join(__dirname, 'res/highlight.min.js'));
 const style = fs.readFileSync(path.join(__dirname, 'res/atom-one-dark.min.css'));
