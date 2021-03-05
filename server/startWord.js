@@ -33,18 +33,16 @@ function createImage(dir, list, children, file) {
     const images = list.map(o=>({ img: path.join(dir, o.image), text: o.text, w, h }));
     children.push({ images, file, w: tw, h });
 }
-function createExcel(excelTextList, children) {
-    // console.log("[createExcel]", excelTextList[0]);
-    // const fontSize = config.tableFontSize; // 字体大小
-    // const width = { size: 100, type: WidthType.PERCENTAGE }; // 表格总宽度
-    // const list = (line) => line.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(o=>o.trim().replace(/<br>/g, '\n'));
-    // const text = (str, alignment = AlignmentType.CENTER) => paragraph({ children: [new TextRun({ text: str, size: fontSize, font: { name: config.fontName } })], alignment });
-    // const row = (line, alignments = []) => list(line).map((o, i)=> new TableCell({ children: [text(o, alignments[i])] }));
-    // const header = new TableRow({ children: row(excelTextList[0]) });
-    // const alignments = list(excelTextList[1]).map(o=> /^:-+:$/.test(o) ? AlignmentType.CENTER : /-+:$/.test(o) ? AlignmentType.END : AlignmentType.START);
-    // const rows = excelTextList.slice(2).map(line=>new TableRow({ children: row(line, alignments) }));
-    // const table = new Table({ width, rows: [ header, ...rows ] });
-    // children.push(table);
+function createExcel(excelTextList, children, file) {
+    console.log("[createExcel]", excelTextList[0]);
+    const fontSize = config.tableFontSize; // 字体大小
+    const list = (line) => line.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(o=>o.trim().replace(/<br>/g, '\n'));
+    const text = (str, alignment = 'center') => ({ text: str, fontSize, fontName: config.fontName, alignment });
+    const row = (line, alignments = []) => list(line).map((o, i)=> text(o, alignments[i]));
+    const header = row(excelTextList[0]);
+    const alignments = list(excelTextList[1]).map(o=> /^:-+:$/.test(o) ? 'center' : /-+:$/.test(o) ? 'right' : 'left');
+    const rows = excelTextList.slice(2).map(line=>row(line, alignments));
+    children.push({ table: { header, rows }, file  });
 }
 async function createCode(codeTextList, children, file) {
     console.log("[createCode]", codeTextList[0]);
@@ -114,7 +112,7 @@ function crateWordLayer(dir, children, level = -1) {
                     if (isExcel) {
                         isExcel = false;
                         // 生成表格
-                        createExcel(excelTextList, children);
+                        createExcel(excelTextList, children, file);
                         excelTextList = [];
                     }
                 }
@@ -122,7 +120,7 @@ function crateWordLayer(dir, children, level = -1) {
             if (isExcel) {
                 isExcel = false;
                 // 生成表格
-                createExcel(excelTextList, children);
+                createExcel(excelTextList, children, file);
                 excelTextList = [];
             }
         }
@@ -139,6 +137,8 @@ function getHtml(children) {
             return `<h${o.headingNo}>${heading.join('.')} ${o.text}</h${o.headingNo}>`;
         } else if (o.images) {
             return `<div class="imageRow" style="width:${o.w}px;height:${o.h}px;">${o.images.map(m=>`<div class="imageItem"><img src="${m.img}" style="width:${m.w}px;height:${m.h}px;"/><div class="imageItem">图${imgNo++}：${m.text}</div></div>`).join('')}</div><br/>`;
+        } else if (o.table) {
+            return `<pre><code class="lang-javascript">${o.code}</code></pre>`;
         } else if (o.code) {
             return `<pre><code class="lang-javascript">${o.code}</code></pre>`;
         } else {
