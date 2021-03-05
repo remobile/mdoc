@@ -43,8 +43,13 @@ if (!fs.existsSync(CWD + 'config.js')) {
 
 const { port, start, build, hasDomain, file, ppt, word, edit, mobile, verbose, open } = program;
 if (word) {
-    const buildWord = require('./server/buildWord.js');
-    buildWord(word);
+    if (build) {
+        const buildWord = require('./server/buildWord.js');
+        buildWord(word);
+    } else {
+        const startWord = require('./server/startWord.js');
+        startWord(word, port*1, verbose, open);
+    }
 } else {
     require('babel-register')({
         babelrc: false,
