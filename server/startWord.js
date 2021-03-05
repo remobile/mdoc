@@ -46,9 +46,9 @@ function createExcel(excelTextList, children) {
     // const table = new Table({ width, rows: [ header, ...rows ] });
     // children.push(table);
 }
-function createCode(codeTextList, children) {
-    // console.log("[createCode]", codeTextList[0]);
-    // children.push(paragraph(codeTextList.join('\n')));
+async function createCode(codeTextList, children, file) {
+    console.log("[createCode]", codeTextList[0]);
+    children.push({ code: codeTextList.join('\n') });
 }
 function crateWordLayer(dir, children, level = -1) {
     const files = fs.readdirSync(dir);
@@ -74,7 +74,7 @@ function crateWordLayer(dir, children, level = -1) {
                     } else {
                         isCode = false;
                         // 生成代码片段
-                        createCode(codeTextList, children);
+                        createCode(codeTextList, children, file);
                         codeTextList = [];
                     }
                 } else {
@@ -93,16 +93,16 @@ function crateWordLayer(dir, children, level = -1) {
                     } else if (/^\s*!\[([^\]]*)\]\(([^)]*)\)/.test(line)) { // 图片
                         const list = parseImage(line, []);
                         createImage(dir, list, children, file);
-                    // } else if (/^\*+\s+/.test(line)) { // 列表
-                    //     const li = line.replace(/(^\*+)[^*]*/, '$1');
-                    //     const level = li.length;
-                    //     const title = line.replace(/^\*+\s+/, '');
-                    //     const head = [ '', '■', '\t◆', '\t\t ●' ][level];
-                    //     children.push(paragraph({ children: [new TextRun({
-                    //         text: `${head} ${title}`,
-                    //         size: config.paragraphFontSize,
-                    //         font: { name : config.fontName },
-                    //     })], indent: { left: 900, hanging: 360 } }));
+                    } else if (/^\*+\s+/.test(line)) { // 列表
+                        const li = line.replace(/(^\*+)[^*]*/, '$1');
+                        const level = li.length;
+                        const title = line.replace(/^\*+\s+/, '');
+                        const head = [ '', '■', '\t◆', '\t\t ●' ][level];
+                        children.push({
+                            text: `${level==1?'':_.repeat('&emsp;&emsp;', level-1)} ${head} ${title}`,
+                            fontSize: config.paragraphFontSize,
+                            fontName: { name : config.fontName },
+                        });
                     } else {
                         children.push({
                             file,
@@ -139,6 +139,8 @@ function getHtml(children) {
             return `<h${o.headingNo}>${heading.join('.')} ${o.text}</h${o.headingNo}>`;
         } else if (o.images) {
             return `<div class="imageRow" style="width:${o.w}px;height:${o.h}px;">${o.images.map(m=>`<div class="imageItem"><img src="${m.img}" style="width:${m.w}px;height:${m.h}px;"/><div class="imageItem">图${imgNo++}：${m.text}</div></div>`).join('')}</div><br/>`;
+        } else if (o.code) {
+            return `<pre><code class="lang-javascript">${o.code}</code></pre>`;
         } else {
             return `<p>&emsp;&emsp;${o.text}</p>`;
         }
@@ -153,6 +155,7 @@ async function startWord(configPath, port, verbose, open) {
     const app = express();
     verbose && app.use(morgan('short'));
     app.use(express.static('.'));
+    app.use(express.static(__dirname));
 
     app.get('/', (req, res) => {
         children = [];
@@ -162,6 +165,8 @@ async function startWord(configPath, port, verbose, open) {
             <head>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width" />
+                <script src="res/highlight.min.js"></script>
+                <link rel="stylesheet" href="res/atom-one-dark.min.css" />
                 <style>
                 body { background: black; display: flex; justify-content: center; padding: 0; margin: 0; }
                 h1, h2, h3, h4, h5, h6 { color: inherit; font-weight: 600; line-height: 1.25; margin-bottom: 16px; margin-top: 1.5em; }
@@ -171,6 +176,9 @@ async function startWord(configPath, port, verbose, open) {
                 h4 { font-size: 16px; }
                 h5 { font-size: 14px; }
                 h6 { font-size: 13.6px; }
+                pre, code { white-space: pre-wrap; }
+                .hljs ul { list-style: decimal; padding: 0px 70px !important; font-size: 28px; }
+                .hljs ul li { list-style: decimal; border-left: 1px solid #ddd !important; padding: 3px!important; margin: 0 !important; word-break: break-all; word-wrap: break-word; }
                 .container { min-width: 1000px; max-width: 1000px; min-height: 100%; background: #FFFFFF; padding-left: 20px; padding-right: 20px; }
                 .imageRow { display: flex; flex-direction: row; }
                 .imageItem { display: flex; flex-direction: column; align-items: center; }
@@ -180,6 +188,13 @@ async function startWord(configPath, port, verbose, open) {
                 <div class="container">
                 ${getHtml(children)}
                 </div>
+                <script >
+                hljs.initHighlightingOnLoad();
+                document.querySelectorAll('pre code').forEach(o=>{
+                    const list = o.innerHTML.split(/\\n/);
+                    o.innerHTML = '<ul><li>'+list.slice(1, list.length-1).join('\\n</li><li>')+'</li></ul>';
+                });
+                </script>
             </body>
             </html>
             `);
