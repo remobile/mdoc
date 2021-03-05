@@ -138,7 +138,7 @@ function getHtml(children) {
             heading.length = no + 1;
             return `<h${o.headingNo}>${heading.join('.')} ${o.text}</h${o.headingNo}>`;
         } else if (o.images) {
-            return `<div class="imageRow" style="width:${o.w}px;height:${o.h}px;">${o.images.map(m=>`<div class="imageItem"><img src="${m.img}" style="width:${m.w}px;height:${m.h}px;"/><div class="imageItem">图${imgNo++}：${m.text}</div></div>`)}</div><br/>`;
+            return `<div class="imageRow" style="width:${o.w}px;height:${o.h}px;">${o.images.map(m=>`<div class="imageItem"><img src="${m.img}" style="width:${m.w}px;height:${m.h}px;"/><div class="imageItem">图${imgNo++}：${m.text}</div></div>`).join('')}</div><br/>`;
         } else {
             return `<p>&emsp;&emsp;${o.text}</p>`;
         }
@@ -163,6 +163,7 @@ async function startWord(configPath, port, verbose, open) {
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="width=device-width" />
                 <style>
+                body { background: black; display: flex; justify-content: center; padding: 0; margin: 0; }
                 h1, h2, h3, h4, h5, h6 { color: inherit; font-weight: 600; line-height: 1.25; margin-bottom: 16px; margin-top: 1.5em; }
                 h1 { font-size: 32px; }
                 h2 { font-size: 24px; }
@@ -170,12 +171,15 @@ async function startWord(configPath, port, verbose, open) {
                 h4 { font-size: 16px; }
                 h5 { font-size: 14px; }
                 h6 { font-size: 13.6px; }
+                .container { min-width: 1000px; max-width: 1000px; min-height: 100%; background: #FFFFFF; padding-left: 20px; padding-right: 20px; }
                 .imageRow { display: flex; flex-direction: row; }
                 .imageItem { display: flex; flex-direction: column; align-items: center; }
                 </style>
             </head>
             <body>
+                <div class="container">
                 ${getHtml(children)}
+                </div>
             </body>
             </html>
             `);
