@@ -136,63 +136,60 @@ async function crateWordLayer(doc, dir, children, level = -1) {
         if(info.isDirectory()) {
             await crateWordLayer(doc, fullname, children, level + 1);
         } else if (/.*\.md/.test(file)) {
-            const text = fs.readFileSync(fullname, 'utf8');
-            const list = text.split(/\n/);
-            let isExcel = false, isCode = false;
-            let excelTextList = [];
-            let codeTextList = [];
-            for (const line of list) {
-                if (/^\s*\|.*\|\s*$/.test(line)) { // 表格
-                    isExcel = true;
-                    excelTextList.push(line.trim());
-                } else if (/^\s*```.*$/.test(line)) { // 代码
-                    if (!isCode) {
-                        isCode = true;
-                    } else {
-                        isCode = false;
-                        // 生成代码片段
-                        await createCode(doc, codeTextList, children);
-                        codeTextList = [];
-                    }
-                } else {
-                    if (isCode) { // 插入代码
-                        codeTextList.push(line);
-                    } else if (/^#+\s+/.test(line)) { // 标题
-                        const li = line.replace(/(^#+)[^#]*/, '$1');
-                        const no = li.length + Math.max(level, 0);
-                        const title = line.replace(/^#+\s+/, '');
-                        console.log(`HEADING_${no}:${_.repeat('-', no*3)}${title}`);
-                        children.push(new Paragraph({
-                            text: title,
-                            heading: HeadingLevel[`HEADING_${no}`],
-                        }));
-                    } else if (/^\s*!\[([^\]]*)\]\(([^)]*)\)/.test(line)) { // 图片
-                        const list = parseImage(line, []);
-                        createImage(doc, dir, list, children);
-                    } else if (/^\*+\s+/.test(line)) { // 列表
-                        const li = line.replace(/(^\*+)[^*]*/, '$1');
-                        const level = li.length;
-                        const title = line.replace(/^\*+\s+/, '');
-                        const head = [ '', '■', '\t◆', '\t\t ●' ][level];
-                        children.push(new Paragraph({ children: [new TextRun({
-                            text: `${head} ${title}`,
-                            size: config.paragraphFontSize,
-                            font: { name : config.fontName },
-                        })], indent: { left: 900, hanging: 360 } }));
-                    } else {
-                        children.push(new Paragraph({ children: [new TextRun({
-                            text: line,
-                            size: config.paragraphFontSize,
-                            font: { name : config.fontName },
-                        })], indent: { left: 900, hanging: 360 } }));
-                    }
-                    if (isExcel) {
-                        isExcel = false;
-                        // 生成表格
-                        createExcel(excelTextList, children);
-                        excelTextList = [];
-                    }
-                }
+            await parseMarkDownFile(doc, fullname, level, children);
+        }
+    }
+}
+async function parseMarkDownFile(doc, file, level, children) {
+    const text = fs.readFileSync(file, 'utf8');
+    const list = text.split(/\n/);
+    let isExcel = false, isCode = false;
+    let excelTextList = [];
+    let codeTextList = [];
+    for (const line of list) {
+        if (/^\s*\|.*\|\s*$/.test(line)) { // 表格
+            isExcel = true;
+            excelTextList.push(line.trim());
+        } else if (/^\s*```.*$/.test(line)) { // 代码
+            if (!isCode) {
+                isCode = true;
+            } else {
+                isCode = false;
+                // 生成代码片段
+                await createCode(doc, codeTextList, children);
+                codeTextList = [];
+            }
+        } else {
+            if (isCode) { // 插入代码
+                codeTextList.push(line);
+            } else if (/^#+\s+/.test(line)) { // 标题
+                const li = line.replace(/(^#+)[^#]*/, '$1');
+                const no = li.length + Math.max(level, 0);
+                const title = line.replace(/^#+\s+/, '');
+                console.log(`HEADING_${no}:${_.repeat('-', no*3)}${title}`);
+                children.push(new Paragraph({
+                    text: title,
+                    heading: HeadingLevel[`HEADING_${no}`],
+                }));
+            } else if (/^\s*!\[([^\]]*)\]\(([^)]*)\)/.test(line)) { // 图片
+                const list = parseImage(line, []);
+                createImage(doc, path.dirname(file), list, children);
+            } else if (/^\*+\s+/.test(line)) { // 列表
+                console.log("[createList]", line);
+                const li = line.replace(/(^\*+)[^*]*/, '$1');
+                const title = line.replace(/^\*+\s+/, '');
+                const head = [ '', '■', '\t◆', '\t\t ●' ][li.length];
+                children.push(new Paragraph({ children: [new TextRun({
+                    text: `${head} ${title}`,
+                    size: config.paragraphFontSize,
+                    font: { name : config.fontName },
+                })], indent: { left: 900, hanging: 360 } }));
+            } else {
+                children.push(new Paragraph({ children: [new TextRun({
+                    text: line,
+                    size: config.paragraphFontSize,
+                    font: { name : config.fontName },
+                })], indent: { left: 900, hanging: 360 } }));
             }
             if (isExcel) {
                 isExcel = false;
@@ -201,6 +198,12 @@ async function crateWordLayer(doc, dir, children, level = -1) {
                 excelTextList = [];
             }
         }
+    }
+    if (isExcel) {
+        isExcel = false;
+        // 生成表格
+        createExcel(excelTextList, children);
+        excelTextList = [];
     }
 }
 async function buildMarkdown(configPath) {
