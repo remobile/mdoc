@@ -86,6 +86,12 @@ function parseMarkDownFile(file, level, children) {
                 codeTextList = [];
             }
         } else {
+            if (isExcel) {
+                isExcel = false;
+                // 生成表格
+                createExcel(excelTextList, children, file);
+                excelTextList = [];
+            }
             if (isCode) { // 插入代码
                 codeTextList.push(line);
             } else if (/^#+\s+/.test(line)) { // 标题
@@ -120,12 +126,6 @@ function parseMarkDownFile(file, level, children) {
                     fontName: config.fontName,
                 });
             }
-            if (isExcel) {
-                isExcel = false;
-                // 生成表格
-                createExcel(excelTextList, children, file);
-                excelTextList = [];
-            }
         }
     }
     if (isExcel) {
@@ -159,7 +159,6 @@ async function startWord(configPath, port, verbose, open) {
     config = require(path.resolve(CWD, configPath));
     let children = [];
     crateWordLayer(config.srcPath, children);
-    console.log("=======", children);
     const express = require('express');
     const morgan = require('morgan');
     const app = express();
@@ -182,7 +181,7 @@ async function startWord(configPath, port, verbose, open) {
                 pre, code { white-space: pre-wrap; }
                 .hljs ul { list-style: decimal; padding: 0px 70px !important; font-size: 28px; }
                 .hljs ul li { list-style: decimal; border-left: 1px solid #ddd !important; padding: 3px!important; margin: 0 !important; word-break: break-all; word-wrap: break-word; }
-                .container { min-width: 1000px; max-width: 1000px; height: 100%; background: #FFFFFF; padding-left: 20px; padding-right: 20px; overflow: scroll; }
+                .container { min-width: 1000px; max-width: 1000px; min-height: 100%; background: #FFFFFF; padding-left: 20px; padding-right: 20px; }
                 .imageRow { display: flex; flex-direction: row; }
                 .imageItem { display: flex; flex-direction: column; align-items: center; }
                 table { border-collapse: collapse; border-spacing: 0; display: block; margin-bottom: 16px; margin-top: 0; overflow: auto; width: 100%; }
@@ -220,10 +219,15 @@ async function startWord(configPath, port, verbose, open) {
                 files: [{
                     match: [path.join(CWD, config.srcPath)+'/**/*.md'],
                     fn: function (event, file) {
-                        // if (event === 'change') {
-                        //
-                        // }
-                        console.log("=======",event, file);
+                        if (event === 'change') {
+                            const level = _.find(children, o=>o.file===file && o.headingNo).level;
+                            const list = [];
+                            parseMarkDownFile(file, level, list);
+                            const start = _.findIndex(children, o=>o.file===file);
+                            const end = _.findLastIndex(children, o=>o.file===file);
+                            children.splice(start, end-start+1, ...list);
+                            browserSync.reload();
+                        }
                     }
                 }],
                 notify: false,

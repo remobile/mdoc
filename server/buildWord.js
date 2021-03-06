@@ -160,6 +160,12 @@ async function parseMarkDownFile(doc, file, level, children) {
                 codeTextList = [];
             }
         } else {
+            if (isExcel) {
+                isExcel = false;
+                // 生成表格
+                createExcel(excelTextList, children);
+                excelTextList = [];
+            }
             if (isCode) { // 插入代码
                 codeTextList.push(line);
             } else if (/^#+\s+/.test(line)) { // 标题
@@ -190,12 +196,6 @@ async function parseMarkDownFile(doc, file, level, children) {
                     size: config.paragraphFontSize,
                     font: { name : config.fontName },
                 })], indent: { left: 900, hanging: 360 } }));
-            }
-            if (isExcel) {
-                isExcel = false;
-                // 生成表格
-                createExcel(excelTextList, children);
-                excelTextList = [];
             }
         }
     }
