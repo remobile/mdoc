@@ -35,18 +35,22 @@ function createImage(dir, list, children, file) {
 }
 function createExcel(excelTextList, children, file) {
     console.log("[createExcel]", excelTextList[0]);
+    const tw = 1000; // 总宽度
     const fontSize = config.tableFontSize; // 字体大小
     const list = (line) => line.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(o=>o.trim().replace(/<br>/g, '\n'));
-    const text = (str, alignment = 'center') => ({ text: str, fontSize, fontName: config.fontName, alignment });
-    const row = (line, alignments = []) => list(line).map((o, i)=> text(o, alignments[i]));
-    const header = row(excelTextList[0]);
-    const alignments = list(excelTextList[1]).map(o=> /^:-+:$/.test(o) ? 'center' : /-+:$/.test(o) ? 'right' : 'left');
-    const rows = excelTextList.slice(2).map(line=>row(line, alignments));
+    const text = (str, width, alignment = 'center') => ({ text: str, fontSize, fontName: config.fontName, alignment, width });
+    const row = (line, widths = [], alignments = []) => list(line).map((o, i)=> text(o, widths[i], alignments[i]));
+    const alignments = list(excelTextList[1]).map(o=> /^:\s*\d+:\s*$/.test(o) ? 'center' : /\d+\s*:$/.test(o) ? 'right' : 'left');
+    let widths = list(excelTextList[1]).map(o=>+(o.replace(/[:\s]*/g, ''))||1);
+    const totalWidth = _.sum(widths);
+    widths = widths.map(o=>Math.round(o/totalWidth*1000)-4);
+    const header = row(excelTextList[0], widths);
+    const rows = excelTextList.slice(2).map(line=>row(line, widths, alignments));
     children.push({ table: { header, rows }, file  });
 }
 async function createCode(codeTextList, children, file) {
     console.log("[createCode]", codeTextList[0]);
-    children.push({ code: codeTextList.join('\n') });
+    children.push({ code: codeTextList.join('\n'), file });
 }
 function crateWordLayer(dir, children, level = -1) {
     const files = fs.readdirSync(dir);
@@ -138,7 +142,7 @@ function getHtml(children) {
         } else if (o.images) {
             return `<div class="imageRow" style="width:${o.w}px;height:${o.h}px;">${o.images.map(m=>`<div class="imageItem"><img src="${m.img}" style="width:${m.w}px;height:${m.h}px;"/><div class="imageItem">图${imgNo++}：${m.text}</div></div>`).join('')}</div><br/>`;
         } else if (o.table) {
-            return `<pre><code class="lang-javascript">${o.code}</code></pre>`;
+            return `<table><thead><tr>${o.table.header.map(m=>`<th style="text-align:${m.alignment};min-width:${m.width}px;max-width:${m.width}px">${m.text}</th>`).join('')}</tr></thead><tbody>${o.table.rows.map(m=>`<tr>${m.map(n=>`<td style="text-align:${n.alignment}">${n.text}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
         } else if (o.code) {
             return `<pre><code class="lang-javascript">${o.code}</code></pre>`;
         } else {
@@ -179,9 +183,14 @@ async function startWord(configPath, port, verbose, open) {
                 pre, code { white-space: pre-wrap; }
                 .hljs ul { list-style: decimal; padding: 0px 70px !important; font-size: 28px; }
                 .hljs ul li { list-style: decimal; border-left: 1px solid #ddd !important; padding: 3px!important; margin: 0 !important; word-break: break-all; word-wrap: break-word; }
-                .container { min-width: 1000px; max-width: 1000px; min-height: 100%; background: #FFFFFF; padding-left: 20px; padding-right: 20px; }
+                .container { min-width: 1000px; max-width: 1000px; height: 100%; background: #FFFFFF; padding-left: 20px; padding-right: 20px; overflow: scroll; }
                 .imageRow { display: flex; flex-direction: row; }
                 .imageItem { display: flex; flex-direction: column; align-items: center; }
+                table { border-collapse: collapse; border-spacing: 0; display: block; margin-bottom: 16px; margin-top: 0; overflow: auto; width: 100%; }
+                table tr { background-color: transparent; border-top: 1px solid #dfe2e5; }
+                table th, table td { border: 1px solid #dfe2e5; }
+                table th { background-color: #f6f8fa; color: inherit; font-weight: 600; }
+                table td { color: inherit; }
                 </style>
             </head>
             <body>
