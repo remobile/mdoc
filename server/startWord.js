@@ -19,7 +19,7 @@ function parseImage(line, list = []) {
     return list;
 }
 function createImage(list, children, file) {
-    console.log("[createImage]", list[0]);
+    console.log('[createImage]', list[0]);
     let w, h;
     const tw = 1000; // 总宽度
     const dir = path.dirname(file);
@@ -35,11 +35,10 @@ function createImage(list, children, file) {
     children.push({ images, file, w: tw, h });
 }
 function createExcel(excelTextList, children, file) {
-    console.log("[createExcel]", excelTextList[0]);
+    console.log('[createExcel]', excelTextList[0]);
     const tw = 1000; // 总宽度
-    const fontSize = config.tableFontSize; // 字体大小
     const list = (line) => line.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(o=>o.trim().replace(/<br>/g, '\n'));
-    const text = (str, width, alignment = 'center') => ({ text: str, fontSize, fontName: config.fontName, alignment, width });
+    const text = (str, width, alignment = 'center') => ({ text: str, fontSize: config.tableFontSize, fontName: config.fontName, alignment, width });
     const row = (line, widths = [], alignments = []) => list(line).map((o, i)=> text(o, widths[i], alignments[i]));
     const alignments = list(excelTextList[1]).map(o=> /^:\s*\d+:\s*$/.test(o) ? 'center' : /\d+\s*:$/.test(o) ? 'right' : 'left');
     let widths = list(excelTextList[1]).map(o=>+(o.replace(/[:\s]*/g, ''))||1);
@@ -50,7 +49,7 @@ function createExcel(excelTextList, children, file) {
     children.push({ table: { header, rows }, file  });
 }
 function createCode(codeTextList, children, file) {
-    console.log("[createCode]", codeTextList[0]);
+    console.log('[createCode]', codeTextList[0]);
     children.push({ code: codeTextList.join('\n'), file });
 }
 function crateWordLayer(dir, children, level = -1) {
@@ -109,20 +108,20 @@ function parseMarkDownFile(file, level, children) {
                 const list = parseImage(line, []);
                 createImage(list, children, file);
             } else if (/^\*+\s+/.test(line)) { // 列表
-                console.log("[createList]", line);
+                console.log('[createList]', line);
                 const li = line.replace(/(^\*+)[^*]*/, '$1');
                 const title = line.replace(/^\*+\s+/, '');
                 const head = [ '', '■', '&emsp;&emsp;◆', '&emsp;&emsp;&emsp;&emsp;●' ][li.length];
                 children.push({
                     text: `${head} ${title}`,
-                    fontSize: config.paragraphFontSize,
-                    fontName: { name : config.fontName },
+                    fontSize: config.fontSize,
+                    fontName: config.fontName,
                 });
             } else {
                 children.push({
                     file,
                     text: line,
-                    fontSize: config.paragraphFontSize,
+                    fontSize: config.fontSize,
                     fontName: config.fontName,
                 });
             }
@@ -153,7 +152,7 @@ function getHtml(children) {
         } else {
             return `<p>&emsp;&emsp;${o.text}</p>`;
         }
-    }).join('<br/>');
+    }).join('');
 }
 async function startWord(configPath, port, verbose, open) {
     config = require(path.resolve(CWD, configPath));
@@ -237,7 +236,7 @@ async function startWord(configPath, port, verbose, open) {
         gulp.start(['browser']);
     });
     server.on('error', function (err) {
-        console.log("open error on port:", port);
+        console.log('open error on port:', port);
         startServer(configPath, port+1);
     });
 }

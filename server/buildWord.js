@@ -86,7 +86,7 @@ function parseImage(line, list = []) {
     return list;
 }
 function createImage(doc, dir, list, children) {
-    console.log("[createImage]", list[0]);
+    console.log('[createImage]', list[0]);
     let w, h;
     const tw = 600; // 总宽度
     if (list.length === 1) {
@@ -98,7 +98,7 @@ function createImage(doc, dir, list, children) {
         h = w * 4 / 3;
     }
     const width = { size: 100, type: WidthType.PERCENTAGE }; // 表格总宽度
-    const border = { color: "white", size: 1 };
+    const border = { color: 'white', size: 1 };
     const borders = { top: border, bottom: border, left: border, right: border };
     const text = (str) => new Paragraph({ text: str, style: 'Caption' });
     const image = (img, w, h) => new Paragraph({ children: [Media.addImage(doc, fs.readFileSync(path.join(dir, img)), w, h)], alignment: AlignmentType.CENTER });
@@ -108,11 +108,10 @@ function createImage(doc, dir, list, children) {
     children.push(table);
 }
 function createExcel(excelTextList, children) {
-    console.log("[createExcel]", excelTextList[0]);
-    const fontSize = config.tableFontSize; // 字体大小
+    console.log('[createExcel]', excelTextList[0]);
     const width = { size: 100, type: WidthType.PERCENTAGE }; // 表格总宽度
     const list = (line) => line.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(o=>o.trim().replace(/<br>/g, '\n'));
-    const text = (str, alignment = AlignmentType.CENTER) => new Paragraph({ children: [new TextRun({ text: str, size: fontSize, font: { name: config.fontName } })], alignment });
+    const text = (str, alignment = AlignmentType.CENTER) => new Paragraph({ children: [new TextRun({ text: str, size: config.tableFontSize, font: { name: config.fontName } })], alignment });
     const row = (line, alignments = []) => list(line).map((o, i)=> new TableCell({ children: [text(o, alignments[i])] }));
     const header = new TableRow({ children: row(excelTextList[0]) });
     const alignments = list(excelTextList[1]).map(o=> /^:-+:$/.test(o) ? AlignmentType.CENTER : /-+:$/.test(o) ? AlignmentType.END : AlignmentType.START);
@@ -121,7 +120,7 @@ function createExcel(excelTextList, children) {
     children.push(table);
 }
 async function createCode(doc, codeTextList, children) {
-    console.log("[createCode]", codeTextList[0]);
+    console.log('[createCode]', codeTextList[0]);
     const buffer = await createCodeImage(codeTextList.join('\n'));
     const size = sizeOf(buffer);
     const image = Media.addImage(doc, buffer, 600, 600*size.height/size.width);
@@ -181,19 +180,19 @@ async function parseMarkDownFile(doc, file, level, children) {
                 const list = parseImage(line, []);
                 createImage(doc, path.dirname(file), list, children);
             } else if (/^\*+\s+/.test(line)) { // 列表
-                console.log("[createList]", line);
+                console.log('[createList]', line);
                 const li = line.replace(/(^\*+)[^*]*/, '$1');
                 const title = line.replace(/^\*+\s+/, '');
                 const head = [ '', '■', '\t◆', '\t\t ●' ][li.length];
                 children.push(new Paragraph({ children: [new TextRun({
                     text: `${head} ${title}`,
-                    size: config.paragraphFontSize,
+                    size: config.fontSize,
                     font: { name : config.fontName },
                 })], indent: { left: 900, hanging: 360 } }));
             } else {
                 children.push(new Paragraph({ children: [new TextRun({
                     text: line,
-                    size: config.paragraphFontSize,
+                    size: config.fontSize,
                     font: { name : config.fontName },
                 })], indent: { left: 900, hanging: 360 } }));
             }
@@ -208,12 +207,15 @@ async function parseMarkDownFile(doc, file, level, children) {
 }
 async function buildMarkdown(configPath) {
     config = require(path.resolve(CWD, configPath));
+    config.backgroundColor = config.backgroundColor || 'FFFFFF';
+    config.fontName = config.fontName || 'Songti SC Regular';
+    config.tableFontSize = config.tableFontSize || config.fontSize;
 
-    const styles = config.stylesPath && fs.readFileSync(path.resolve(CWD, config.stylesPath), "utf-8");
-    const numbering = config.numberingPath && fs.readFileSync(path.resolve(CWD, config.numberingPath), "utf-8");
+    const styles = config.stylesPath && fs.readFileSync(path.resolve(CWD, config.stylesPath), 'utf-8');
+    const numbering = config.numberingPath && fs.readFileSync(path.resolve(CWD, config.numberingPath), 'utf-8');
     const doc = new Document({
-        title: config.title || "点击这里修改标题",
-        background: { color: config.backgroundColor || "FFFFFF" },
+        title: config.title || '点击这里修改标题',
+        background: { color: config.backgroundColor },
         externalStyles: styles,
         externalNumbering: numbering,
     });
@@ -221,7 +223,7 @@ async function buildMarkdown(configPath) {
     await crateWordLayer(doc, config.srcPath, children);
     doc.addSection({ children });
     Packer.toBuffer(doc).then((buffer) => {
-        fs.writeFileSync(config.distPath || "dist.docx", buffer);
+        fs.writeFileSync(config.distPath || 'dist.docx', buffer);
     });
     browser && await browser.close();
 }
