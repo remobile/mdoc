@@ -1,10 +1,67 @@
 const fs = require('fs-extra');
 const path = require('path');
+const Excel = require('exceljs');
 const sizeOf = require('image-size');
 const _ = require('lodash');
 const CWD = process.cwd();
 let config;
 
+async function parseExcelData(excelFile, children, file) {
+    const getValues = (ws, rowNo) => {
+        const values = ws.getRow(rowNo).values.slice(1);
+        return _.map(values, (o, index) => {
+            if (o && o.richText) {
+                return _.map(o.richText, m => m.text).join('');
+            }
+            if (o && o.formula) {
+                return o.result;
+            }
+            return o;
+        }).map(o => o && o.trim ? o.trim() : o);
+    };
+    const getAlignments = (ws, colCount, rowNo) => {
+        const row =  ws.getRow(rowNo);
+        const alignments = [];
+        for (let i=1; i<=colCount; i++) {
+            const style = row.getCell(i).style;
+            if (!style.alignment && !style.font) {
+                alignments.push('right');
+            } else if (!style.alignment) {
+                alignments.push('left');
+            } else {
+                alignments.push(style.alignment.horizontal||'left');
+            }
+        }
+        return alignments;
+    };
+    const getWidths = (ws, colCount) => {
+        const tw = 1000; // 总宽度
+        let widths = [];
+        for (let i=0; i<colCount; i++) {
+            widths.push(ws.columns[i].width||10);
+        }
+        const totalWidth = _.sum(widths);
+        widths = widths.map(o=>Math.round(o/totalWidth*tw)-4);
+        return widths;
+    }
+    const dir = path.dirname(file);
+    const wb = new Excel.Workbook();
+    await wb.xlsx.readFile(path.join(dir, excelFile));
+    // const ws = workbook.getWorksheet('My Sheet');
+    const ws = wb.worksheets[0];
+    const rowCount = ws.actualRowCount;
+    const colCount = ws.columnCount;
+    const alignments = getAlignments(ws, colCount, 2);
+    const widths = getWidths(ws, colCount);
+
+    const text = (str, width, alignment = 'center') => ({ text: str, fontSize: config.tableFontSize, fontName: config.fontName, alignment, width });
+    const header = getValues(ws, 1).map((o, i)=>text(o, widths[i]));
+    const rows = [];
+    for (var i = 2; i <= rowCount; i++) {
+        rows.push(getValues(ws, i).map((o, i)=> text(o, widths[i], alignments[i])));
+    }
+    children.push({ table: { header, rows }, file  });
+}
 function parseImage(line, list = []) {
     const match = line.match(/\s*!\[([^\]]*)\]\(([^)]*)\)\s*/);
     if (match) {
@@ -43,7 +100,7 @@ function createExcel(excelTextList, children, file) {
     const alignments = list(excelTextList[1]).map(o=> /^:\s*\d+:\s*$/.test(o) ? 'center' : /\d+\s*:$/.test(o) ? 'right' : 'left');
     let widths = list(excelTextList[1]).map(o=>+(o.replace(/[:\s]*/g, ''))||1);
     const totalWidth = _.sum(widths);
-    widths = widths.map(o=>Math.round(o/totalWidth*1000)-4);
+    widths = widths.map(o=>Math.round(o/totalWidth*tw)-4);
     const header = row(excelTextList[0], widths);
     const rows = excelTextList.slice(2).map(line=>row(line, widths, alignments));
     children.push({ table: { header, rows }, file  });
@@ -52,20 +109,20 @@ function createCode(codeTextList, children, file) {
     console.log('[createCode]', codeTextList[0]);
     children.push({ code: codeTextList.join('\n'), file });
 }
-function crateWordLayer(dir, children, level = -1) {
+async function crateWordLayer(dir, children, level = -1) {
     const files = fs.readdirSync(dir);
     for (const index in files) {
         const file = files[index];
         const fullname = path.join(dir, file);
         const info = fs.statSync(fullname);
         if(info.isDirectory()) {
-            crateWordLayer(fullname, children, level + 1);
+            await crateWordLayer(fullname, children, level + 1);
         } else if (/.*\.md/.test(file)) {
-            parseMarkDownFile(fullname, level, children);
+            await parseMarkDownFile(fullname, level, children);
         }
     }
 }
-function parseMarkDownFile(file, level, children) {
+async function parseMarkDownFile(file, level, children) {
     const text = fs.readFileSync(file, 'utf8');
     const list = text.split(/\n/).filter(Boolean);
     let isExcel = false, isCode = false;
@@ -107,6 +164,8 @@ function parseMarkDownFile(file, level, children) {
             } else if (/^\s*!\[([^\]]*)\]\(([^)]*)\)/.test(line)) { // 图片
                 const list = parseImage(line, []);
                 createImage(list, children, file);
+            } else if (/^\s*!<[^>]*>/.test(line)) { // excel
+                await parseExcelData(line.replace(/^\s*!<([^>]*)>.*/, '$1'), children, file);
             } else if (/^\*+\s+/.test(line)) { // 列表
                 console.log('[createList]', line);
                 const li = line.replace(/(^\*+)[^*]*/, '$1');
@@ -194,10 +253,10 @@ function getPageHtml(children) {
         </html>
     `;
 }
-function startWord(configPath, port, verbose, open) {
+async function startWord(configPath, port, verbose, open) {
     config = require(path.resolve(CWD, configPath));
     let children = [];
-    crateWordLayer(config.srcPath, children);
+    await crateWordLayer(config.srcPath, children);
     const express = require('express');
     const morgan = require('morgan');
     const app = express();
@@ -220,25 +279,25 @@ function startWord(configPath, port, verbose, open) {
                 proxy: url,
                 files: [{
                     match: [path.join(CWD, config.srcPath)+'/**/*.md'],
-                    fn: function (event, file) {
+                    fn: async function (event, file) {
                         if (event === 'change') {
                             const currentChild = _.find(children, o=>o.file===file && o.headingNo);
                             if (currentChild) {
                                 const level = currentChild.level;
                                 const list = [];
-                                parseMarkDownFile(file, level, list);
+                                await parseMarkDownFile(file, level, list);
                                 const start = _.findIndex(children, o=>o.file===file);
                                 const end = _.findLastIndex(children, o=>o.file===file);
                                 children.splice(start, end-start+1, ...list);
                                 browserSync.reload();
                             } else {
                                 children = [];
-                                crateWordLayer(config.srcPath, children);
+                                await crateWordLayer(config.srcPath, children);
                                 browserSync.reload();
                             }
                         } else {
                             children = [];
-                            crateWordLayer(config.srcPath, children);
+                            await crateWordLayer(config.srcPath, children);
                             browserSync.reload();
                         }
                     }

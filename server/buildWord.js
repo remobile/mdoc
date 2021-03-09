@@ -1,5 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
+const Excel = require('exceljs');
 const puppeteer = require('puppeteer-cn');
 const sizeOf = require('image-size');
 const _ = require('lodash');
@@ -71,7 +72,70 @@ async function createCodeImage(code) {
     const image = await element.screenshot();
     return image;
 }
+async function parseExcelData(excelFile, children, file) {
+    console.log('[parseExcelData]', excelFile);
+    const getValues = (ws, rowNo) => {
+        const values = ws.getRow(rowNo).values.slice(1);
+        return _.map(values, (o, index) => {
+            if (o && o.richText) {
+                return _.map(o.richText, m => m.text).join('');
+            }
+            if (o && o.formula) {
+                return o.result;
+            }
+            return o;
+        }).map(o => o && o.trim ? o.trim() : o);
+    };
+    const getAlignments = (ws, colCount, rowNo) => {
+        const row =  ws.getRow(rowNo);
+        const alignments = [];
+        for (let i=1; i<=colCount; i++) {
+            const style = row.getCell(i).style;
+            if (!style.alignment && !style.font) {
+                alignments.push('right');
+            } else if (!style.alignment) {
+                alignments.push('left');
+            } else {
+                alignments.push(style.alignment.horizontal||'left');
+            }
+        }
+        const MAP = {
+            'left': AlignmentType.START,
+            'center': AlignmentType.CENTER,
+            'right': AlignmentType.END,
+        };
+        return alignments.map(o=>MAP[o]);
+    };
+    const getWidths = (ws, colCount) => {
+        let widths = [];
+        for (let i=0; i<colCount; i++) {
+            widths.push(ws.columns[i].width||10);
+        }
+        const totalWidth = _.sum(widths);
+        widths = widths.map(o=>o/totalWidth*100);
+        return widths;
+    }
 
+    const dir = path.dirname(file);
+    const wb = new Excel.Workbook();
+    await wb.xlsx.readFile(path.join(dir, excelFile));
+    // const ws = workbook.getWorksheet('My Sheet');
+    const ws = wb.worksheets[0];
+    const rowCount = ws.actualRowCount;
+    const colCount = ws.columnCount;
+    const alignments = getAlignments(ws, colCount, 2);
+    const widths = getWidths(ws, colCount);
+
+    const text = (str, alignment = AlignmentType.CENTER) => new Paragraph({ children: [new TextRun({ text: str, size: config.tableFontSize, font: { name: config.fontName } })], alignment });
+    const row = (values, widths = [], alignments = []) => values.map((o, i)=> new TableCell({ children: [text(o, alignments[i])], width: { size: widths[i], type: WidthType.PERCENTAGE } }));
+    const header = new TableRow({ children: row(getValues(ws, 1), widths) });
+    const rows = [];
+    for (var i = 2; i <= rowCount; i++) {
+        rows.push(new TableRow({ children: row(getValues(ws, i), widths, alignments) }));
+    }
+    const table = new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: [ header, ...rows ] });
+    children.push(table);
+}
 function parseImage(line, list = []) {
     const match = line.match(/\s*!\[([^\]]*)\]\(([^)]*)\)\s*/);
     if (match) {
@@ -109,14 +173,16 @@ function createImage(doc, dir, list, children) {
 }
 function createExcel(excelTextList, children) {
     console.log('[createExcel]', excelTextList[0]);
-    const width = { size: 100, type: WidthType.PERCENTAGE }; // 表格总宽度
     const list = (line) => line.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(o=>o.trim().replace(/<br>/g, '\n'));
     const text = (str, alignment = AlignmentType.CENTER) => new Paragraph({ children: [new TextRun({ text: str, size: config.tableFontSize, font: { name: config.fontName } })], alignment });
-    const row = (line, alignments = []) => list(line).map((o, i)=> new TableCell({ children: [text(o, alignments[i])] }));
-    const header = new TableRow({ children: row(excelTextList[0]) });
-    const alignments = list(excelTextList[1]).map(o=> /^:-+:$/.test(o) ? AlignmentType.CENTER : /-+:$/.test(o) ? AlignmentType.END : AlignmentType.START);
-    const rows = excelTextList.slice(2).map(line=>new TableRow({ children: row(line, alignments) }));
-    const table = new Table({ width, rows: [ header, ...rows ] });
+    const row = (line, widths = [], alignments = []) => list(line).map((o, i)=> new TableCell({ children: [text(o, alignments[i])], width: { size: widths[i], type: WidthType.PERCENTAGE } }));
+    const alignments = list(excelTextList[1]).map(o=> /^:\s*\d+:\s*$/.test(o) ? AlignmentType.CENTER : /\d+\s*:$/.test(o) ? AlignmentType.END : AlignmentType.START);
+    let widths = list(excelTextList[1]).map(o=>+(o.replace(/[:\s]*/g, ''))||1);
+    const totalWidth = _.sum(widths);
+    widths = widths.map(o=>o/totalWidth*100);
+    const header = new TableRow({ children: row(excelTextList[0], widths) });
+    const rows = excelTextList.slice(2).map(line=>new TableRow({ children: row(line, widths, alignments) }));
+    const table = new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: [ header, ...rows ] });
     children.push(table);
 }
 async function createCode(doc, codeTextList, children) {
@@ -179,6 +245,8 @@ async function parseMarkDownFile(doc, file, level, children) {
             } else if (/^\s*!\[([^\]]*)\]\(([^)]*)\)/.test(line)) { // 图片
                 const list = parseImage(line, []);
                 createImage(doc, path.dirname(file), list, children);
+            } else if (/^\s*!<[^>]*>/.test(line)) { // excel
+                await parseExcelData(line.replace(/^\s*!<([^>]*)>.*/, '$1'), children, file);
             } else if (/^\*+\s+/.test(line)) { // 列表
                 console.log('[createList]', line);
                 const li = line.replace(/(^\*+)[^*]*/, '$1');
