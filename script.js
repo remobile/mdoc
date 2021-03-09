@@ -13,14 +13,14 @@ const newline_file = CWD + NODE_MODULES_PATH + 'lib/rules_inline/newline.js';
 program
 .version('0.0.1')
 .option('-s, --start', 'start server for project')
-.option('-b, --build', 'build release for project or single file')
+.option('-b, --build []', 'build release for project or single file')
 .option('-d, --hasDomain', 'if has domain')
 .option('-f, --file <config file>', 'start server single file with config')
 .option('-t, --ppt <config file>', 'start server single file with ppt')
 .option('-e, --edit [ppt index file]', 'edit ppt file')
 .option('-m, --mobile', 'is mppt file')
 .option('-w, --word <config file>', 'crate word with config')
-.option('-a, --artical <md file>', 'crate artical with md file')
+.option('-a, --artical <md file>', 'crate artical with md file, -b xx.html to build release')
 .option('-p, --port [4000]', 'port of server', 4000)
 .option('-o, --open', 'if open browser')
 .option('-v, --verbose', 'verbose mode')
@@ -45,7 +45,7 @@ if (!fs.existsSync(CWD + 'config.js')) {
 const { port, start, build, hasDomain, file, ppt, word, edit, mobile, artical, verbose, open } = program;
 if (artical) {
     const startArtical = require('./server/startArtical.js');
-    startArtical(artical, port*1, verbose, open);
+    startArtical(artical, port*1, verbose, open, build);
 } else if (word) {
     if (build) {
         const buildWord = require('./server/buildWord.js');

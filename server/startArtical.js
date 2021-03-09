@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const sizeOf = require('image-size');
+const jimp = require('jimp');
 const _ = require('lodash');
 const CWD = process.cwd();
 let hasCode;
@@ -18,7 +19,7 @@ function parseImage(line, list = []) {
     }
     return list;
 }
-function createImage(list, children, file) {
+async function createImage(list, children, file, build) {
     console.log('[createImage]', list[0]);
     let w, h;
     const tw = 1000; // 总宽度
@@ -31,7 +32,22 @@ function createImage(list, children, file) {
         w = tw / list.length;
         h = w * 4 / 3;
     }
-    const images = list.map(o=>({ img: path.join(dir, o.image), text: o.text, w, h }));
+    const images = [];
+    for (const o of list) {
+        let img;
+        if (!build) {
+            img = path.join(dir, o.image);
+        } else {
+            const image = await jimp.read(path.join(dir, o.image));
+            if (image.getWidth() > w) {
+                await image.resize(w, jimp.AUTO);
+            } else if (image.getHeight() > h) {
+                await image.resize(jimp.AUTO, h);
+            }
+            img = await image.getBase64Async(jimp.MIME_JPEG);
+        }
+        images.push({ img, text: o.text, w, h });
+    }
     children.push({ images, file, w: tw, h });
 }
 function createExcel(excelTextList, children, file) {
@@ -53,7 +69,7 @@ function createCode(codeTextList, children, file) {
     children.push({ code: codeTextList.join('\n'), file });
 }
 
-function parseMarkDownFile(file, children) {
+async function parseMarkDownFile(file, children, build) {
     const text = fs.readFileSync(file, 'utf8');
     const list = text.split(/\n/).filter(Boolean);
     let isExcel = false, isCode = false;
@@ -99,7 +115,7 @@ function parseMarkDownFile(file, children) {
                 });
             } else if (/^\s*!\[([^\]]*)\]\(([^)]*)\)/.test(line)) { // 图片
                 const list = parseImage(line, []);
-                createImage(list, children, file);
+                await createImage(list, children, file, build);
             } else if (/^\*+\s+/.test(line)) { // 列表
                 console.log('[createList]', line);
                 const li = line.replace(/(^\*+)[^*]*/, '$1');
@@ -123,7 +139,7 @@ function parseMarkDownFile(file, children) {
         excelTextList = [];
     }
 }
-function getHtml(children) {
+function getHtml(children, build) {
     const heading = [];
     let imgNo = 1;
     return children.map(o=>{
@@ -146,9 +162,60 @@ function getHtml(children) {
         }
     }).join('');
 }
-async function startWord(file, port, verbose, open) {
+function getPageHtml(children) {
+    return `
+        <html>
+        <head>
+            <meta charSet="utf-8" />
+            <meta name="viewport" content="width=device-width" />
+            ${!hasCode?'':`
+            <script src="res/highlight.min.js">
+            </script><link rel="stylesheet" href="res/atom-one-dark.min.css" />
+            `}
+            <style>
+            body { background: black; display: flex; justify-content: center; padding: 0; margin: 0; }
+            .title { font-size: 32px; text-align: center; padding-top: 20px; padding-bottom: 10px; }
+            h1, h2, h3, h4, h5, h6 { color: inherit; font-weight: 600; line-height: 1.25; margin-bottom: 16px; margin-top: 1.5em; }
+            h1 { font-size: 32px; } h2 { font-size: 24px; } h3 { font-size: 20px; } h4 { font-size: 16px; } h5 { font-size: 14px; } h6 { font-size: 13.6px; }
+            pre, code { white-space: pre-wrap; }
+            ${!hasCode?'':`
+            .hljs ul { list-style: decimal; padding: 0px 70px !important; font-size: 28px; }
+            .hljs ul li { list-style: decimal; border-left: 1px solid #ddd !important; padding: 3px!important; margin: 0 !important; word-break: break-all; word-wrap: break-word; }
+            `}
+            .container { min-width: 1000px; max-width: 1000px; min-height: 100%; background: #FFFFFF; padding-left: 20px; padding-right: 20px; }
+            .imageRow { display: flex; flex-direction: row; }
+            .imageItem { display: flex; flex-direction: column; align-items: center; }
+            table { border-collapse: collapse; border-spacing: 0; display: block; margin-bottom: 16px; margin-top: 0; overflow: auto; width: 100%; }
+            table tr { background-color: transparent; border-top: 1px solid #dfe2e5; }
+            table th, table td { border: 1px solid #dfe2e5; }
+            table th { background-color: #f6f8fa; color: inherit; font-weight: 600; }
+            table td { color: inherit; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+            ${getHtml(children)}
+            </div>
+            ${!hasCode?'':
+            `
+            <script >
+            hljs.initHighlightingOnLoad();
+            document.querySelectorAll('pre code').forEach(o=>{
+                const list = o.innerHTML.split(/\\n/);
+                o.innerHTML = '<ul><li>'+list.slice(1, list.length-1).join('\\n</li><li>')+'</li></ul>';
+            });
+            </script>
+            `}
+        </body>
+        </html>
+    `;
+}
+async function startArtical(file, port, verbose, open, build) {
     let children = [];
-    parseMarkDownFile(file, children);
+    await parseMarkDownFile(file, children, build);
+    if (build) {
+        return fs.writeFileSync(build===true ? '__dist.html' : build, getPageHtml(children), 'utf-8');
+    }
     const express = require('express');
     const morgan = require('morgan');
     const app = express();
@@ -157,52 +224,7 @@ async function startWord(file, port, verbose, open) {
     app.use(express.static(__dirname));
 
     app.get('/', (req, res) => {
-        res.send(`
-            <html>
-            <head>
-                <meta charSet="utf-8" />
-                <meta name="viewport" content="width=device-width" />
-                ${!hasCode?'':`
-                <script src="res/highlight.min.js">
-                </script><link rel="stylesheet" href="res/atom-one-dark.min.css" />
-                `}
-                <style>
-                body { background: black; display: flex; justify-content: center; padding: 0; margin: 0; }
-                .title { font-size: 32px; text-align: center; padding-top: 20px; padding-bottom: 10px; }
-                h1, h2, h3, h4, h5, h6 { color: inherit; font-weight: 600; line-height: 1.25; margin-bottom: 16px; margin-top: 1.5em; }
-                h1 { font-size: 32px; } h2 { font-size: 24px; } h3 { font-size: 20px; } h4 { font-size: 16px; } h5 { font-size: 14px; } h6 { font-size: 13.6px; }
-                pre, code { white-space: pre-wrap; }
-                ${!hasCode?'':`
-                .hljs ul { list-style: decimal; padding: 0px 70px !important; font-size: 28px; }
-                .hljs ul li { list-style: decimal; border-left: 1px solid #ddd !important; padding: 3px!important; margin: 0 !important; word-break: break-all; word-wrap: break-word; }
-                `}
-                .container { min-width: 1000px; max-width: 1000px; min-height: 100%; background: #FFFFFF; padding-left: 20px; padding-right: 20px; }
-                .imageRow { display: flex; flex-direction: row; }
-                .imageItem { display: flex; flex-direction: column; align-items: center; }
-                table { border-collapse: collapse; border-spacing: 0; display: block; margin-bottom: 16px; margin-top: 0; overflow: auto; width: 100%; }
-                table tr { background-color: transparent; border-top: 1px solid #dfe2e5; }
-                table th, table td { border: 1px solid #dfe2e5; }
-                table th { background-color: #f6f8fa; color: inherit; font-weight: 600; }
-                table td { color: inherit; }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                ${getHtml(children)}
-                </div>
-                ${!hasCode?'':
-                `
-                <script >
-                hljs.initHighlightingOnLoad();
-                document.querySelectorAll('pre code').forEach(o=>{
-                    const list = o.innerHTML.split(/\\n/);
-                    o.innerHTML = '<ul><li>'+list.slice(1, list.length-1).join('\\n</li><li>')+'</li></ul>';
-                });
-                </script>
-                `}
-            </body>
-            </html>
-            `);
+        res.send(getPageHtml(children));
     });
 
     const server = app.listen(port);
@@ -216,10 +238,10 @@ async function startWord(file, port, verbose, open) {
                 proxy: url,
                 files: [{
                     match: [path.join(CWD, file)],
-                    fn: function (event, file) {
+                    fn: async function (event, file) {
                         if (event === 'change') {
                             children = [];
-                            parseMarkDownFile(file, children);
+                            await parseMarkDownFile(file, children);
                             browserSync.reload();
                         }
                     }
@@ -236,4 +258,4 @@ async function startWord(file, port, verbose, open) {
     });
 }
 
-module.exports = startWord;
+module.exports = startArtical;

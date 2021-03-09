@@ -154,7 +154,47 @@ function getHtml(children) {
         }
     }).join('');
 }
-async function startWord(configPath, port, verbose, open) {
+function getPageHtml(children) {
+    return `
+        <html>
+        <head>
+            <meta charSet="utf-8" />
+            <meta name="viewport" content="width=device-width" />
+            <script src="res/highlight.min.js"></script>
+            <link rel="stylesheet" href="res/atom-one-dark.min.css" />
+            <style>
+            body { background: black; display: flex; justify-content: center; padding: 0; margin: 0; }
+            h1, h2, h3, h4, h5, h6 { color: inherit; font-weight: 600; line-height: 1.25; margin-bottom: 16px; margin-top: 1.5em; }
+            h1 { font-size: 32px; } h2 { font-size: 24px; } h3 { font-size: 20px; } h4 { font-size: 16px; } h5 { font-size: 14px; } h6 { font-size: 13.6px; }
+            pre, code { white-space: pre-wrap; }
+            .hljs ul { list-style: decimal; padding: 0px 70px !important; font-size: 28px; }
+            .hljs ul li { list-style: decimal; border-left: 1px solid #ddd !important; padding: 3px!important; margin: 0 !important; word-break: break-all; word-wrap: break-word; }
+            .container { min-width: 1000px; max-width: 1000px; min-height: 100%; background: #FFFFFF; padding-left: 20px; padding-right: 20px; }
+            .imageRow { display: flex; flex-direction: row; }
+            .imageItem { display: flex; flex-direction: column; align-items: center; }
+            table { border-collapse: collapse; border-spacing: 0; display: block; margin-bottom: 16px; margin-top: 0; overflow: auto; width: 100%; }
+            table tr { background-color: transparent; border-top: 1px solid #dfe2e5; }
+            table th, table td { border: 1px solid #dfe2e5; }
+            table th { background-color: #f6f8fa; color: inherit; font-weight: 600; }
+            table td { color: inherit; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+            ${getHtml(children)}
+            </div>
+            <script >
+            hljs.initHighlightingOnLoad();
+            document.querySelectorAll('pre code').forEach(o=>{
+                const list = o.innerHTML.split(/\\n/);
+                o.innerHTML = '<ul><li>'+list.slice(1, list.length-1).join('\\n</li><li>')+'</li></ul>';
+            });
+            </script>
+        </body>
+        </html>
+    `;
+}
+function startWord(configPath, port, verbose, open) {
     config = require(path.resolve(CWD, configPath));
     let children = [];
     crateWordLayer(config.srcPath, children);
@@ -166,44 +206,7 @@ async function startWord(configPath, port, verbose, open) {
     app.use(express.static(__dirname));
 
     app.get('/', (req, res) => {
-        res.send(`
-            <html>
-            <head>
-                <meta charSet="utf-8" />
-                <meta name="viewport" content="width=device-width" />
-                <script src="res/highlight.min.js"></script>
-                <link rel="stylesheet" href="res/atom-one-dark.min.css" />
-                <style>
-                body { background: black; display: flex; justify-content: center; padding: 0; margin: 0; }
-                h1, h2, h3, h4, h5, h6 { color: inherit; font-weight: 600; line-height: 1.25; margin-bottom: 16px; margin-top: 1.5em; }
-                h1 { font-size: 32px; } h2 { font-size: 24px; } h3 { font-size: 20px; } h4 { font-size: 16px; } h5 { font-size: 14px; } h6 { font-size: 13.6px; }
-                pre, code { white-space: pre-wrap; }
-                .hljs ul { list-style: decimal; padding: 0px 70px !important; font-size: 28px; }
-                .hljs ul li { list-style: decimal; border-left: 1px solid #ddd !important; padding: 3px!important; margin: 0 !important; word-break: break-all; word-wrap: break-word; }
-                .container { min-width: 1000px; max-width: 1000px; min-height: 100%; background: #FFFFFF; padding-left: 20px; padding-right: 20px; }
-                .imageRow { display: flex; flex-direction: row; }
-                .imageItem { display: flex; flex-direction: column; align-items: center; }
-                table { border-collapse: collapse; border-spacing: 0; display: block; margin-bottom: 16px; margin-top: 0; overflow: auto; width: 100%; }
-                table tr { background-color: transparent; border-top: 1px solid #dfe2e5; }
-                table th, table td { border: 1px solid #dfe2e5; }
-                table th { background-color: #f6f8fa; color: inherit; font-weight: 600; }
-                table td { color: inherit; }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                ${getHtml(children)}
-                </div>
-                <script >
-                hljs.initHighlightingOnLoad();
-                document.querySelectorAll('pre code').forEach(o=>{
-                    const list = o.innerHTML.split(/\\n/);
-                    o.innerHTML = '<ul><li>'+list.slice(1, list.length-1).join('\\n</li><li>')+'</li></ul>';
-                });
-                </script>
-            </body>
-            </html>
-            `);
+        res.send(getPageHtml(children));
     });
 
     const server = app.listen(port);
@@ -219,12 +222,23 @@ async function startWord(configPath, port, verbose, open) {
                     match: [path.join(CWD, config.srcPath)+'/**/*.md'],
                     fn: function (event, file) {
                         if (event === 'change') {
-                            const level = _.find(children, o=>o.file===file && o.headingNo).level;
-                            const list = [];
-                            parseMarkDownFile(file, level, list);
-                            const start = _.findIndex(children, o=>o.file===file);
-                            const end = _.findLastIndex(children, o=>o.file===file);
-                            children.splice(start, end-start+1, ...list);
+                            const currentChild = _.find(children, o=>o.file===file && o.headingNo);
+                            if (currentChild) {
+                                const level = currentChild.level;
+                                const list = [];
+                                parseMarkDownFile(file, level, list);
+                                const start = _.findIndex(children, o=>o.file===file);
+                                const end = _.findLastIndex(children, o=>o.file===file);
+                                children.splice(start, end-start+1, ...list);
+                                browserSync.reload();
+                            } else {
+                                children = [];
+                                crateWordLayer(config.srcPath, children);
+                                browserSync.reload();
+                            }
+                        } else {
+                            children = [];
+                            crateWordLayer(config.srcPath, children);
                             browserSync.reload();
                         }
                     }

@@ -23,6 +23,7 @@
     "highlight.js": "9.12.0",
     "image-size": "0.9.3",
     "inliner": "1.13.1",
+    "jimp": "0.16.1",
     "katex": "0.9.0",
     "markdown-it": "8.4.1",
     "markdown-it-attrs": "1.2.1",
