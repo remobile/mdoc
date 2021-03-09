@@ -3,7 +3,7 @@ const path = require('path');
 const sizeOf = require('image-size');
 const _ = require('lodash');
 const CWD = process.cwd();
-let config, browser;
+let config;
 
 function parseImage(line, list = []) {
     const match = line.match(/\s*!\[([^\]]*)\]\(([^)]*)\)\s*/);

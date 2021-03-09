@@ -3,7 +3,7 @@ const path = require('path');
 const sizeOf = require('image-size');
 const _ = require('lodash');
 const CWD = process.cwd();
-let config, browser;
+let hasCode;
 
 function parseImage(line, list = []) {
     const match = line.match(/\s*!\[([^\]]*)\]\(([^)]*)\)\s*/);
@@ -38,7 +38,7 @@ function createExcel(excelTextList, children, file) {
     console.log('[createExcel]', excelTextList[0]);
     const tw = 1000; // 总宽度
     const list = (line) => line.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(o=>o.trim().replace(/<br>/g, '\n'));
-    const text = (str, width, alignment = 'center') => ({ text: str, fontSize: config.tableFontSize, fontName: config.fontName, alignment, width });
+    const text = (str, width, alignment = 'center') => ({ text: str, alignment, width });
     const row = (line, widths = [], alignments = []) => list(line).map((o, i)=> text(o, widths[i], alignments[i]));
     const alignments = list(excelTextList[1]).map(o=> /^:\s*\d+:\s*$/.test(o) ? 'center' : /\d+\s*:$/.test(o) ? 'right' : 'left');
     let widths = list(excelTextList[1]).map(o=>+(o.replace(/[:\s]*/g, ''))||1);
@@ -59,6 +59,8 @@ function parseMarkDownFile(file, children) {
     let isExcel = false, isCode = false;
     let excelTextList = [];
     let codeTextList = [];
+    let firstHeadLevel;
+    hasCode = false;
     for (const line of list) {
         if (/^\s*\|.*\|\s*$/.test(line)) { // 表格
             isExcel = true;
@@ -66,6 +68,7 @@ function parseMarkDownFile(file, children) {
         } else if (/^\s*```.*$/.test(line)) { // 代码
             if (!isCode) {
                 isCode = true;
+                hasCode = true;
             } else {
                 isCode = false;
                 // 生成代码片段
@@ -83,12 +86,14 @@ function parseMarkDownFile(file, children) {
                 codeTextList.push(line);
             } else if (/^#+\s+/.test(line)) { // 标题
                 const li = line.replace(/(^#+)[^#]*/, '$1');
-                const no = li.length + Math.max(level, 0);
+                if (!firstHeadLevel) {
+                    firstHeadLevel = li.length;
+                }
+                const no = li.length - firstHeadLevel;
                 const title = line.replace(/^#+\s+/, '');
                 console.log(`HEADING_${no}:${_.repeat('-', no*3)}${title}`);
                 children.push({
                     file,
-                    level,
                     text: title,
                     headingNo: no,
                 });
@@ -102,15 +107,11 @@ function parseMarkDownFile(file, children) {
                 const head = [ '', '■', '&emsp;&emsp;◆', '&emsp;&emsp;&emsp;&emsp;●' ][li.length];
                 children.push({
                     text: `${head} ${title}`,
-                    fontSize: config.fontSize,
-                    fontName: config.fontName,
                 });
             } else {
                 children.push({
                     file,
                     text: line,
-                    fontSize: config.fontSize,
-                    fontName: config.fontName,
                 });
             }
         }
@@ -126,11 +127,14 @@ function getHtml(children) {
     const heading = [];
     let imgNo = 1;
     return children.map(o=>{
-        if (o.headingNo) {
+        if (o.headingNo !== undefined) {
+            if (!o.headingNo) {
+                return `<div class="title" >${o.text}</div>`;
+            }
             const no = o.headingNo - 1;
             heading[no] = (heading[no] || 0) + 1;
             heading.length = no + 1;
-            return `<h${o.headingNo}>${heading.join('.')} ${o.text}</h${o.headingNo}>`;
+            return `<h${o.headingNo}>${heading.filter(Boolean).join('.')} ${o.text}</h${o.headingNo}>`;
         } else if (o.images) {
             return `<div class="imageRow" style="width:${o.w}px;height:${o.h}px;">${o.images.map(m=>`<div class="imageItem"><img src="${m.img}" style="width:${m.w}px;height:${m.h}px;"/><div class="imageItem">图${imgNo++}：${m.text}</div></div>`).join('')}</div><br/>`;
         } else if (o.table) {
@@ -142,14 +146,14 @@ function getHtml(children) {
         }
     }).join('');
 }
-async function startWord(file, hasCode, port, verbose, open) {
+async function startWord(file, port, verbose, open) {
     let children = [];
     parseMarkDownFile(file, children);
     const express = require('express');
     const morgan = require('morgan');
     const app = express();
     verbose && app.use(morgan('short'));
-    app.use(express.static(path.dirname(mdFile)));
+    app.use(express.static('.'));
     app.use(express.static(__dirname));
 
     app.get('/', (req, res) => {
@@ -164,6 +168,7 @@ async function startWord(file, hasCode, port, verbose, open) {
                 `}
                 <style>
                 body { background: black; display: flex; justify-content: center; padding: 0; margin: 0; }
+                .title { font-size: 32px; text-align: center; padding-top: 20px; padding-bottom: 10px; }
                 h1, h2, h3, h4, h5, h6 { color: inherit; font-weight: 600; line-height: 1.25; margin-bottom: 16px; margin-top: 1.5em; }
                 h1 { font-size: 32px; } h2 { font-size: 24px; } h3 { font-size: 20px; } h4 { font-size: 16px; } h5 { font-size: 14px; } h6 { font-size: 13.6px; }
                 pre, code { white-space: pre-wrap; }
@@ -210,15 +215,11 @@ async function startWord(file, hasCode, port, verbose, open) {
             browserSync.init({
                 proxy: url,
                 files: [{
-                    match: [path.join(CWD, config.srcPath)+'/**/*.md'],
+                    match: [path.join(CWD, file)],
                     fn: function (event, file) {
                         if (event === 'change') {
-                            const level = _.find(children, o=>o.file===file && o.headingNo).level;
-                            const list = [];
-                            parseMarkDownFile(file, level, list);
-                            const start = _.findIndex(children, o=>o.file===file);
-                            const end = _.findLastIndex(children, o=>o.file===file);
-                            children.splice(start, end-start+1, ...list);
+                            children = [];
+                            parseMarkDownFile(file, children);
                             browserSync.reload();
                         }
                     }

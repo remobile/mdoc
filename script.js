@@ -20,6 +20,7 @@ program
 .option('-e, --edit [ppt index file]', 'edit ppt file')
 .option('-m, --mobile', 'is mppt file')
 .option('-w, --word <config file>', 'crate word with config')
+.option('-a, --artical <md file>', 'crate artical with md file')
 .option('-p, --port [4000]', 'port of server', 4000)
 .option('-o, --open', 'if open browser')
 .option('-v, --verbose', 'verbose mode')
@@ -41,8 +42,11 @@ if (!fs.existsSync(CWD + 'config.js')) {
     process.exit(1);
 }
 
-const { port, start, build, hasDomain, file, ppt, word, edit, mobile, verbose, open } = program;
-if (word) {
+const { port, start, build, hasDomain, file, ppt, word, edit, mobile, artical, verbose, open } = program;
+if (artical) {
+    const startArtical = require('./server/startArtical.js');
+    startArtical(artical, port*1, verbose, open);
+} else if (word) {
     if (build) {
         const buildWord = require('./server/buildWord.js');
         buildWord(word);
