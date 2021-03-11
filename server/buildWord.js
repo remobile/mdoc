@@ -15,6 +15,7 @@ const {
     TableCell,
     TableRow,
     WidthType,
+    BorderStyle,
     Media,
 }  = require('./res/docx');
 const CWD = process.cwd();
@@ -133,7 +134,7 @@ async function parseExcelData(excelFile, children, file) {
     for (var i = 2; i <= rowCount; i++) {
         rows.push(new TableRow({ children: row(getValues(ws, i), widths, alignments) }));
     }
-    const table = new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: [ header, ...rows ] });
+    const table = new Table({ width: { type: WidthType.AUTO }, rows: [ header, ...rows ] });
     children.push(table);
 }
 function parseImage(line, list = []) {
@@ -162,7 +163,7 @@ function createImage(doc, dir, list, children) {
         h = w * 4 / 3;
     }
     const width = { size: 100, type: WidthType.PERCENTAGE }; // 表格总宽度
-    const border = { color: 'white', size: 1 };
+    const border = { style: BorderStyle.NONE };
     const borders = { top: border, bottom: border, left: border, right: border };
     const text = (str) => new Paragraph({ text: str, style: 'Caption' });
     const image = (img, w, h) => new Paragraph({ children: [Media.addImage(doc, fs.readFileSync(path.join(dir, img)), w, h)], alignment: AlignmentType.CENTER });
@@ -182,7 +183,7 @@ function createExcel(excelTextList, children) {
     widths = widths.map(o=>o/totalWidth*100);
     const header = new TableRow({ children: row(excelTextList[0], widths) });
     const rows = excelTextList.slice(2).map(line=>new TableRow({ children: row(line, widths, alignments) }));
-    const table = new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: [ header, ...rows ] });
+    const table = new Table({ width: { type: WidthType.AUTO }, rows: [ header, ...rows ] });
     children.push(table);
 }
 async function createCode(doc, codeTextList, children) {
@@ -278,6 +279,7 @@ async function buildMarkdown(configPath) {
     config.backgroundColor = config.backgroundColor || 'FFFFFF';
     config.fontName = config.fontName || 'Songti SC Regular';
     config.tableFontSize = config.tableFontSize || config.fontSize;
+    config.wps && (AlignmentType.END = 'right');
 
     const styles = config.stylesPath && fs.readFileSync(path.resolve(CWD, config.stylesPath), 'utf-8');
     const numbering = config.numberingPath && fs.readFileSync(path.resolve(CWD, config.numberingPath), 'utf-8');
