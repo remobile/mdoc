@@ -163,7 +163,7 @@ function createImage(doc, dir, list, children) {
         h = w * 4 / 3;
     }
     const width = { size: 100, type: WidthType.PERCENTAGE }; // 表格总宽度
-    const border = { style: BorderStyle.NONE };
+    const border = { color: 'white', style: BorderStyle.NONE };
     const borders = { top: border, bottom: border, left: border, right: border };
     const text = (str) => new Paragraph({ text: str, style: 'Caption' });
     const image = (img, w, h) => new Paragraph({ children: [Media.addImage(doc, fs.readFileSync(path.join(dir, img)), w, h)], alignment: AlignmentType.CENTER });
